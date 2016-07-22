@@ -1,7 +1,6 @@
 
 /*
- * Description: Arquivo contendo somente declaracoes internas da
- *              biblioteca (nada e visivel para o usuario).
+ * Description:
  *
  * Author: Rodrigo Freitas
  * Created at: Tue Dec  9 22:44:20 2014
@@ -26,24 +25,24 @@
  */
 
 #ifndef _LIBALEX_INTERNAL_H
-#define _LIBALEX_INTERNAL_H	1
+#define _LIBALEX_INTERNAL_H         1
 
-/* Tamanho maximo suportado numa string por um objeto 'edit' */
+/* Maximum string size supported by an 'edit' object */
 #define MAX_EDIT_SIZE               1024
 
-/* Valores default para janela da interface grafica */
+/* Default main window resolution and color */
 #define AL_DEFAULT_WIDTH            800
 #define AL_DEFAULT_HEIGHT           600
 #define AL_DEFAULT_COLOR_DEPTH      32
 
-/* Tipos de valores de objetos em arquivos GRC */
+/* Values supported inside a GRC file */
 enum grc_entry_type_value {
     GRC_NUMBER,
     GRC_STRING,
     GRC_BOOL
 };
 
-/* Objetos principais dos arquivos GRC */
+/* Main objects of GRC file */
 #define OBJ_INFO                    "info"
 #define OBJ_OBJECTS                 "objects"
 #define OBJ_KEYS                    "keys"
@@ -53,7 +52,7 @@ enum grc_entry_type_value {
 #define OBJ_MENU_OPTIONS            "menu_options"
 #define OBJ_OPTIONS                 "options"
 
-/* Objetos secundarios dos arquivos GRC */
+/* Secondary objects of GRC file */
 #define OBJ_WIDTH                   "width"
 #define OBJ_HEIGHT                  "height"
 #define OBJ_COLOR_DEPTH             "color_depth"
@@ -79,7 +78,7 @@ enum grc_entry_type_value {
 #define OBJ_FPS                     "fps"
 #define OBJ_DEVICES                 "devices"
 
-/* Nomes dos objetos suportados num DIALOG */
+/* DIALOG supported object names */
 #define DLG_OBJ_KEY                 "key"
 #define DLG_OBJ_BOX                 "box"
 #define DLG_OBJ_DIGITAL_CLOCK       "digital_clock"
@@ -100,18 +99,18 @@ enum grc_entry_type_value {
 #define DLG_OBJ_ICON                "icon"
 #define DLG_OBJ_TEXTBOX             "textbox"
 
-/* String identificando um separador de itens em um menu */
+/* Menu separator string */
 #define MENU_SEPARATOR              "separator"
 
-/* Layout de teclados */
+/* Keyboard layout */
 enum grc_keyboard_layout {
     GRC_KLAYOUT_LETTERS,
     GRC_KLAYOUT_NUMBERS
 };
 
 /*
- * Estrutura para identificar os possiveis objetos do tipo "string": valor,
- * em um arquivo GRC.
+ * Structure to identify possible objects of type "string": value
+ * in a GRC file.
  */
 struct grc_json_key {
     char                        name[128];
@@ -119,13 +118,13 @@ struct grc_json_key {
     enum grc_entry_type_value   type;
 };
 
-/* Estrutura para armazenar um objeto "key" do arquivo GRC */
+/* Structure to store an object "key" of a GRC file */
 struct grc_key_data {
     char    *key;
     char    *name;
 };
 
-/* Estrutura para armazenar um objeto "object" do arquivo GRC */
+/* Structure to store an object "object" of a GRC file */
 struct grc_obj_properties {
     enum al_grc_object  type;
     char                *name;
@@ -148,30 +147,31 @@ struct grc_obj_properties {
 };
 
 /*
- * Estrutura para mapear os objetos capazes de serem referenciados pelo
- * usuario dentro da estrutura DIALOG interna.
+ * Structure to map objects able to be referenced by the user inside a
+ * DIALOG structure.
  */
 struct dlg_obj_ref {
+    struct dlg_obj_ref  *prev;
     struct dlg_obj_ref  *next;
     char                *name;
     int                 dlg_index;
     enum al_grc_object  type;
 };
 
-/* Estrutura para ser utilizada nas funcoes de callback dos objetos */
+/* Structure to be used in the callback functions */
 struct al_callback_data {
+    struct al_callback_data *prev;
     struct al_callback_data *next;
     char                    *value_string;
     int                     value_int;
     void                    *user_arg;
-    void                    *grc; /* Aponta para a estrutura principal do
-                                     aplicativo. */
+    void                    *grc; /* Pointer to the main structure */
 
     /* internal */
     int                     (*callback)(struct al_callback_data *);
 };
 
-/* Estrutura com informacoes do modo grafico */
+/* Graphic mode informations */
 struct al_gfx_info {
     int width;
     int height;
@@ -180,21 +180,23 @@ struct al_gfx_info {
     int use_mouse;
 };
 
-/* Estrutura para armazenar os menus lidos do arquivo GRC */
+/* Menus loaded */
 struct grc_menu {
+    struct grc_menu *prev;
     struct grc_menu *next;
     char            *name;
     char            *parent;
 
-    /* Lista de itens do menu */
+    /* Items from menu */
     struct grc_menu *items;
 
-    /* Informacao de cada item */
+    /* Item info */
     char            *text;
 };
 
-/* Lista de menus e submenus de um DIALOG */
+/* List of menus and submenus from a DIALOG */
 struct al_menu {
+    struct al_menu  *prev;
     struct al_menu  *next;
     char            *name;
     int             t_items;
@@ -203,92 +205,74 @@ struct al_menu {
 };
 
 struct grc_generic_data {
+    struct grc_generic_data   *prev;
     struct grc_generic_data   *next;
     char                      data[MAX_EDIT_SIZE];
 };
 
-/* Estrutura principal para a manipulacao de um DIALOG da Allegro */
+/* Main structure to handle an Allegro DIALOG */
 struct al_grc {
-    /* JSON carregado do arquivo GRC */
+    /* GRC JSON */
     cjson_t                 *jgrc;
 
-    /* DIALOG da Allegro */
+    /* Allegro's DIALOG */
     DIALOG                  *dlg;
 
-    /* Referencias para objetos com propriedade 'name' */
+    /* Objects with property 'name' */
     struct dlg_obj_ref      *ref;
 
-    /* Lista de funcoes de callback de objetos */
+    /* Callback functions */
     struct al_callback_data *callback_data;
 
-    /* Informacoes principais do modo grafico da Allegro */
+    /* Graphic mode info */
     enum al_flag            use_gfx;
     struct al_gfx_info      gfx;
 
-    /* Cores principais do DIALOG */
+    /* Main colors of the DIALOG */
     int                     fg;
     int                     bg;
 
-    /* Tipo de quebra de linha do objeto 'messages_log_box' */
+    /* 'messages_log_box' break line type */
     enum al_grc_line_break  lbreak;
 
-    /* Flag indicando ignorar tecla ESC ou nao */
+    /* Flag to ignore the ESC key */
     enum al_flag            ignore_esc_key;
 
-    /* Flag indicando se a tecla ESC foi definida pelo usuario */
+    /* Flag showing if the user has declared the ESC key */
     enum al_flag            esc_key_user_defined;
 
-    /* Flag indicando a utilizacao ou nao do teclado virtual */
+    /* Flag to use the virtual keyboard */
     enum al_flag            virtual_keyboard;
 
     /*
-     * Ponteiro para o objeto 'edit' selecionado ao ativar e utilizar o teclado
-     * virtual.
+     * Pointer to the 'edit' object selected while activated the virtual
+     * keyboard.
      */
     DIALOG                  *last_edit_object;
 
-    /* Variaveis utilizadas pelo objeto 'digital_clock' */
+    /* 'digital_clock' info */
     char                    dlg_clock_str[256];
     struct tm               dlg_tm;
 
     /*
-     * Lista utilizada para armazenar variaveis para o texto com asterisco '*'
-     * num objeto 'edit' com 'password = true' ou para dados de um objeto 'text'
-     * provenientes de um objeto pai.
+     * List of values to store texts with asterisks '*' in a 'edit' object with
+     * 'password = true' or data from a 'text' object.
      */
     struct grc_generic_data *g_data;
 
-    /* Variaveis para controle de um objeto do tipo menu */
+    /* Used to control a menu from an object */
     struct grc_menu         *grc_menu;
     struct al_menu          *menu;
     MENU                    *dlg_menu;
     int                     dlg_menu_t_items;
 
-    /*
-     * Variaveis temporarias durante o processo de criacao em memoria do
-     * arquivo GRC.
-     */
+    /* Temporary values while creating a GRC file. */
     cjson_t                 *jtmp;
     cjson_t                 *jtmp_obj;
 };
 
-/* Arquivos de prototipos que nao devem ser visiveis para usuarios */
-/*#include "gui_button.h"
-#include "gui_clock.h"
-#include "gui_keyboard.h"
-#include "gui_messages_log_box.h"
-#include "gui_bitmap.h"
-#include "gui_edit.h"
-#include "gui_list.h"
-#include "gui_slider.h"
-#include "gui_check.h"
-#include "gui_radio.h"
-#include "gui_vt_keyboard.h"
-#include "gui_icon.h"
-#include "gui_textbox.h"*/
-
-#include "grc_gui.h"
-#include "grc.h"
+#include "gui.h"
+#include "parser.h"
 
 #endif
 

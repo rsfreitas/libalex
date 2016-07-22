@@ -29,7 +29,7 @@
 
 #ifndef LIBALEX_COMPILE
 # ifndef _LIBALEX_H
-#  error "Nao inclua o arquivo <common.h> diretamente; use o arquivo <libalex.h>"
+#  error "Never use <common.h> directly; include <libalex.h> instead."
 # endif
 #endif
 

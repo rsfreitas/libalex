@@ -24,8 +24,8 @@
  * USA
  */
 
-#ifndef _LIBALEX_GUI_H
-#define _LIBALEX_GUI_H              1
+#ifndef _LIBALEX_OBJECTS_H
+#define _LIBALEX_OBJECTS_H              1
 
 /* gui_bitmap.c */
 int gui_d_bitmap_proc(int msg, DIALOG *d, int c);

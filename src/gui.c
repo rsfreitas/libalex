@@ -28,7 +28,7 @@
 #include <ctype.h>
 
 #include "libalex.h"
-#include "gui/gui.h"
+#include "gui/objects.h"
 
 /* Altura default de um edit */
 #define DEFAULT_EDIT_HEIGHT                 15

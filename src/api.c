@@ -25,7 +25,7 @@
  */
 
 #include "libalex.h"
-#include "gui/gui.h"
+#include "gui/objects.h"
 
 #define LOAD_FROM_MEM       0
 #define LOAD_FROM_FILE      1

@@ -49,22 +49,15 @@
 # include <collections.h>
 #endif
 
-#ifdef LIBIMG_SUPPORT
-# ifndef _LIBIMG_H
-#  include <libimg.h>
-# endif
-#endif
-
 /*
- * Flag TRUE ou FALSE para ser utilizado nas funcoes desta biblioteca, devido
- * ao conflito destes defines entre a 'libutils' e a 'Allegro'.
+ * TODO: Bad, bad... use a bool type...
  */
 enum al_flag {
     AL_FALSE,
     AL_TRUE
 };
 
-/* Quantidade de cores suportadas */
+/* Number of supported colors */
 enum al_grc_color_depth {
     AL_GRC_COLOR_8 = 8,
     AL_GRC_COLOR_15 = 15,
@@ -73,34 +66,34 @@ enum al_grc_color_depth {
     AL_GRC_COLOR_32
 };
 
-/* Modos de quebra de linha no objeto do tipo 'messages_log_box' */
+/* 'messages_log_box' breaking line types */
 enum al_grc_line_break {
     AL_GRC_LBREAK_RAW = 1,  /* raw */
     AL_GRC_LBREAK_SMART     /* smart */
 };
 
-/* Formatos de radio button */
+/* radio button formats */
 enum al_grc_radio_button_fmt {
     AL_GRC_RADIO_CIRCLE = 1,
     AL_GRC_RADIO_SQUARE
 };
 
-/* Posicoes horizontais */
+/* Horizontal positions */
 enum al_grc_hpos {
     AL_GRC_H_POS_LEFT = 1,
     AL_GRC_H_POS_RIGHT
 };
 
-/* Campos capazes de suportarem dados variaveis por objeto */
+/* Fields able to handle variable data inside an object */
 enum al_data_type {
-    /* Nomes originais da Allegro */
+    /* Original Allegro names */
     AL_DT_D1,
     AL_DT_D2,
     AL_DT_DP,
     AL_DT_DP2,
     AL_DT_DP3,
 
-    /* Nomes "amigaveis" para o usuario */
+    /* User friendly names */
     AL_DT_SLIDER_LIMIT,
     AL_DT_SLIDER_POSITION,
     AL_DT_EDIT_VALUE,
@@ -114,8 +107,8 @@ enum al_data_type {
 };
 
 /*
- * Objetos de um DIALOG, inclusive o objeto correspondente a uma tecla,
- * mesmo ele possuindo uma secao especifica dentro do arquivo GRC.
+ * Objects from a DIALOG, including the key objects, even having a specific
+ * section inside de GRC file.
  */
 enum al_grc_object {
     AL_GRC_OBJ_KEY,
@@ -139,7 +132,7 @@ enum al_grc_object {
     AL_GRC_OBJ_TEXTBOX
 };
 
-/* Objetos JSON do arquivo GRC */
+/* JSON objects of the GRC file */
 enum al_grc_object_property {
     AL_GRC_JOBJ_WIDTH,
     AL_GRC_JOBJ_HEIGHT,
@@ -167,7 +160,7 @@ enum al_grc_object_property {
     AL_GRC_JOBJ_DEVICES
 };
 
-/* Defines de teclas inexistentes na Allegro */
+/* Nonexistent keys inside the Allegro */
 enum al_key {
     KEY_EXCLAMATION = KEY_MAX + 1,
     KEY_SHARP,
@@ -188,7 +181,7 @@ enum al_key {
     KEY_INTERROGATION
 };
 
-/* Cores suportadas */
+/* Supported colors */
 #define AL_BLACK                        "black"
 #define AL_WHITE                        "white"
 #define AL_LIGHT_RED                    "light_red"
@@ -244,7 +237,7 @@ enum al_key {
 #define AL_DARK_KHAKI                   "dark_khaki"
 #define AL_INDIAN_RED                   "indian_red"
 
-/* Mensagens (customizadas) suportadas por objetos dos DIALOGs */
+/* Custom supported messages by objects from DIALOGs */
 #define MSG_NEW_LOG_TEXT                MSG_USER
 #define MSG_CLEAR_LOG_TEXT              MSG_USER + 1
 #define MSG_LOAD_IMAGE                  MSG_USER + 2
@@ -257,16 +250,10 @@ struct al_grc;
 struct al_callback_data;
 #endif
 
-/* Includes com funcoes exportadas */
 #include "alex/error.h"
 #include "alex/common.h"
-
-#ifdef LIBIMG_SUPPORT
-# include "alex/image.h"
-#endif
-
-#include "alex/grc_api.h"
-#include "alex/grc_write.h"
+#include "alex/api.h"
+#include "alex/write.h"
 
 #endif
 

@@ -24,12 +24,12 @@
  * USA
  */
 
-#ifndef _LIBALEX_GRC_H
-#define _LIBALEX_GRC_H                            1
+#ifndef _LIBALEX_PARSER_H
+#define _LIBALEX_PARSER_H               1
 
 #ifndef LIBALEX_COMPILE
 # ifndef _LIBALEX_H
-#  error "Nao inclua o arquivo <grc.h> diretamente; use o arquivo <libalex.h>"
+#  error "Never use <parser.h> directly; include <libalex.h> instead."
 # endif
 #endif
 

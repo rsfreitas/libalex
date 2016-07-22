@@ -24,12 +24,12 @@
  * USA
  */
 
-#ifndef _LIBALEX_GRC_API_H
-#define _LIBALEX_GRC_API_H                            1
+#ifndef _LIBALEX_API_H
+#define _LIBALEX_API_H                            1
 
 #ifndef LIBALEX_COMPILE
 # ifndef _LIBALEX_H
-#  error "Nao inclua o arquivo <grc_api.h> diretamente; use o arquivo <libalex.h>"
+#  error "Never use <api.h> directly; include <libalex.h> instead."
 # endif
 #endif
 

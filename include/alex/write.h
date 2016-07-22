@@ -24,12 +24,12 @@
  * USA
  */
 
-#ifndef _LIBALEXGRC_WRITE_H
-#define _LIBALEXGRC_WRITE_H			1
+#ifndef _LIBALEX_WRITE_H
+#define _LIBALEX_WRITE_H			1
 
 #ifndef LIBALEX_COMPILE
 # ifndef _LIBALEX_H
-#  error "Nao inclua o arquivo <grc_write.h> diretamente; use o arquivo <libalex.h>"
+#  error "Never use <write.h> directly; include <libalex.h> instead."
 # endif
 #endif
 

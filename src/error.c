@@ -28,31 +28,31 @@
 
 static const char *__error_descriptions[] = {
     "Ok",
-    "Argumento invalido",
-    "Falha ao alocar memoria interna",
-    "Falha ao carregar dados GRC",
-    "Objeto nao definido internamente",
-    "Bloco de informacoes do ambiente grafico nao encontrado",
-    "Bloco de cores do ambiente grafico nao encontrado",
-    "Falha ao ajustar a resolucao de tela",
-    "Falha ao inicializar biblioteca Allegro",
-    "Falha ao inicializar o teclado",
-    "Bloco de objetos do ambiente grafico nao encontrado",
-    "Nenhum objeto foi encontrado",
-    "Falha ao criar referencia interna do objeto",
-    "Nenhuma tecla foi encontrada",
-    "Objeto nao encontrado",
-    "Objeto desconhecido",
-    "Modo de inicializacao da biblioteca invalido",
-    "Quantidade de caracteres nao suportada pelo objeto",
-    "Cores nao suportadas",
-    "Quantidade de cores nao suportada",
-    "Propriedade desconhecida",
-    "Tipo de dado nao suportado"
+    "Invalid argument",
+    "Internal memory error",
+    "Unabled to load GRC data",
+    "Object not previously defined",
+    "Graphic mode information block not found",
+    "Color block not found",
+    "Error changing screen resolution",
+    "Internal Allegro error",
+    "Keyboard init error",
+    "Objects block not found",
+    "No object was found",
+    "Error creating internal reference to object",
+    "No key was found",
+    "Object not found",
+    "Unknown object",
+    "Invalid library init mode",
+    "The object does not support this number of keys",
+    "Unsupported colors",
+    "Unsupported number of colors",
+    "Unknown property",
+    "Unsupported type"
 };
 
 static int __al_errno;
-static const char *__unknown_error = "Erro desconhecido";
+static const char *__unknown_error = "Unknown error";
 
 void al_errno_clear(void)
 {
@@ -64,25 +64,11 @@ void al_set_errno(enum al_error_code code)
     __al_errno = code;
 }
 
-/**
- * @name al_get_last_error
- * @brief Obtem o codigo de erro atual da biblioteca.
- *
- * @return Retorna o codigo de erro atual da biblioteca.
- */
 enum al_error_code LIBEXPORT al_get_last_error(void)
 {
     return __al_errno;
 }
 
-/**
- * @name al_strerror
- * @brief Obtem uma descricao a respeito de um codigo de erro.
- *
- * @param [in] code: Codigo de erro.
- *
- * @return Retorna uma string contendo a descricao do codigo de erro informado.
- */
 const char LIBEXPORT *al_strerror(enum al_error_code code)
 {
     if (code >= AL_MAX_ERROR_CODE)

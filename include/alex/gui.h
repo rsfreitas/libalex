@@ -24,12 +24,12 @@
  * USA
  */
 
-#ifndef _LIBALEX_GRC_GUI_H
-#define _LIBALEX_GRC_GUI_H			1
+#ifndef _LIBALEX_GUI_H
+#define _LIBALEX_GUI_H			1
 
 #ifndef LIBALEX_COMPILE
 # ifndef _LIBALEX_H
-#  error "Nao inclua o arquivo <grc_gui.h> diretamente; use o arquivo <libalex.h>"
+#  error "Never use <gui.h> directly; include <libalex.h> instead."
 # endif
 #endif
 

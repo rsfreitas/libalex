@@ -53,11 +53,11 @@ void dotted_rect(int x1, int y1, int x2, int y2, int fg, int bg)
 }
 
 /*
- * ------- Criacao e finalizacao de objetos internos -------
+ * ------- internal objects -------
  */
 
 /*
- * Cria e retorna uma estrutura do tipo 'struct al_callback_data'.
+ * Create and return a structure of type 'struct al_callback_data'.
  */
 struct al_callback_data *new_callback_data(void)
 {
@@ -72,7 +72,7 @@ struct al_callback_data *new_callback_data(void)
 }
 
 /*
- * Cria e retorna uma estrutura do tipo 'struct dlg_obj_ref'.
+ * Create and return a structure of type 'struct dlg_obj_ref'.
  */
 struct dlg_obj_ref *new_obj_ref(const char *name, int dlg_index,
     enum al_grc_object type)
@@ -94,7 +94,7 @@ struct dlg_obj_ref *new_obj_ref(const char *name, int dlg_index,
 }
 
 /*
- * Libera uma estrutura do tipo 'struct dlg_obj_ref' da memoria.
+ * Destroy a structure of type 'struct dlg_obj_ref'.
  */
 void destroy_obj_ref(void *a)
 {
@@ -107,7 +107,7 @@ void destroy_obj_ref(void *a)
 }
 
 /*
- * Cria e retorna uma estrutura do tipo 'struct al_grc'.
+ * Create and return a structure of type 'struct al_grc'.
  */
 struct al_grc *new_grc(void)
 {
@@ -127,8 +127,8 @@ struct al_grc *new_grc(void)
     g->menu = NULL;
 
     /*
-     * Deixa o teclado virtual desabilitado, caso exista um objeto deste tipo
-     * este flag sera habilitado.
+     * Let the virtual keyboard disabled by now. If there is such an object
+     * this flag will be enabled.
      */
     g->virtual_keyboard = AL_FALSE;
 
@@ -144,7 +144,7 @@ static void destroy_al_menu(void *a)
 }
 
 /*
- * Libera uma estrutura do tipo 'struct al_grc' da memoria.
+ * Destroy a structure of type 'struct al_grc'.
  */
 void destroy_grc(struct al_grc *grc)
 {
