@@ -27,14 +27,13 @@
 #include "libalex.h"
 
 /*
- * Funcao no mesmo estilo da d_edit_proc da propria Allegro, @dp2 e a variavel
- * exibida na tela, com asteriscos (*), @dp e a variavel que contem o texto
- * digitado.
+ * Function like a d_edit_proc from Allegro, @dp2 is the value displayed
+ * with asterisks (*), @dp is the real value.
  */
 static int d_password_proc(int msg, DIALOG *d, int c)
 {
     static int ignore_next_uchar = FALSE;
-    int f, l, p, w, x, fg, b=0, scroll;
+    int f, l, p, w, x, fg, b = 0, scroll;
     char buf[16], *s, *dp2;
 
     ASSERT(d);
@@ -45,7 +44,7 @@ static int d_password_proc(int msg, DIALOG *d, int c)
     if (d->d2 > l)
         d->d2 = l;
 
-    /* igual a string s em tamanho */
+    /* Its size is the same as len(s) */
     dp2 = d->dp;
 
     /* calculate maximal number of displayable characters */
@@ -190,8 +189,7 @@ static void set_actual_edit_object(DIALOG *d, struct al_callback_data *acd)
         return;
 
     /*
-     * Salva uma referencia do objeto para que o teclado virtual consiga
-     * acessa-lo.
+     * Saves a reference to the object so the virtual keyboard may access it.
      */
     grc->last_edit_object = d;
 }
@@ -201,7 +199,7 @@ int gui_d_password_proc(int msg, DIALOG *d, int c)
     struct al_callback_data *acd = d->dp3;
     int ret;
 
-    /* Recebeu uma edicao via teclado virtual? */
+    /* Received an update from the virtual keyboard? */
     if (msg == MSG_UPDATE_CURSOR_POSITION)
         d->d2 = c;
 
@@ -216,8 +214,8 @@ int gui_d_password_proc(int msg, DIALOG *d, int c)
             run_callback(acd);
 
             /*
-             * Nao deixa fechar a interface, caso o usuario esqueca o retorno
-             * correto.
+             * We don't let the interface shutdown if the user forgets the
+             * correct return value.
              */
             ret = D_O_K;
         } else
@@ -232,15 +230,15 @@ int gui_d_edit_proc(int msg, DIALOG *d, int c)
     struct al_callback_data *acd = d->dp3;
     int ret;
 
-    /* Recebeu uma edicao via teclado virtual? */
+    /* Received an update from the virtual keyboard? */
     if (msg == MSG_UPDATE_CURSOR_POSITION)
         d->d2 = c;
 
     ret = d_edit_proc(msg, d, c);
 
     /*
-     * Caso o usuario passe sobre o objeto, deixa-o selecionado para
-     * edicao via teclado virtual.
+     * If the user passes over the object we let it selected so the
+     * virtual keyboard edit it.
      */
     if ((msg == MSG_LOSTFOCUS) || (msg == MSG_GOTMOUSE))
         set_actual_edit_object(d, acd);
@@ -251,8 +249,8 @@ int gui_d_edit_proc(int msg, DIALOG *d, int c)
             run_callback(acd);
 
             /*
-             * Nao deixa fechar a interface, caso o usuario esqueca o retorno
-             * correto.
+             * We don't let the interface shutdown if the user forgets the
+             * correct return value.
              */
             ret = D_O_K;
         } else

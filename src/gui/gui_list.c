@@ -27,17 +27,16 @@
 #include "libalex.h"
 
 /*
- * Para utilizar corretamente este objeto o usuario precisa criar uma funcao
- * do tipo:
+ * The user must pass a function of following type to use this object:
  *
  * char *foo(int index, int *list_size);
  *
- * sendo que, quando index for >= 0, a funcao deve retornar um ponteiro
- * para a string que deve ser exibida na lista na posicao index. Caso
- * contrario, deve retornar NULL e *list_size deve conter o tamanho total
- * da lista de itens.
+ * so, when @index >= 0 the function must return a pointer to the string
+ * which will be displayed in the list in the @index position. Otherwise
+ * it must return NULL and @list_size must contain the total size of the
+ * list.
  *
- * Esta funcao deve ficar em d->dp.
+ * This function must be passed in @d->dp.
  */
 int gui_d_list_proc(int msg, DIALOG *d, int c)
 {
@@ -52,8 +51,8 @@ int gui_d_list_proc(int msg, DIALOG *d, int c)
             run_callback(acd);
 
             /*
-             * Nao deixa fechar a interface, caso o usuario esqueca o retorno
-             * correto.
+             * We don't let the interface shutdown if the user forgets the
+             * correct return value.
              */
             ret = D_O_K;
         } else

@@ -33,7 +33,6 @@
 
 static int start_grc(struct al_grc *grc)
 {
-    /* Altera resolucao da tela */
     if (grc->use_gfx == AL_TRUE) {
         if (gui_change_resolution(grc) < 0)
             return -1;
@@ -49,7 +48,7 @@ static struct al_grc *al_grc_init(const char *grc_data, int load_mode,
     enum al_flag gfx)
 {
     struct al_grc *grc;
-    int ret=0;
+    int ret = 0;
 
     al_errno_clear();
     grc = new_grc();
@@ -61,15 +60,15 @@ static struct al_grc *al_grc_init(const char *grc_data, int load_mode,
 
     grc->use_gfx = gfx;
 
-    /* Faz o parse do arquivo .grc ou de um buffer da memoria */
+    /* Makes parse from a file or from a buffer */
     if (load_mode == LOAD_FROM_FILE)
         ret = grc_parse_file(grc, grc_data);
     else if (load_mode == LOAD_FROM_MEM)
         ret = grc_parse_mem(grc, grc_data);
     else if (load_mode == LOAD_BARE_DATA) {
         /*
-         * Permite somente inicializar a estrutura para o modo de criacao em
-         * memoria do formato GRC.
+         * We allow creating an object in this mode only when creating a
+         * GRC file in memory.
          */
         return grc;
     } else {
@@ -196,11 +195,11 @@ int LIBEXPORT al_grc_uninit(struct al_grc *grc)
         return -1;
     }
 
-    /* Volta resolucao da tela para modo texto */
+    /* Return the gfx to text mode */
     if (grc->use_gfx == AL_TRUE)
         gui_reset_resolution();
 
-    /* Desaloca memoria */
+    /* Free the object */
     destroy_grc(grc);
 
     return 0;
@@ -258,7 +257,7 @@ int LIBEXPORT al_grc_do_dialog(struct al_grc *grc)
 
 static int object_has_callback_data(struct al_grc *grc, DIALOG *d)
 {
-    struct al_callback_data *acd=NULL;
+    struct al_callback_data *acd = NULL;
 
     acd = d->dp3;
 
@@ -302,7 +301,7 @@ int LIBEXPORT al_grc_set_callback(struct al_grc *grc, const char *object_name,
     int (*callback)(struct al_callback_data *), void *arg)
 {
     DIALOG *d;
-    struct al_callback_data *acd=NULL;
+    struct al_callback_data *acd = NULL;
     MENU *m;
 
     al_errno_clear();
@@ -469,7 +468,7 @@ int LIBEXPORT al_grc_object_set_data(struct al_grc *grc, const char *object_name
 {
     DIALOG *d;
     int s;
-    struct al_callback_data *acd=NULL;
+    struct al_callback_data *acd = NULL;
 
     al_errno_clear();
 
@@ -636,7 +635,7 @@ void LIBEXPORT *al_grc_object_get_data(struct al_grc *grc,
     const char *ifmt="%d\0";
     va_list ap;
     char tmp[512]={0};
-    void *data=NULL;
+    void *data = NULL;
     int value=-1;
     DIALOG *d;
 
@@ -896,7 +895,7 @@ int LIBEXPORT al_grc_radio_get_status(struct al_grc *grc,
 char LIBEXPORT *al_grc_edit_get_data(struct al_grc *grc,
     const char *object_name)
 {
-    char *v=NULL;
+    char *v = NULL;
 
     v = (char *)al_grc_object_get_data(grc, object_name, AL_DT_EDIT_VALUE,
                                        NULL);

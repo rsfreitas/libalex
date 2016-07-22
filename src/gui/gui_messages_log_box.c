@@ -40,8 +40,8 @@ struct line {
 };
 
 struct messages {
-    unsigned int    c; /* total de colunas */
-    unsigned int    l; /* total de linhas */
+    unsigned int    c; /* total columns */
+    unsigned int    l; /* total lines */
     struct line     *lines;
     char            **tmp;
 };
@@ -79,7 +79,7 @@ static void init_messages(DIALOG *d)
 
     __mlog.lines = NULL;
 
-    /* Aloca memoria do buffer temporario para novas mensagens */
+    /* This buffer is for new messages... */
     __mlog.tmp = calloc(__mlog.l + 1, sizeof(char *));
 
     for (i = 0; i < __mlog.l; i++)
@@ -99,7 +99,7 @@ static void uninit_messages(void)
 
 static void print_messages(DIALOG *d)
 {
-    int y=d->y;
+    int y = d->y;
     struct line *p;
 
     for (p = __mlog.lines; p; p = p->next, y += text_height(font) + 2) {
@@ -131,7 +131,7 @@ static void clear_messages(DIALOG *d)
 static int split_line(enum al_grc_line_break lbreak, const char *msg)
 {
     size_t l;
-    int i, exact_l=0, splitted=0, p=0, r;
+    int i, exact_l = 0, splitted = 0, p = 0, r;
 
     l = strlen(msg);
     exact_l = l / __mlog.c;
@@ -144,10 +144,9 @@ static int split_line(enum al_grc_line_break lbreak, const char *msg)
         strncpy(__mlog.tmp[i], msg + p, __mlog.c);
 
         /*
-         * Para que este modo de quebra de colunas seja realmente eficiente,
-         * nao deve existir palavras maiores do que o maximo de colunas
-         * suportados, pois neste caso nao sera possivel realizar a quebra
-         * corretamente.
+         * To make this way of breaking the columns really efficient, we
+         * cannot have words bigger than the maximum supported columns,
+         * because in this case we will not be able to break it.
          */
         if (lbreak == AL_GRC_LBREAK_SMART) {
             int n, x;
@@ -181,8 +180,8 @@ void gui_messages_set(enum al_grc_line_break lbreak, int fg_color,
     const char *msg, const char *color)
 {
     size_t l;
-    unsigned int msg_lines=0, i=0;
-    int rm_lines=0;
+    unsigned int msg_lines = 0, i = 0;
+    int rm_lines = 0;
     struct line *line;
 
     pthread_mutex_lock(&__m_lines);
@@ -191,8 +190,8 @@ void gui_messages_set(enum al_grc_line_break lbreak, int fg_color,
 
     if (l > __mlog.c) {
         /*
-         * E necessario dividir a linha pois ultrapassou o limite de colunas
-         * do objeto.
+         * We need to split the line because it exceeded the object column
+         * limit.
          */
         msg_lines = split_line(lbreak, msg);
     } else {
@@ -201,7 +200,7 @@ void gui_messages_set(enum al_grc_line_break lbreak, int fg_color,
         __mlog.tmp[0][l] = '\0';
     }
 
-    /* Remove linhas se atingiu o limite */
+    /* Remove lines that reach the limit */
     rm_lines = (cdll_size(__mlog.lines) + msg_lines) - __mlog.l;
 
     if (rm_lines > 0) {
@@ -211,7 +210,7 @@ void gui_messages_set(enum al_grc_line_break lbreak, int fg_color,
         }
     }
 
-    /* Adiciona novas linhas */
+    /* Add new lines */
     for (i = 0; i < msg_lines; i++) {
         line = new_line(__mlog.tmp[i], fg_color, color);
         __mlog.lines = cdll_unshift(__mlog.lines, line);
@@ -233,8 +232,8 @@ int gui_messages_log_proc(int msg, DIALOG *d, int c __attribute__((unused)))
 
         case MSG_NEW_LOG_TEXT:
             /*
-             * Mensagem indicando que ha uma nova mensagem para ser processada e
-             * exibida na tela.
+             * Message indicating that there is a new message to be processed
+             * and displayed.
              */
             print_messages(d);
             break;

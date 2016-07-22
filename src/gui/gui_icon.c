@@ -27,9 +27,8 @@
 #include "libalex.h"
 
 /*
- * "Copia" do objeto 'd_icon_proc' da Allegro, sem a funcionalidade de
- * poder utilizar 2 imagens diferentes para quando o botao for selecionado
- * ou desabilitado.
+ * This is a copy from Allegro's 'd_icon_proc' without the capability of use
+ * 2 different imagens to use when selected or not.
  */
 static int simple_d_icon_proc(int msg, DIALOG *d, int c)
 {
@@ -101,8 +100,8 @@ int gui_d_icon_proc(int msg, DIALOG *d, int c)
     int ret;
 
     /*
-     * Caso a imagem nao tenha sido indicada ainda nao faz nada e evita um
-     * erro ao desenhar o objeto na tela.
+     * If the image is not passed yet we do nothing and avoid some error
+     * trying to draw something invalid into the screen.
      */
     if (NULL == d->dp)
         return D_O_K;
@@ -114,8 +113,8 @@ int gui_d_icon_proc(int msg, DIALOG *d, int c)
             run_callback(acd);
 
             /*
-             * Nao deixa fechar a interface, caso o usuario esqueca o retorno
-             * correto.
+             * We don't let the interface shutdown if the user forgets the
+             * correct return value.
              */
             ret = D_REDRAWME;
         }

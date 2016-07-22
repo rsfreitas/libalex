@@ -225,7 +225,7 @@ static int tr_str_type_to_grc_type(const char *type_name)
 const char *str_grc_obj_type(enum al_grc_object obj)
 {
     unsigned int i;
-    char *n=NULL;
+    char *n = NULL;
 
     for (i = 0; i < MAX_DLG_SUPPORTED_OBJECTS; i++)
         if (__dlg_objects[i].type == obj) {
@@ -243,7 +243,7 @@ const char *str_grc_obj_type(enum al_grc_object obj)
 struct grc_json_key *get_grc_json_key(enum al_grc_object_property prop)
 {
     unsigned int i;
-    struct grc_json_key *e=NULL;
+    struct grc_json_key *e = NULL;
 
     for (i = 0; i < MAX_GRC_ENTRIES; i++)
         if (__entries[i].prop == prop) {
@@ -353,7 +353,7 @@ void destroy_key_data(struct grc_key_data *kdata)
  */
 struct grc_key_data *new_key_data(cjson_t *key)
 {
-    struct grc_key_data *k=NULL;
+    struct grc_key_data *k = NULL;
     struct grc_json_key *e;
     char *tmp;
 
@@ -419,7 +419,7 @@ void destroy_obj_properties(struct grc_obj_properties *prop)
  */
 struct grc_obj_properties *new_obj_properties(cjson_t *object)
 {
-    struct grc_obj_properties *p=NULL;
+    struct grc_obj_properties *p = NULL;
     struct grc_json_key *e;
     char *tmp;
 

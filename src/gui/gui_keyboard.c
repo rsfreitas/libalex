@@ -1,8 +1,6 @@
 
 /*
- * Description: Reimplementacao do objeto de tratativa de teclas
- *              num DIALOG para manter o padrao de funcoes de
- *              resposta.
+ * Description:
  *
  * Author: Rodrigo Freitas
  * Created at: Thu Dec 11 15:40:59 2014

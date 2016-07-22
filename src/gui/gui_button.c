@@ -27,12 +27,11 @@
 #include "libalex.h"
 
 /*
- * O objeto permite que uma funcao seja executada quando o botao for
- * ativado. A funcao deve ser indicada em d->dp2, sendo seu argumento
- * definido em d->dp3.
+ * This object allows that a function be called when activated (when
+ * the buttone is pressed). The function must be passed in d->dp2, and
+ * its argument defined in d->dp3.
  *
- * Caso nenhuma funcao seja indicada, o botao fara com que o DIALOG
- * seja fechado.
+ * If no function is passed the button makes the DIALOG close.
  */
 int gui_d_button_proc(int msg, DIALOG *d, int c)
 {

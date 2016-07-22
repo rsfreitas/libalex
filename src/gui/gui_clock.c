@@ -1,7 +1,6 @@
 
 /*
- * Description: Funcoes para controle do objeto de exibicao do
- *              relogio atual do equipamento.
+ * Description: Functions to control a digital clock.
  *
  * Author: Rodrigo Freitas
  * Created at: Tue Dec  9 22:42:19 2014
@@ -23,11 +22,6 @@
  * License along with this library; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301
  * USA
- *
- * Importante
- * ----------
- *
- *  Nao deve-se utilizar mais do que um objeto deste por DIALOG.
  */
 
 #include <time.h>
@@ -35,8 +29,10 @@
 #include "libalex.h"
 
 /*
- * Funcao para construir um objeto do tipo relogio na tela. O relogio e do tipo
- * digital exibindo data e hora, com atualizacao a cada segundo.
+ * Function to build an object to put a digital clock into the screen. The clock
+ * is updated every second.
+ *
+ * XXX: We must not create more than one object of this kind.
  */
 int gui_clock_proc(int msg, DIALOG *d, int c)
 {

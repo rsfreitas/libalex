@@ -29,8 +29,8 @@
 int gui_d_textbox_proc(int msg, DIALOG *d, int c)
 {
     /*
-     * Caso o texto nao tenha sido indicado ainda nao faz nada e evita um
-     * erro ao desenhar o objeto na tela.
+     * In case the text is not passed yet we do nothing and avoid draw
+     * something invalid into the screen.
      */
     if (NULL == d->dp)
         return D_O_K;

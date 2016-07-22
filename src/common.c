@@ -30,7 +30,8 @@
 #include "libalex.h"
 
 /*
- * Funcao replicada da Allegro (ela e static dentro dela).
+ * This is an original Allegro function. We put it here because there it
+ * is declared as static and we need it.
  */
 void dotted_rect(int x1, int y1, int x2, int y2, int fg, int bg)
 {
@@ -60,7 +61,7 @@ void dotted_rect(int x1, int y1, int x2, int y2, int fg, int bg)
  */
 struct al_callback_data *new_callback_data(void)
 {
-    struct al_callback_data *cd=NULL;
+    struct al_callback_data *cd = NULL;
 
     cd = calloc(1, sizeof(struct al_callback_data));
 
@@ -76,7 +77,7 @@ struct al_callback_data *new_callback_data(void)
 struct dlg_obj_ref *new_obj_ref(const char *name, int dlg_index,
     enum al_grc_object type)
 {
-    struct dlg_obj_ref *r=NULL;
+    struct dlg_obj_ref *r = NULL;
 
     r = calloc(1, sizeof(struct dlg_obj_ref));
 
@@ -176,7 +177,7 @@ void destroy_grc(struct al_grc *grc)
 
 struct grc_generic_data *new_grc_generic_data(void)
 {
-    struct grc_generic_data *d=NULL;
+    struct grc_generic_data *d = NULL;
 
     d = calloc(1, sizeof(struct grc_generic_data));
 

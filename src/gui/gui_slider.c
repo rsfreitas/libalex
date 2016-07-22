@@ -40,8 +40,8 @@ int gui_d_slider_proc(int msg, DIALOG *d, int c)
     switch (msg) {
         case MSG_START:
             /*
-             * Inicializa a funcao de callback suportada pela Allegro, caso o
-             * usuario tenha instalado uma funcao propria.
+             * Initiate the callback function (supported by Allegro) in case
+             * the user installed its own function.
              */
             if (d->dp3 != NULL)
                 d->dp2 = internal_callback;

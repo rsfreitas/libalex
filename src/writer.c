@@ -217,7 +217,7 @@ int LIBEXPORT al_grc_GRC_keys_start(struct al_grc *grc)
 int LIBEXPORT al_grc_GRC_add_key(struct al_grc *grc, const char *key,
     const char *name)
 {
-    cjson_t *k, *n=NULL, *p;
+    cjson_t *k, *n = NULL, *p;
 
     al_errno_clear();
 
@@ -354,10 +354,10 @@ int LIBEXPORT al_grc_GRC_set_object_property(struct al_grc *grc,
 {
     va_list ap;
     enum grc_entry_type_value grc_value;
-    const char *jkey=NULL;
+    const char *jkey = NULL;
     cjson_t *c;
     int i;
-    char *s=NULL;
+    char *s = NULL;
 
     al_errno_clear();
 

@@ -42,13 +42,13 @@
  * (change fmt) ?? (spacebar 5x) ?? (enter)
  */
 
-/* Total de linhas do teclado virtual */
+/* Virtual keyboard number of lines */
 #define TOTAL_LINES             4
 
-/* Numero maximo de layouts de teclado para o usuario */
+/* The number of layouts so the user can use it */
 #define MAX_FORMATS             2
 
-/* Quantidade de teclas de cada linha do teclado */
+/* The number of keys of each line */
 #define LINE1_NKEYS             10
 #define LINE2_NKEYS             9
 #define LINE3_NKEYS             9
@@ -57,8 +57,7 @@
 #define MAX_SCREEN_KEYS         LINE1_NKEYS
 
 /*
- * Posicao relativa do inicio da primeira tecla com relacao ao proprio
- * objeto.
+ * Relative position from the first key to the own object.
  */
 #define RELATIVE_INITAL_POS     4
 
@@ -77,13 +76,13 @@ enum special_key_value {
     SPK_ENTER
 };
 
-/* bitfield flags para o campo d2 do objeto */
+/* bitfield flags to the object @d2 field */
 #define DLG_SPK_SHIFT           1
 
 struct special_key {
-    char                    token[128];     /* identificacao interna */
-    char                    user_key[16];   /* formato exibido para usuario */
-    enum special_key_value  value;          /* valor interno */
+    char                    token[128];     /* internal identification */
+    char                    user_key[16];   /* format displayed to the user */
+    enum special_key_value  value;          /* internal value */
 };
 
 struct key {
@@ -115,12 +114,12 @@ struct keyboard_layout {
 };
 
 static struct keyboard_layout __klayout[] = {
-    /* formato 1 */
+    /* format 1 */
     {
         .format = 1,
 
         .line = {
-            /* linha 1 */
+            /* line 1 */
             {
                 LINE1_NKEYS,
                 {
@@ -147,7 +146,7 @@ static struct keyboard_layout __klayout[] = {
                 }
             },
 
-            /* linha 2 */
+            /* line 2 */
             {
                 LINE2_NKEYS,
                 {
@@ -172,7 +171,7 @@ static struct keyboard_layout __klayout[] = {
                 }
             },
 
-            /* linha 3 */
+            /* line 3 */
             {
                 LINE3_NKEYS,
                 {
@@ -197,7 +196,7 @@ static struct keyboard_layout __klayout[] = {
                 }
             },
 
-            /* linha 4 */
+            /* line 4 */
             {
                 LINE4_NKEYS,
                 {
@@ -216,12 +215,12 @@ static struct keyboard_layout __klayout[] = {
         },
     },
 
-    /* formato 2 */
+    /* format 2 */
     {
         .format = 2,
 
         .line = {
-            /* linha 1 */
+            /* line 1 */
             {
                 LINE1_NKEYS,
                 {
@@ -248,7 +247,7 @@ static struct keyboard_layout __klayout[] = {
                 }
             },
 
-            /* linha 2 */
+            /* line 2 */
             {
                 LINE2_NKEYS,
                 {
@@ -273,7 +272,7 @@ static struct keyboard_layout __klayout[] = {
                 }
             },
 
-            /* linha 3 */
+            /* line 3 */
             {
                 LINE3_NKEYS,
                 {
@@ -298,7 +297,7 @@ static struct keyboard_layout __klayout[] = {
                 }
             },
 
-            /* linha 4 */
+            /* line 4 */
             {
                 LINE4_NKEYS,
                 {
@@ -318,7 +317,7 @@ static struct keyboard_layout __klayout[] = {
     }
 };
 
-/* Teclas especiais do teclado virtual */
+/* Virtual keyboard special keys */
 static struct special_key __special_keys[] = {
     { SHIFT_TOK,        "S",        SPK_SHIFT       },
     { CHANGE_FMT_TOK,   "12#",      SPK_CHANGE_FMT  },
@@ -358,7 +357,7 @@ static void calc_buttons_area(DIALOG *d, int keyb_layout)
     int i, j, x, y, w, btn_height;
     struct keyboard_layout *k = &__klayout[keyb_layout];
     struct screen_key *sk;
-    struct special_key *spk=NULL;
+    struct special_key *spk = NULL;
 
     btn_height = d->h / TOTAL_LINES;
     w = (d->w / MAX_SCREEN_KEYS) - 2;
@@ -366,7 +365,7 @@ static void calc_buttons_area(DIALOG *d, int keyb_layout)
     for (i = 0; i < TOTAL_LINES; i++) {
         x = d->x + 1 + RELATIVE_INITAL_POS;
 
-        /* Centraliza as linhas seguintes por possuirem menos botoes */
+        /* Center the next lines cause they have less buttons */
         if (i > 0)
             x += (w / 2) + 1;
 
@@ -381,7 +380,7 @@ static void calc_buttons_area(DIALOG *d, int keyb_layout)
             sk->area.y = y;
             sk->area.w = w;
 
-            /* O botao da barra de status ocupa o lugar de 3 botoes normais */
+            /* The space bar button takes the space of 3 regular buttons */
             if ((spk != NULL) && (spk->value == SPK_SPACEBAR)) {
                 sk->area.w *= 5;
                 sk->area.w += 4;
@@ -405,8 +404,8 @@ static void draw_special_key(struct screen_key *key, struct special_key *spk,
     switch (spk->value) {
         case SPK_SHIFT:
             /*
-             * Deveria sair desenhado algo como, proporcional ao tamanho do
-             * botao:
+             * Should something like this be drawn, proportional the size of
+             * the button:
              *
              *    /|\
              *   / | \
@@ -436,8 +435,8 @@ static void draw_special_key(struct screen_key *key, struct special_key *spk,
 
         case SPK_ENTER:
             /*
-             * Deveria sair desenhado algo como, proporcional ao tamanho do
-             * botao:
+             * Should something like this be drawn, proportional the size of
+             * the button:
              *
              *                  |
              *      /           |
@@ -475,8 +474,8 @@ static void draw_special_key(struct screen_key *key, struct special_key *spk,
 
         case SPK_BACKSPACE:
             /*
-             * Deveria sair desenhado algo como, proporcional ao tamanho do
-             * botao:
+             * Should something like this be drawn, proportional the size of
+             * the button:
              *
              *       /
              *      /________
@@ -516,28 +515,28 @@ static void draw_keyboard(DIALOG *d, int keyb_layout)
 {
     int i, btn_height, j, half_letter = text_height(font) / 2, fg, bg;
     struct keyboard_layout *k = &__klayout[keyb_layout];
-    struct screen_key *sk, *dotted_key=NULL;
+    struct screen_key *sk, *dotted_key = NULL;
     struct special_key *spk;
     char *btn_text;
     BITMAP *gui_bmp;
 
     gui_bmp = gui_get_screen();
 
-    /* Fundo e moldura principal */
+    /* Background and main frame */
     rectfill(gui_bmp, d->x, d->y, d->x + d->w - 1, d->y + d->h - 1, d->bg);
     rect(gui_bmp, d->x, d->y, d->x + d->w - 1, d->y + d->h - 1, d->fg);
 
-    /* Desenha teclas */
+    /* Draw keys */
     btn_height = d->h / TOTAL_LINES;
 
-    /* linhas */
+    /* lines */
     for (i = 0; i < TOTAL_LINES; i++) {
         for (j = 0; j < k->line[i].n; j++) {
             fg = d->fg;
             bg = d->bg;
             sk = &k->line[i].keys[j];
 
-            /* Inverte as cores do botao que foi clicado */
+            /* Swaps the colors of the pressed button */
             if (sk->selected == AL_TRUE) {
                 fg = d->bg;
                 bg = d->fg;
@@ -569,7 +568,7 @@ static void draw_keyboard(DIALOG *d, int keyb_layout)
         }
     }
 
-    /* Coloca uma borda de efeito no botao que acabou de ser pressionado */
+    /* Puts an edge effect into the button that has been pressed */
     if ((d->flags & D_GOTFOCUS) &&
         (!(d->flags & D_SELECTED) || !(d->flags & D_EXIT)) &&
         (dotted_key != NULL))
@@ -583,7 +582,7 @@ static void draw_keyboard(DIALOG *d, int keyb_layout)
 
 static struct screen_key *find_clicked_button(int x, int y, int keyb_layout)
 {
-    struct screen_key *key=NULL, *sk;
+    struct screen_key *key = NULL, *sk;
     struct keyboard_layout *k = &__klayout[keyb_layout];
     int i, j;
 
@@ -612,7 +611,7 @@ static char *add_char(const char *s, unsigned int pos, char *c)
 
     l = strlen(s);
 
-    /* Esta inserindo no final? */
+    /* Are we inserting into the end? */
     if (pos == l) {
         tmp = cstring_create("%s", s);
         cstring_cat(tmp, "%s", c);
@@ -647,18 +646,18 @@ static void run_edit_callback(DIALOG *edit)
 static int update_last_edit_object_value(DIALOG *d, struct al_grc *grc,
     struct screen_key *key)
 {
-    struct special_key *spk=NULL;
-    char *tmp=NULL, *ed_value;
+    struct special_key *spk = NULL;
+    char *tmp = NULL, *ed_value;
     DIALOG *edit;
-    unsigned int ed_pos=0;
+    unsigned int ed_pos = 0;
 
     if (NULL == grc->last_edit_object)
         return D_O_K;
 
-    /* Obtem o objeto 'edit' que sera manipulado */
+    /* Gets the edit object which will be handled */
     edit = grc->last_edit_object;
 
-    /* Trata teclas especiais */
+    /* Treat special keys */
     spk = search_special_key(key->key[d->d2 & DLG_SPK_SHIFT].key);
 
     if (spk != NULL) {
@@ -680,10 +679,7 @@ static int update_last_edit_object_value(DIALOG *d, struct al_grc *grc,
                 return D_REDRAWME;
 
             case SPK_ENTER:
-                /*
-                 * Chama funcao de callback do objeto 'edit' que esta sendo
-                 * manipulado.
-                 */
+                /* Call the callback function. */
                 run_edit_callback(edit);
                 return D_O_K;
 
@@ -694,7 +690,7 @@ static int update_last_edit_object_value(DIALOG *d, struct al_grc *grc,
 
     ed_value = edit->dp;
 
-    /* Nao faz nada caso atinja o limite da string do objeto */
+    /* Do nothing since we reached the object string limit */
     if (strlen(ed_value) >= (size_t)edit->d1)
         return D_O_K;
 
@@ -703,7 +699,7 @@ static int update_last_edit_object_value(DIALOG *d, struct al_grc *grc,
 
         switch (spk->value) {
             case SPK_BACKSPACE:
-                /* Nao faz nada com o cursor na posicao inicial da string */
+                /* Do nothing since we're at the begining of the string */
                 if (edit->d2 == 0)
                     return D_O_K;
 
@@ -736,19 +732,22 @@ static int update_last_edit_object_value(DIALOG *d, struct al_grc *grc,
     strcpy(ed_value, tmp);
     free(tmp);
 
-    /* Atualiza o cursor, para fazer o scroll correto na linha editada */
+    /*
+     * Updates the cursor so we can make the scroll looks correctly onto
+     * the edited line.
+     */
     object_message(edit, MSG_UPDATE_CURSOR_POSITION, ed_pos);
 
-    /* Atualiza o conteudo do objeto para o usuario */
+    /* Updates the obejct content to the user */
     object_message(edit, MSG_DRAW, 0);
 
     return D_O_K;
 }
 
 /*
- * d1 - Layout do teclado
- * d2 - Flags internos (shift key, ...)
- * dp3 - callback padrao
+ * d1 - Keyboard layout
+ * d2 - Internal flags (shift key, ...)
+ * dp3 - Standard callback
  */
 int gui_d_vt_keyboard_proc(int msg, DIALOG *d, int c __attribute__((unused)))
 {
@@ -756,13 +755,13 @@ int gui_d_vt_keyboard_proc(int msg, DIALOG *d, int c __attribute__((unused)))
     struct al_callback_data *acd = d->dp3;
     struct al_grc *grc = acd->grc;
     enum grc_keyboard_layout klayout = d->d1;
-    int mx, my, ret, draw=AL_FALSE;
+    int mx, my, ret, draw = AL_FALSE;
 
     switch (msg) {
         case MSG_START:
             /*
-             * Calcula a area de cada botao para facilitar a validacao do
-             * clique do mouse.
+             * Estimate each button area make the mouse click validation
+             * easier.
              */
             calc_buttons_area(d, GRC_KLAYOUT_LETTERS);
             calc_buttons_area(d, GRC_KLAYOUT_NUMBERS);
@@ -781,14 +780,14 @@ int gui_d_vt_keyboard_proc(int msg, DIALOG *d, int c __attribute__((unused)))
             key = find_clicked_button(mx, my, klayout);
 
             while (gui_mouse_b()) {
-                /* Precisa redesenhar o botao clicado */
+                /* Needs to redraw the clicked button */
                 if ((key != NULL) && (draw == AL_FALSE)) {
                     key->selected = AL_TRUE;
                     object_message(d, MSG_DRAW, 0);
                     draw = AL_TRUE;
                 }
 
-                /* Permite continuar desenhando os outros objetos */
+                /* Allow to continue draw the other objects */
                 broadcast_dialog_message(MSG_IDLE, 0);
             }
 
@@ -799,15 +798,15 @@ int gui_d_vt_keyboard_proc(int msg, DIALOG *d, int c __attribute__((unused)))
                     return ret;
 
                 /*
-                 * Precisa redesenhar para dar a impressao de que um botao
-                 * foi clicado.
+                 * We need to redraw to make look that a button has been
+                 * clicked.
                  */
                 object_message(d, MSG_DRAW, 0);
 
-                /* Disponibiliza qual tecla foi ativada para o usuario */
+                /* Makes available which key is been activated */
                 acd->value_int = key->key[d->d2 & DLG_SPK_SHIFT].scancode;
 
-                /* Executa funcao de callback do objeto */
+                /* Run the callback function */
                 run_callback(acd);
             }
 
