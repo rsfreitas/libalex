@@ -20,6 +20,8 @@ LGPLv2
 
 ## TODO
 
+* Add examples
+
 * Add support to plugins from libcollections.
 
 * Convert all string manipulation to use *cstring_t* from libcollections.

@@ -370,9 +370,9 @@ int LIBEXPORT al_grc_set_callback(struct al_grc *grc, const char *object_name,
 int LIBEXPORT al_grc_get_callback_data(struct al_callback_data *acd,
     enum al_data_type data, ...)
 {
-    const char *ifmt="%d\0", *sfmt="%[^|]";
+    const char *ifmt = "%d\0", *sfmt = "%[^|]";
     va_list ap;
-    char tmp[512]={0};
+    char tmp[512] = {0};
 
     al_errno_clear();
 
@@ -632,11 +632,11 @@ int LIBEXPORT al_grc_object_send_message(struct al_grc *grc,
 void LIBEXPORT *al_grc_object_get_data(struct al_grc *grc,
     const char *object_name, enum al_data_type type, ...)
 {
-    const char *ifmt="%d\0";
+    const char *ifmt = "%d\0";
     va_list ap;
-    char tmp[512]={0};
+    char tmp[512] = {0};
     void *data = NULL;
-    int value=-1;
+    int value = -1;
     DIALOG *d;
 
     al_errno_clear();
@@ -821,7 +821,7 @@ int LIBEXPORT al_grc_log(struct al_grc *grc, const char *object_name,
 int LIBEXPORT al_grc_list_get_selected_index(struct al_grc *grc,
     const char *object_name)
 {
-    int p=-1;
+    int p = -1;
 
     if ((al_grc_object_get_data(grc, object_name, AL_DT_LIST_POSITION,
                                 &p) == NULL) &&
@@ -846,7 +846,7 @@ int LIBEXPORT al_grc_list_get_selected_index(struct al_grc *grc,
 int LIBEXPORT al_grc_checkbox_get_status(struct al_grc *grc,
     const char *object_name)
 {
-    int st=-1;
+    int st = -1;
 
     if ((al_grc_object_get_data(grc, object_name, AL_DT_CHECKBOX_STATE,
                                 &st) == NULL) &&
@@ -871,7 +871,7 @@ int LIBEXPORT al_grc_checkbox_get_status(struct al_grc *grc,
 int LIBEXPORT al_grc_radio_get_status(struct al_grc *grc,
     const char *object_name)
 {
-    int st=-1;
+    int st = -1;
 
     if ((al_grc_object_get_data(grc, object_name, AL_DT_RADIO_STATE,
                                 &st) == NULL) &&

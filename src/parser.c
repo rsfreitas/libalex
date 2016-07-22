@@ -29,7 +29,7 @@
 
 #include "libalex.h"
 
-/* Estrutura para mapear os possiveis objetos de um DIALOG */
+/* Used to map possible objects from a DIALOG */
 struct grc_dlg_object {
     char                name[256];
     enum al_grc_object  type;
@@ -65,7 +65,7 @@ static struct grc_json_key __entries[] = {
 #define MAX_GRC_ENTRIES             \
     (sizeof(__entries) / sizeof(__entries[0]))
 
-/* Objetos suportados por um DIALOG */
+/* Supported objects from a DIALOG */
 static struct grc_dlg_object __dlg_objects [] = {
     { DLG_OBJ_KEY,              AL_GRC_OBJ_KEY                  },
     { DLG_OBJ_BOX,              AL_GRC_OBJ_BOX                  },
@@ -91,29 +91,28 @@ static struct grc_dlg_object __dlg_objects [] = {
 #define MAX_DLG_SUPPORTED_OBJECTS   \
     (sizeof(__dlg_objects) / sizeof(__dlg_objects[0]))
 
-/* Tipos de quebra da linha do objeto "messages_log_box" */
+/* 'messages_log_box' line break types */
 #define LBREAK_RAW_STR      "raw"
 #define LBREAK_SMART_STR    "smart"
 
-/* Tipos de radio button */
+/* Radio button types */
 #define RADIO_CIRCLE        "circle"
 #define RADIO_SQUARE        "square"
 
-/* Posicoes horizontais */
+/* Horizontal positions */
 #define POS_H_LEFT          "left"
 #define POS_H_RIGHT         "right"
 
 /*
- * ------- Funcoes diversas -------
+ * ------- Common functions -------
  */
 
 /*
- * Faz a traducao de uma string indicando o modo de quebra das linhas em um
- * objeto do tipo de mensagens de log.
+ * Translate a string into a line break mode.
  */
 static int tr_line_break(const char *mode)
 {
-    /* opcao default caso a chave nao exista */
+    /* default option in case there is no key */
     if ((NULL == mode) || !strcmp(mode, LBREAK_SMART_STR))
         return AL_GRC_LBREAK_SMART;
 
@@ -137,11 +136,11 @@ const char *str_line_break(enum al_grc_line_break lbreak)
 }
 
 /*
- * Faz a traducao de uma string indicando o tipo de radio button.
+ * Translate a string to the radio button type.
  */
 static int tr_radio_type(const char *type)
 {
-    /* opcao default caso a chave nao exista */
+    /* default option in case there is no key */
     if ((NULL == type) || !strcmp(type, RADIO_CIRCLE))
         return AL_GRC_RADIO_CIRCLE;
 
@@ -165,11 +164,11 @@ const char *str_radio_type(enum al_grc_radio_button_fmt radio)
 }
 
 /*
- * Faz a traducao de uma string indicando a posicao horizontal de um objeto.
+ * Translate a string pointing to a horizontal position from an object.
  */
 static int tr_horizontal_position(const char *pos)
 {
-    /* opcao default caso a chave nao exista */
+    /* default option in case there is no key */
     if ((NULL == pos) || !strcmp(pos, POS_H_RIGHT))
         return AL_GRC_H_POS_RIGHT;
 
@@ -193,22 +192,21 @@ const char *str_horizontal_position(enum al_grc_hpos hpos)
 }
 
 /*
- * ------- Funcoes de tratamento dos objetos de arquivo GRC -------
+ * ------- GRC object handling -------
  */
 
 /*
- * Procura um objeto capaz de ser utilizado em um DIALOG atraves de seu
- * nome. Este nome e o mesmo carregado do arquivo GRC.
+ * Search for an object able to be used in a DIALOG through its name. This
+ * name is the same loaded from the GRC file.
  *
- * Obs.: Retorna um int para permitir devolver um valor negativo sem
- *       warning na compilacao.
+ * Returns an int to allow negative values without compile warnings.
  *
- * @type_name: Nome do objeto que sera procurado.
+ * @type_name: Object name which will be searched.
  */
 static int tr_str_type_to_grc_type(const char *type_name)
 {
     unsigned int i;
-    int ret=-1;
+    int ret = -1;
 
     if (NULL == type_name)
         return -1;
@@ -237,8 +235,8 @@ const char *str_grc_obj_type(enum al_grc_object obj)
 }
 
 /*
- * Procura pela estrutura de informacoes de um objeto JSON na lista e objetos
- * suportados por um arquivo GRC.
+ * Search for an information structure from a JSON object in the supported
+ * objects list.
  */
 struct grc_json_key *get_grc_json_key(enum al_grc_object_property prop)
 {
@@ -255,7 +253,7 @@ struct grc_json_key *get_grc_json_key(enum al_grc_object_property prop)
 }
 
 /*
- * Faz o parse de um arquivo GRC para memoria.
+ * THE parse ;-) (from a file)
  */
 int grc_parse_file(struct al_grc *grc, const char *grc_filename)
 {
@@ -268,7 +266,7 @@ int grc_parse_file(struct al_grc *grc, const char *grc_filename)
 }
 
 /*
- * Faz o parse de um buffer JSON para memoria.
+ * THE parse ;-) (from a buffer)
  */
 int grc_parse_mem(struct al_grc *grc, const char *data)
 {
@@ -281,8 +279,8 @@ int grc_parse_mem(struct al_grc *grc, const char *data)
 }
 
 /*
- * Obtem o valor de um objeto de dentro do arquivo GRC, esperando que seja
- * um objeto do tipo GRC_NUMBER ou GRC_BOOL.
+ * Get the object value from within a GRC file, expecting to be a GRC_NUMBER
+ * or a GRC_BOOL object.
  */
 int grc_get_object_value(cjson_t *object, const char *object_name,
     int default_value)
@@ -311,8 +309,8 @@ int grc_get_object_value(cjson_t *object, const char *object_name,
 }
 
 /*
- * Obtem o valor de um objeto de dentro do arquivo GRC, esperando que seja um
- * objeto do tipo GRC_STRING.
+ * Get the object value from within a GRC file, expecting to be a GRC_STRING
+ * object.
  */
 char *grc_get_object_str(cjson_t *object, const char *object_name)
 {
@@ -333,7 +331,7 @@ char *grc_get_object_str(cjson_t *object, const char *object_name)
 }
 
 /*
- * Libera uma estrutura do tipo 'struct grc_key_data' da memoria.
+ * Destroy a structure 'struct grc_key_data'.
  */
 void destroy_key_data(struct grc_key_data *kdata)
 {
@@ -347,9 +345,8 @@ void destroy_key_data(struct grc_key_data *kdata)
 }
 
 /*
- * Cria e retorna uma estrutura do tipo 'struct grc_key_data'. A estrutura e
- * criada e preenchida com o conteudo de um objeto do array 'keys' de um arquivo
- * GRC.
+ * Create and return a structure 'grc_key_data'. It is created and filled with
+ * content from an object from an array 'keys' inside a GRC file.
  */
 struct grc_key_data *new_key_data(cjson_t *key)
 {
@@ -396,7 +393,7 @@ undefined_grc_jkey_block:
 }
 
 /*
- * Libera uma estrutura do tipo 'struct grc_obj_properties' da memoria.
+ * Destroy a structure 'struct grc_obj_properties'.
  */
 void destroy_obj_properties(struct grc_obj_properties *prop)
 {
@@ -413,9 +410,8 @@ void destroy_obj_properties(struct grc_obj_properties *prop)
 }
 
 /*
- * Cria e retorna uma estrutura do tipo 'struct grc_obj_properties'. A estrutura e
- * criada e preenchida com o conteudo de um objeto do array 'objects' do arquivo
- * GRC.
+ * Create and return a structure 'struct grc_obj_properties'. It is created
+ * and filled with an object content from 'objects' array inside a GRC file.
  */
 struct grc_obj_properties *new_obj_properties(cjson_t *object)
 {

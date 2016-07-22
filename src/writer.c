@@ -26,8 +26,8 @@
 
 #include "libalex.h"
 
-/* Cores utilizadas para quando nao estiver em modo grafico */
-#define TMP_COLOR_DEPTH             8
+/* Number os colors used when outside graphic mode */
+#define OUT_GFX_COLOR_DEPTH             8
 
 static int create_root_object(struct al_grc *grc)
 {
@@ -45,13 +45,15 @@ static int create_root_object(struct al_grc *grc)
 
 /**
  * @name al_grc_GRC_create_colors
- * @brief Cria o objeto com as cores principais do DIALOG.
+ * @brief Create the color block information.
  *
- * @param [in,out] grc: Estrutura de um arquivo GRC previamente inicializada.
- * @param [in] foreground: String contendo a cor do primeiro plano.
- * @param [in] background: String contendo a cor de fundo.
+ * Add information about the DIALOG main colors to a GRC file.
  *
- * @return Retorna 0 em caso de sucesso ou -1 em caso de erro.
+ * @param [in,out] grc: Previously created GRC structure.
+ * @param [in] foreground: Foreground color name.
+ * @param [in] background: Background color name.
+ *
+ * @return On success returns 0 or -1 otherwise.
  */
 int LIBEXPORT al_grc_GRC_create_colors(struct al_grc *grc,
     const char *foreground, const char *background)
@@ -68,10 +70,10 @@ int LIBEXPORT al_grc_GRC_create_colors(struct al_grc *grc,
     if (create_root_object(grc) < 0)
         return -1;
 
-    if ((grc_tr_color_to_al_color(TMP_COLOR_DEPTH, foreground) < 0) ||
-        (grc_tr_color_to_al_color(TMP_COLOR_DEPTH, background) < 0))
+    /* Invalid colors? */
+    if ((grc_tr_color_to_al_color(OUT_GFX_COLOR_DEPTH, foreground) < 0) ||
+        (grc_tr_color_to_al_color(OUT_GFX_COLOR_DEPTH, background) < 0))
     {
-        /* Cores invalidas */
         al_set_errno(AL_ERROR_UNSUPPORTED_COLORS);
         return -1;
     }
@@ -85,11 +87,11 @@ int LIBEXPORT al_grc_GRC_create_colors(struct al_grc *grc,
         return -1;
     }
 
-    /* Cria objeto com as cores */
+    /* Create an object with the colors */
     cjson_add_item_to_object(c, OBJ_FOREGROUND, fg);
     cjson_add_item_to_object(c, OBJ_BACKGROUND, bg);
 
-    /* Adiciona no objeto principal */
+    /* Add it to the main object */
     cjson_add_item_to_object(grc->jgrc, OBJ_COLORS, c);
 
     return 0;
@@ -99,7 +101,7 @@ int LIBEXPORT al_grc_GRC_create_colors(struct al_grc *grc,
  * @name al_grc_GRC_create_info
  * @brief Cria o objeto com as informacoes principais do DIALOG.
  *
- * @param [in,out] grc: Estrutura de um arquivo GRC previamente inicializada.
+ * @param [in,out] grc: Previously created GRC structure.
  * @param [in] width: Largura da janela.
  * @param [in] height: Altura da janela.
  * @param [in] color: Quantidade de cores da janela.
@@ -109,7 +111,7 @@ int LIBEXPORT al_grc_GRC_create_colors(struct al_grc *grc,
  * @param [in] ignore_esc_key: Flag indicando ou nao se a tecla ESC sera
  *                             ignorada.
  *
- * @return Retorna 0 em caso de sucesso ou -1 em caso de erro.
+ * @return On success returns 0 or -1 otherwise.
  */
 int LIBEXPORT al_grc_GRC_create_info(struct al_grc *grc, unsigned int width,
     unsigned int height, enum al_grc_color_depth color,
@@ -155,7 +157,7 @@ int LIBEXPORT al_grc_GRC_create_info(struct al_grc *grc, unsigned int width,
         return -1;
     }
 
-    /* Cria objeto com as informacoes */
+    /* Create an object with the info */
     cjson_add_item_to_object(i, OBJ_WIDTH, w);
     cjson_add_item_to_object(i, OBJ_HEIGHT, h);
     cjson_add_item_to_object(i, OBJ_COLOR_DEPTH, c);
@@ -163,7 +165,7 @@ int LIBEXPORT al_grc_GRC_create_info(struct al_grc *grc, unsigned int width,
     cjson_add_item_to_object(i, OBJ_MOUSE, m);
     cjson_add_item_to_object(i, OBJ_IGNORE_ESC_KEY, e);
 
-    /* Adiciona no objeto principal */
+    /* Add it to the main object */
     cjson_add_item_to_object(grc->jgrc, OBJ_INFO, i);
 
     return 0;
@@ -193,9 +195,9 @@ static int create_tmp_array(struct al_grc *grc)
  * @name al_grc_GRC_keys_start
  * @brief Inicializa o objeto de teclas suportadas pelo DIALOG.
  *
- * @param [in,out] grc: Estrutura de um arquivo GRC previamente inicializada.
+ * @param [in,out] grc: Previously created GRC structure.
  *
- * @return Retorna 0 em caso de sucesso ou -1 em caso de erro.
+ * @return On success returns 0 or -1 otherwise.
  */
 int LIBEXPORT al_grc_GRC_keys_start(struct al_grc *grc)
 {
@@ -206,12 +208,12 @@ int LIBEXPORT al_grc_GRC_keys_start(struct al_grc *grc)
  * @name al_grc_GRC_add_key
  * @brief Adiciona uma tecla no objeto principal de teclas do DIALOG.
  *
- * @param [in,out] grc: Estrutura de um arquivo GRC previamente inicializada.
+ * @param [in,out] grc: Previously created GRC structure.
  * @param [in] key: Tecla que sera suportada pelo DIALOG. Deve ser uma string
  *                  no mesmo padrao do scancode da Allegro. Exemplo: KEY_A.
  * @param [in] name: Nome de identificacao do objeto para o usuario.
  *
- * @return Retorna 0 em caso de sucesso ou -1 em caso de erro.
+ * @return On success returns 0 or -1 otherwise.
  */
 int LIBEXPORT al_grc_GRC_add_key(struct al_grc *grc, const char *key,
     const char *name)
@@ -267,9 +269,9 @@ static int add_tmp_array(struct al_grc *grc, const char *array_name)
  * @name al_grc_GRC_keys_finish
  * @brief Finaliza o objeto de teclas suportadas pelo DIALOG.
  *
- * @param [in,out] grc: Estrutura de um arquivo GRC previamente inicializada.
+ * @param [in,out] grc: Previously created GRC structure.
  *
- * @return Retorna 0 em caso de sucesso ou -1 em caso de erro.
+ * @return On success returns 0 or -1 otherwise.
  */
 int LIBEXPORT al_grc_GRC_keys_finish(struct al_grc *grc)
 {
@@ -280,9 +282,9 @@ int LIBEXPORT al_grc_GRC_keys_finish(struct al_grc *grc)
  * @name al_grc_GRC_objects_start
  * @brief Inicializa o objeto que contera os objetos suportados pelo DIALOG.
  *
- * @param [in,out] grc: Estrutura de um arquivo GRC previamente inicializada.
+ * @param [in,out] grc: Previously created GRC structure.
  *
- * @return Retorna 0 em caso de sucesso ou -1 em caso de erro.
+ * @return On success returns 0 or -1 otherwise.
  */
 int LIBEXPORT al_grc_GRC_objects_start(struct al_grc *grc)
 {
@@ -293,9 +295,9 @@ int LIBEXPORT al_grc_GRC_objects_start(struct al_grc *grc)
  * @name al_grc_GRC_create_object
  * @brief Inicializa um objeto para ser inserido no DIALOG.
  *
- * @param [in,out] grc: Estrutura de um arquivo GRC previamente inicializada.
+ * @param [in,out] grc: Previously created GRC structure.
  *
- * @return Retorna 0 em caso de sucesso ou -1 em caso de erro.
+ * @return On success returns 0 or -1 otherwise.
  */
 int LIBEXPORT al_grc_GRC_create_object(struct al_grc *grc)
 {
@@ -320,9 +322,9 @@ int LIBEXPORT al_grc_GRC_create_object(struct al_grc *grc)
  * @name al_grc_GRC_finish_object
  * @brief Finaliza o objeto que sera inserido no DIALOG.
  *
- * @param [in,out] grc: Estrutura de um arquivo GRC previamente inicializada.
+ * @param [in,out] grc: Previously created GRC structure.
  *
- * @return Retorna 0 em caso de sucesso ou -1 em caso de erro.
+ * @return On success returns 0 or -1 otherwise.
  */
 int LIBEXPORT al_grc_GRC_finish_object(struct al_grc *grc)
 {
@@ -342,11 +344,11 @@ int LIBEXPORT al_grc_GRC_finish_object(struct al_grc *grc)
  * @name al_grc_GRC_set_object_property
  * @brief Insere uma propriedade no objeto recem criado.
  *
- * @param [in,out] grc: Estrutura de um arquivo GRC previamente inicializada.
+ * @param [in,out] grc: Previously created GRC structure.
  * @param [in] prop: Propriedade que sera inserida no objeto.
  * @param [in] ...: Valor da propriedade.
  *
- * @return Retorna 0 em caso de sucesso ou -1 em caso de erro.
+ * @return On success returns 0 or -1 otherwise.
  */
 int LIBEXPORT al_grc_GRC_set_object_property(struct al_grc *grc,
     enum al_grc_object_property prop, ...)
@@ -485,7 +487,7 @@ int LIBEXPORT al_grc_GRC_set_object_property(struct al_grc *grc,
             return -1;
     }
 
-    /* Somente insere propriedades suportadas */
+    /* Only supported properties are inserted */
     if (jkey != NULL) {
         switch (grc_value) {
             case GRC_NUMBER:
@@ -522,9 +524,9 @@ int LIBEXPORT al_grc_GRC_set_object_property(struct al_grc *grc,
  * @name al_grc_GRC_objects_finish
  * @brief Finaliza o objeto contendo os objetos principais suportados pelo DIALOG.
  *
- * @param [in,out] grc: Estrutura de um arquivo GRC previamente inicializada.
+ * @param [in,out] grc: Previously created GRC structure.
  *
- * @return Retorna 0 em caso de sucesso ou -1 em caso de erro.
+ * @return On success returns 0 or -1 otherwise.
  */
 int LIBEXPORT al_grc_GRC_objects_finish(struct al_grc *grc)
 {

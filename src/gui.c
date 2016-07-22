@@ -30,25 +30,25 @@
 #include "libalex.h"
 #include "gui/objects.h"
 
-/* Altura default de um edit */
+/* Edit deafult height */
 #define DEFAULT_EDIT_HEIGHT                 15
 
-/* Espacador default de um botao */
+/* Space between buttons */
 #define BUTTON_DEFAULT_SPACER               4
 
-/* Altura default de um botao */
+/* Button default height */
 #define DEFAULT_BUTTON_HEIGHT               30
 
-/* Espacador default de um checkbox */
+/* Space between checkboxes */
 #define CHECKBOX_DEFAULT_SPACER             13
 
-/* Altura default de um checkbox */
+/* Checkbox default height */
 #define DEFAULT_CHECKBOX_HEIGHT             15
 
-/* Espacador default de um radio button */
+/* Space between radio buttons */
 #define RADIO_DEFAULT_SPACER                13
 
-/* Altura default de um radio button */
+/* Radio button default height */
 #define DEFAULT_RADIO_HEIGHT                15
 
 struct rgb {
@@ -123,7 +123,7 @@ static struct color __colors[] = {
     (sizeof(__colors) / sizeof(__colors[0]))
 
 /*
- * Objetos default num DIALOG:
+ * Default DIALOG objects:
  *
  *  d_clear_proc
  *  d_yield_proc
@@ -131,7 +131,7 @@ static struct color __colors[] = {
 #define DLG_DEFAULT_NOBJS           2
 
 /*
- * ------- Funcoes diversas -------
+ * ------- Common functions -------
  */
 
 static int special_keys(const char *key)
@@ -165,8 +165,8 @@ static int key_char(const char *key)
 }
 
 /*
- * Converte uma string indicando uma tecla, desde que ela esteja no formato
- * 'KEY_X', para seu correspondente scancode.
+ * Translate a key string, since it is in the format 'KEY_X', to its
+ * corresponding scancode.
  */
 static int grc_tr_str_key_to_al_key(const char *skey)
 {
@@ -208,8 +208,8 @@ end_block:
 }
 
 /*
- * Converte uma string numa cor. Tratando corretamente a quantidade de cores
- * do ambiente grafico na hora de converter.
+ * Translate a string into a color. Dealing correctly with the number of
+ * colors from the GFX mode.
  */
 int grc_tr_color_to_al_color(int color_depth, const char *color)
 {
@@ -245,8 +245,8 @@ static int search_object_ref(void *a, void *b)
 }
 
 /*
- * Procura por um objeto atraves de seu "name" dentro da lista de referencia de
- * objetos e retorna um ponteiro para sua estrutura DIALOG.
+ * Search for an object through its "name" inside the objects reference list
+ * and return a pointer to its DIALOG.
  */
 DIALOG *get_DIALOG_from_grc(struct al_grc *grc, const char *object_name)
 {
@@ -292,13 +292,13 @@ MENU *get_MENU_from_grc(struct al_grc *grc, const char *object_name)
         return NULL;
     }
 
-    /* Procura no menu principal */
+    /* Search in the main menu */
     it = search_menu(grc->dlg_menu, grc->dlg_menu_t_items, object_name);
 
     if (it != NULL)
         return it;
 
-    /* Procura nos outros menus */
+    /* Search in the others */
     for (p = grc->menu; p; p = p->next) {
         it = search_menu(p->menu, p->t_items, object_name);
 
@@ -315,7 +315,7 @@ MENU *get_MENU_from_grc(struct al_grc *grc, const char *object_name)
 }
 
 /*
- * ------- Funcoes de manipulacao da interface grafica -------
+ * ------- Graphical Interface handling functions -------
  */
 
 static int real_change_resolution(struct al_grc *grc)
@@ -333,8 +333,12 @@ static int real_change_resolution(struct al_grc *grc)
     install_timer();
     set_color_depth(grc->gfx.color_depth);
 
-    if (set_gfx_mode(GFX_XWINDOWS, grc->gfx.width, grc->gfx.height, 0, 0) != 0) {
-        if (set_gfx_mode(GFX_FBCON, grc->gfx.width, grc->gfx.height, 0, 0) != 0) {
+    if (set_gfx_mode(GFX_XWINDOWS, grc->gfx.width, grc->gfx.height,
+                     0, 0) != 0)
+    {
+        if (set_gfx_mode(GFX_FBCON, grc->gfx.width, grc->gfx.height,
+                         0, 0) != 0)
+        {
             remove_keyboard();
             allegro_exit();
             al_set_errno(AL_ERROR_SET_GFX_MODE);
@@ -347,7 +351,7 @@ static int real_change_resolution(struct al_grc *grc)
         }
     }
 
-    /* Desabilita ctrl+alt+end */
+    /* Disable ctrl+alt+end */
     if (grc->gfx.block_keys == true)
         three_finger_flag = FALSE;
 
@@ -423,9 +427,8 @@ unknown_grc_key_block:
 }
 
 /*
- * Carrega as informacoes principais de um arquivo GRC relacionadas ao modo
- * grafico do DIALOG e ajusta o ambiente para permitir a execucao de aplicacoes
- * com interfaces graficas.
+ * Load main information from a GRC file GFX related and sets the screen
+ * resolution so we can display some nice UI.
  */
 int gui_change_resolution(struct al_grc *grc)
 {
@@ -436,7 +439,7 @@ int gui_change_resolution(struct al_grc *grc)
 }
 
 /*
- * Carrega as informacoes das cores principais do DIALOG que sera inicializado.
+ * Load main colors of the DIALOG.
  */
 int gui_load_colors(struct al_grc *grc)
 {
@@ -467,7 +470,7 @@ int gui_load_colors(struct al_grc *grc)
 
     bg = grc_get_object_str(jcolors, e->name);
 
-    /* Inicializa cores globais */
+    /* Global colors */
     grc->fg = grc_tr_color_to_al_color(get_color_depth(), fg);
     grc->bg = grc_tr_color_to_al_color(get_color_depth(), bg);
 
@@ -479,7 +482,7 @@ unknown_grc_key_block:
 }
 
 /*
- * Volta a resolucao da tela para o modo texto padrao.
+ * Turn back to text mode.
  */
 void gui_reset_resolution(void)
 {
@@ -490,7 +493,7 @@ void gui_reset_resolution(void)
 }
 
 /*
- * ------- Funcoes de manipulacao do DIALOG -------
+ * ------- DIALOG handling functions -------
  */
 
 static void DIALOG_creation_start(struct al_grc *grc)
@@ -530,8 +533,8 @@ static int add_object(struct al_grc *grc, int dlg_index, cjson_t *object)
     DIALOG *d = &grc->dlg[dlg_index], *p;
     struct dlg_obj_ref *ref = NULL;
     struct grc_generic_data *g_data;
-    int w=-1, h=-1;
-    char tmp[MAX_EDIT_SIZE]={0};
+    int w = -1, h = -1;
+    char tmp[MAX_EDIT_SIZE] = {0};
 
     prop = new_obj_properties(object);
 
@@ -539,7 +542,7 @@ static int add_object(struct al_grc *grc, int dlg_index, cjson_t *object)
         return -1;
 
     /*
-     * Objetos que o usuario precisa definir largura (width) e altura (height):
+     * Objects that the user MUST define _width_ and _height_:
      *
      *  listbox
      *  box
@@ -547,9 +550,8 @@ static int add_object(struct al_grc *grc, int dlg_index, cjson_t *object)
      */
 
     /*
-     * Adiciona objeto no DIALOG. Recomenda-se que as caixas 'box' sejam os
-     * primeiros objetos definidos, para que nenhum tipo de texto seja
-     * sobreposto indevidamente.
+     * Add an object into the DIALOG. It is recommended that 'boxes' be the
+     * first objects defined, so that no text be superimposed.
      */
     switch (prop->type) {
         case AL_GRC_OBJ_BOX:
@@ -570,17 +572,17 @@ static int add_object(struct al_grc *grc, int dlg_index, cjson_t *object)
                 d->proc = gui_d_bitmap_proc;
 
                 /*
-                 * Inicializa como NULL para nao dar erro quando passar pelo
-                 * objeto e nao possuir imagem para exibir.
+                 * We set as NULL here so no error will be thrown when trying
+                 * to draw the object and no image exists.
                  */
                 d->dp = NULL;
             }
 
             /*
-             * Se possuir uma referencia para um objeto "pai", sua posicao sera
-             * relativa a ele. Vale a pena ressaltar que este objeto "pai" deve
-             * ter sido definido __ANTES__ deste, se nao, nao tem como obter sua
-             * posicao ;-). Caso contrario, o usuario precisa defini-la.
+             * If we have a reference to a "father" object, the object position
+             * will derived from his position. Worth mentioning that, for this
+             * work correctly the "father" object must have been defined BEFORE
+             * the object, otherwise we can't get his positions. ;-)
              */
             if (prop->parent != NULL) {
                 p = get_DIALOG_from_grc(grc, prop->parent);
