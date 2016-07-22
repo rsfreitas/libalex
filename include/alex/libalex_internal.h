@@ -225,7 +225,7 @@ struct al_grc {
     struct al_callback_data *callback_data;
 
     /* Graphic mode info */
-    enum al_flag            use_gfx;
+    bool                    use_gfx;
     struct al_gfx_info      gfx;
 
     /* Main colors of the DIALOG */
@@ -236,13 +236,13 @@ struct al_grc {
     enum al_grc_line_break  lbreak;
 
     /* Flag to ignore the ESC key */
-    enum al_flag            ignore_esc_key;
+    bool                    ignore_esc_key;
 
     /* Flag showing if the user has declared the ESC key */
-    enum al_flag            esc_key_user_defined;
+    bool                    esc_key_user_defined;
 
     /* Flag to use the virtual keyboard */
-    enum al_flag            virtual_keyboard;
+    bool                    virtual_keyboard;
 
     /*
      * Pointer to the 'edit' object selected while activated the virtual

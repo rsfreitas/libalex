@@ -130,7 +130,7 @@ struct al_grc *new_grc(void)
      * Let the virtual keyboard disabled by now. If there is such an object
      * this flag will be enabled.
      */
-    g->virtual_keyboard = AL_FALSE;
+    g->virtual_keyboard = false;
 
     return g;
 }

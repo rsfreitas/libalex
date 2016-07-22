@@ -100,7 +100,7 @@ struct btn_key_area {
 struct screen_key {
     struct key          key[2];
     struct btn_key_area area;
-    enum al_flag        selected;
+    bool                selected;
 };
 
 struct screen_line {
@@ -537,10 +537,10 @@ static void draw_keyboard(DIALOG *d, int keyb_layout)
             sk = &k->line[i].keys[j];
 
             /* Swaps the colors of the pressed button */
-            if (sk->selected == AL_TRUE) {
+            if (sk->selected == true) {
                 fg = d->bg;
                 bg = d->fg;
-                sk->selected = AL_FALSE;
+                sk->selected = false;
                 dotted_key = sk;
             }
 
@@ -755,7 +755,7 @@ int gui_d_vt_keyboard_proc(int msg, DIALOG *d, int c __attribute__((unused)))
     struct al_callback_data *acd = d->dp3;
     struct al_grc *grc = acd->grc;
     enum grc_keyboard_layout klayout = d->d1;
-    int mx, my, ret, draw = AL_FALSE;
+    int mx, my, ret, draw = false;
 
     switch (msg) {
         case MSG_START:
@@ -781,10 +781,10 @@ int gui_d_vt_keyboard_proc(int msg, DIALOG *d, int c __attribute__((unused)))
 
             while (gui_mouse_b()) {
                 /* Needs to redraw the clicked button */
-                if ((key != NULL) && (draw == AL_FALSE)) {
-                    key->selected = AL_TRUE;
+                if ((key != NULL) && (draw == false)) {
+                    key->selected = true;
                     object_message(d, MSG_DRAW, 0);
-                    draw = AL_TRUE;
+                    draw = true;
                 }
 
                 /* Allow to continue draw the other objects */

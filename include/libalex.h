@@ -49,14 +49,6 @@
 # include <collections.h>
 #endif
 
-/*
- * TODO: Bad, bad... use a bool type...
- */
-enum al_flag {
-    AL_FALSE,
-    AL_TRUE
-};
-
 /* Number of supported colors */
 enum al_grc_color_depth {
     AL_GRC_COLOR_8 = 8,

@@ -307,7 +307,7 @@ int grc_get_object_value(cjson_t *object, const char *object_name,
         return v;
     }
 
-    return (type == CJSON_TRUE ? AL_TRUE : AL_FALSE);
+    return (type == CJSON_TRUE ? true : false);
 }
 
 /*
@@ -527,7 +527,7 @@ struct grc_obj_properties *new_obj_properties(cjson_t *object)
     if (NULL == e)
         goto undefined_grc_jkey_block;
 
-    p->hide = grc_get_object_value(object, e->name, AL_FALSE);
+    p->hide = grc_get_object_value(object, e->name, false);
 
     /* line_break */
     e = get_grc_json_key(AL_GRC_JOBJ_LINE_BREAK);
@@ -569,7 +569,7 @@ struct grc_obj_properties *new_obj_properties(cjson_t *object)
     if (NULL == e)
         goto undefined_grc_jkey_block;
 
-    p->password_mode = grc_get_object_value(object, e->name, AL_FALSE);
+    p->password_mode = grc_get_object_value(object, e->name, false);
 
     /* horizontal position */
     e = get_grc_json_key(AL_GRC_JOBJ_H_POSITION);

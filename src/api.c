@@ -33,7 +33,7 @@
 
 static int start_grc(struct al_grc *grc)
 {
-    if (grc->use_gfx == AL_TRUE) {
+    if (grc->use_gfx == true) {
         if (gui_change_resolution(grc) < 0)
             return -1;
     }
@@ -45,7 +45,7 @@ static int start_grc(struct al_grc *grc)
 }
 
 static struct al_grc *al_grc_init(const char *grc_data, int load_mode,
-    enum al_flag gfx)
+    bool gfx)
 {
     struct al_grc *grc;
     int ret = 0;
@@ -111,7 +111,7 @@ end_block:
  *         sucesso ou NULL em caso de erro.
  */
 struct al_grc LIBEXPORT *al_grc_init_from_file(const char *grc_file,
-    enum al_flag gfx)
+    bool gfx)
 {
     return al_grc_init(grc_file, LOAD_FROM_FILE, gfx);
 }
@@ -135,7 +135,7 @@ struct al_grc LIBEXPORT *al_grc_init_from_file(const char *grc_file,
  *         sucesso ou NULL em caso de erro.
  */
 struct al_grc LIBEXPORT *al_grc_init_from_mem(const char *data,
-    enum al_flag gfx)
+    bool gfx)
 {
     return al_grc_init(data, LOAD_FROM_MEM, gfx);
 }
@@ -196,7 +196,7 @@ int LIBEXPORT al_grc_uninit(struct al_grc *grc)
     }
 
     /* Return the gfx to text mode */
-    if (grc->use_gfx == AL_TRUE)
+    if (grc->use_gfx == true)
         gui_reset_resolution();
 
     /* Free the object */
@@ -487,7 +487,7 @@ int LIBEXPORT al_grc_object_set_data(struct al_grc *grc, const char *object_name
         case AL_DT_CHECKBOX_STATE:
             s = *((int *)&data);
 
-            if (s == AL_TRUE)
+            if (s == true)
                 d->flags |= D_SELECTED;
             else
                 d->flags &= ~D_SELECTED;

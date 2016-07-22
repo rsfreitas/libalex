@@ -64,8 +64,8 @@ int al_grc_GRC_create_colors(struct al_grc *grc, const char *foreground,
  */
 int al_grc_GRC_create_info(struct al_grc *grc, unsigned int width,
                            unsigned int height, enum al_grc_color_depth color,
-                           enum al_flag block_exit_keys, enum al_flag mouse,
-                           enum al_flag ignore_esc_key);
+                           bool block_exit_keys, bool mouse,
+                           bool ignore_esc_key);
 
 /**
  * @name al_grc_GRC_keys_start

@@ -52,7 +52,7 @@
  * @return Retorna uma estrutura para manipular a interface grafica em caso de
  *         sucesso ou NULL em caso de erro.
  */
-struct al_grc *al_grc_init_from_file(const char *grc_file, enum al_flag gfx);
+struct al_grc *al_grc_init_from_file(const char *grc_file, bool gfx);
 
 /**
  * @name al_grc_init_from_mem
@@ -72,7 +72,7 @@ struct al_grc *al_grc_init_from_file(const char *grc_file, enum al_flag gfx);
  * @return Retorna uma estrutura para manipular a interface grafica em caso de
  *         sucesso ou NULL em caso de erro.
  */
-struct al_grc *al_grc_init_from_mem(const char *data, enum al_flag gfx);
+struct al_grc *al_grc_init_from_mem(const char *data, bool gfx);
 
 /**
  * @name al_grc_create

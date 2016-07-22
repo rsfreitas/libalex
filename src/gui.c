@@ -341,14 +341,14 @@ static int real_change_resolution(struct al_grc *grc)
             return -1;
         }
     } else {
-        if (grc->gfx.use_mouse == AL_TRUE) {
+        if (grc->gfx.use_mouse == true) {
             install_mouse();
             gui_mouse_focus = FALSE;
         }
     }
 
     /* Desabilita ctrl+alt+end */
-    if (grc->gfx.block_keys == AL_TRUE)
+    if (grc->gfx.block_keys == true)
         three_finger_flag = FALSE;
 
     return 0;
@@ -397,7 +397,7 @@ static int load_resolution_info(struct al_grc *grc)
     if (NULL == e)
         goto unknown_grc_key_block;
 
-    grc->gfx.block_keys = grc_get_object_value(jinfo, e->name, AL_TRUE);
+    grc->gfx.block_keys = grc_get_object_value(jinfo, e->name, true);
 
     /* mouse */
     e = get_grc_json_key(AL_GRC_JOBJ_MOUSE);
@@ -405,7 +405,7 @@ static int load_resolution_info(struct al_grc *grc)
     if (NULL == e)
         goto unknown_grc_key_block;
 
-    grc->gfx.use_mouse = grc_get_object_value(jinfo, e->name, AL_FALSE);
+    grc->gfx.use_mouse = grc_get_object_value(jinfo, e->name, false);
 
     /* ignore_esc_key */
     e = get_grc_json_key(AL_GRC_JOBJ_IGNORE_ESC_KEY);
@@ -413,7 +413,7 @@ static int load_resolution_info(struct al_grc *grc)
     if (NULL == e)
         goto unknown_grc_key_block;
 
-    grc->ignore_esc_key = grc_get_object_value(jinfo, e->name, AL_FALSE);
+    grc->ignore_esc_key = grc_get_object_value(jinfo, e->name, false);
 
     return 0;
 
@@ -638,7 +638,7 @@ static int add_object(struct al_grc *grc, int dlg_index, cjson_t *object)
                 return -1;
             }
 
-            if (prop->password_mode == AL_FALSE)
+            if (prop->password_mode == false)
                 d->proc = gui_d_edit_proc;
             else {
                 d->proc = gui_d_password_proc;
@@ -751,7 +751,7 @@ static int add_object(struct al_grc *grc, int dlg_index, cjson_t *object)
             d->proc = gui_d_vt_keyboard_proc;
             d->d1 = GRC_KLAYOUT_LETTERS;
             d->dp = grc;
-            grc->virtual_keyboard = AL_TRUE;
+            grc->virtual_keyboard = true;
             break;
 
         case AL_GRC_OBJ_ICON:
@@ -785,7 +785,7 @@ static int add_object(struct al_grc *grc, int dlg_index, cjson_t *object)
     d->bg = grc->bg;
 
     /* Mostra ou nao o objeto */
-    if (prop->hide == AL_FALSE)
+    if (prop->hide == false)
         d->flags &= ~D_HIDDEN;
     else
         d->flags |= D_HIDDEN;
@@ -860,7 +860,7 @@ static int add_key(struct al_grc *grc, int dlg_index, cjson_t *key)
      * para nao sobrepo-la.
      */
     if (d->d1 == KEY_ESC)
-        grc->esc_key_user_defined = AL_TRUE;
+        grc->esc_key_user_defined = true;
 
     /* Cria referencia para utilizacao posterior */
     ref = new_obj_ref(kdata->name, dlg_index, AL_GRC_OBJ_KEY);
@@ -887,11 +887,11 @@ static void add_default_esc_key(struct al_grc *grc, int dlg_index)
     DIALOG *d = &grc->dlg[dlg_index];
 
     /* A tecla foi definida pelo usuario? */
-    if (grc->esc_key_user_defined == AL_TRUE)
+    if (grc->esc_key_user_defined == true)
         return;
 
     /* O usuario pediu para ignorar ESC default da Allegro? */
-    if (grc->ignore_esc_key == AL_FALSE)
+    if (grc->ignore_esc_key == false)
         return;
 
     /*
@@ -919,7 +919,7 @@ static int DIALOG_add_keys(struct al_grc *grc, cjson_t *keys, int dlg_index)
         return -1;
     }
 
-    grc->esc_key_user_defined = AL_FALSE;
+    grc->esc_key_user_defined = false;
 
     for (i = 0; i < t; i++) {
         n = cjson_get_array_item(keys, i);
@@ -1172,7 +1172,7 @@ int create_DIALOG(struct al_grc *grc)
     total = cjson_get_array_size(objects);
     total += 1; /* d_yield_proc */
 
-    if (grc->use_gfx == AL_TRUE)
+    if (grc->use_gfx == true)
         total += 1; /* d_clear_proc */
 
     if (keys != NULL)
@@ -1200,11 +1200,11 @@ int create_DIALOG(struct al_grc *grc)
     }
 
     /* Inicializa DIALOG */
-    if (grc->use_gfx == AL_TRUE)
+    if (grc->use_gfx == true)
         DIALOG_creation_start(grc);
 
     /* Adiciona objetos definidos no arquivo GRC */
-    p = DIALOG_add_objects(grc, objects, (grc->use_gfx == AL_TRUE) ? 1 : 0);
+    p = DIALOG_add_objects(grc, objects, (grc->use_gfx == true) ? 1 : 0);
 
     if (p < 0)
         return -1;
@@ -1238,7 +1238,7 @@ int create_DIALOG(struct al_grc *grc)
 
 void run_DIALOG(struct al_grc *grc)
 {
-    if (grc->use_gfx == AL_FALSE)
+    if (grc->use_gfx == false)
         centre_dialog(grc->dlg);
 
     do_dialog(grc->dlg, -1);

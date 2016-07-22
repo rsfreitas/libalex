@@ -113,8 +113,7 @@ int LIBEXPORT al_grc_GRC_create_colors(struct al_grc *grc,
  */
 int LIBEXPORT al_grc_GRC_create_info(struct al_grc *grc, unsigned int width,
     unsigned int height, enum al_grc_color_depth color,
-    enum al_flag block_exit_keys, enum al_flag mouse,
-    enum al_flag ignore_esc_key)
+    bool block_exit_keys, bool mouse, bool ignore_esc_key)
 {
     cjson_t *c, *k, *m, *e, *w, *h, *i;
 
@@ -132,17 +131,17 @@ int LIBEXPORT al_grc_GRC_create_info(struct al_grc *grc, unsigned int width,
     h = cjson_create_number(height);
     c = cjson_create_number(color);
 
-    if (block_exit_keys == AL_FALSE)
+    if (block_exit_keys == false)
         k = cjson_create_false();
     else
         k = cjson_create_true();
 
-    if (mouse == AL_FALSE)
+    if (mouse == false)
         m = cjson_create_false();
     else
         m = cjson_create_true();
 
-    if (ignore_esc_key == AL_FALSE)
+    if (ignore_esc_key == false)
         e = cjson_create_false();
     else
         e = cjson_create_true();
@@ -498,7 +497,7 @@ int LIBEXPORT al_grc_GRC_set_object_property(struct al_grc *grc,
                 break;
 
             case GRC_BOOL:
-                if (i == AL_FALSE)
+                if (i == false)
                     c = cjson_create_false();
                 else
                     c = cjson_create_true();
