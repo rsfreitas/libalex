@@ -68,19 +68,19 @@ void al_set_errno(enum al_error_code code);
 
 /**
  * @name al_get_last_error
- * @brief Obtem o codigo de erro atual da biblioteca.
+ * @brief Gets the last error code internally occurred.
  *
- * @return Retorna o codigo de erro atual da biblioteca.
+ * @return Returns the last error code.
  */
 enum al_error_code al_get_last_error(void);
 
 /**
  * @name al_strerror
- * @brief Obtem uma descricao a respeito de um codigo de erro.
+ * @brief Converts a numeric error code in a text message.
  *
- * @param [in] code: Codigo de erro.
+ * @param [in] error_code: Numeric error code.
  *
- * @return Retorna uma string contendo a descricao do codigo de erro informado.
+ * @return Returns the text corresponding the error code.
  */
 const char *al_strerror(enum al_error_code code);
 

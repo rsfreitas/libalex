@@ -24,6 +24,10 @@ LGPLv2
 
 * Add support to plugins from libcollections.
 
+* Add reference count to the exported objects.
+
+* Change all exported data to opaque types.
+
 * Convert all string manipulation to use *cstring_t* from libcollections.
 
 * Framegrabber support, for live capture, with multilive support also.

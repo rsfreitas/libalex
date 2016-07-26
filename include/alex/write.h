@@ -35,32 +35,33 @@
 
 /**
  * @name al_grc_GRC_create_colors
- * @brief Cria o objeto com as cores principais do DIALOG.
+ * @brief Create the color block information.
  *
- * @param [in,out] grc: Estrutura de um arquivo GRC previamente inicializada.
- * @param [in] foreground: String contendo a cor do primeiro plano.
- * @param [in] background: String contendo a cor de fundo.
+ * Add information about the DIALOG main colors to a GRC file.
  *
- * @return Retorna 0 em caso de sucesso ou -1 em caso de erro.
+ * @param [in,out] grc: Previously created GRC structure.
+ * @param [in] foreground: Foreground color name.
+ * @param [in] background: Background color name.
+ *
+ * @return On success returns 0 or -1 otherwise.
  */
 int al_grc_GRC_create_colors(struct al_grc *grc, const char *foreground,
                              const char *background);
 
 /**
  * @name al_grc_GRC_create_info
- * @brief Cria o objeto com as informacoes principais do DIALOG.
+ * @brief Create the main DIALOG block information.
  *
- * @param [in,out] grc: Estrutura de um arquivo GRC previamente inicializada.
- * @param [in] width: Largura da janela.
- * @param [in] height: Altura da janela.
- * @param [in] color: Quantidade de cores da janela.
- * @param [in] block_exit_keys: Flag indicando o bloqueio ou nao das teclas
- *                              ctrl+alt+end.
- * @param [in] mouse: Flag indicando ou nao o uso do mouse.
- * @param [in] ignore_esc_key: Flag indicando ou nao se a tecla ESC sera
- *                             ignorada.
+ * @param [in,out] grc: Previously created GRC structure.
+ * @param [in] width: Window width.
+ * @param [in] height: Window height.
+ * @param [in] color: DIALOG colors.
+ * @param [in] block_exit_keys: Flag to block Allegro's ctrl+alt+end
+ *                              shortcut.
+ * @param [in] mouse: Flag to enable mouse.
+ * @param [in] ignore_esc_key: Flag to ignore ESC key.
  *
- * @return Retorna 0 em caso de sucesso ou -1 em caso de erro.
+ * @return On success returns 0 or -1 otherwise.
  */
 int al_grc_GRC_create_info(struct al_grc *grc, unsigned int width,
                            unsigned int height, enum al_grc_color_depth color,
@@ -69,87 +70,88 @@ int al_grc_GRC_create_info(struct al_grc *grc, unsigned int width,
 
 /**
  * @name al_grc_GRC_keys_start
- * @brief Inicializa o objeto de teclas suportadas pelo DIALOG.
+ * @brief Create the supported keys block.
  *
- * @param [in,out] grc: Estrutura de um arquivo GRC previamente inicializada.
+ * @param [in,out] grc: Previously created GRC structure.
  *
- * @return Retorna 0 em caso de sucesso ou -1 em caso de erro.
+ * @return On success returns 0 or -1 otherwise.
  */
 int al_grc_GRC_keys_start(struct al_grc *grc);
 
+/* TODO: Change this name to tag... */
 /**
  * @name al_grc_GRC_add_key
- * @brief Adiciona uma tecla no objeto principal de teclas do DIALOG.
+ * @brief Add a supported key from a DIALOG.
  *
- * @param [in,out] grc: Estrutura de um arquivo GRC previamente inicializada.
- * @param [in] key: Tecla que sera suportada pelo DIALOG. Deve ser uma string
- *                  no mesmo padrao do scancode da Allegro. Exemplo: KEY_A.
- * @param [in] name: Nome de identificacao do objeto para o usuario.
+ * @param [in,out] grc: Previously created GRC structure.
+ * @param [in] key: Supported key. Must be a string the way Allegro uses,
+ *                  like KEY_A.
+ * @param [in] name: Identification tag to the user.
  *
- * @return Retorna 0 em caso de sucesso ou -1 em caso de erro.
+ * @return On success returns 0 or -1 otherwise.
  */
 int al_grc_GRC_add_key(struct al_grc *grc, const char *key, const char *name);
 
 /**
  * @name al_grc_GRC_keys_finish
- * @brief Finaliza o objeto de teclas suportadas pelo DIALOG.
+ * @brief Ends the supported keys block.
  *
- * @param [in,out] grc: Estrutura de um arquivo GRC previamente inicializada.
+ * @param [in,out] grc: Previously created GRC structure.
  *
- * @return Retorna 0 em caso de sucesso ou -1 em caso de erro.
+ * @return On success returns 0 or -1 otherwise.
  */
 int al_grc_GRC_keys_finish(struct al_grc *grc);
 
 /**
  * @name al_grc_GRC_objects_start
- * @brief Inicializa o objeto que contera os objetos suportados pelo DIALOG.
+ * @brief Creates the block which will contain all DIALOG objects.
  *
- * @param [in,out] grc: Estrutura de um arquivo GRC previamente inicializada.
+ * @param [in,out] grc: Previously created GRC structure.
  *
- * @return Retorna 0 em caso de sucesso ou -1 em caso de erro.
+ * @return On success returns 0 or -1 otherwise.
  */
 int al_grc_GRC_objects_start(struct al_grc *grc);
 
 /**
  * @name al_grc_GRC_create_object
- * @brief Inicializa um objeto para ser inserido no DIALOG.
+ * @brief Creates an object which will be added to the DIALOG.
  *
- * @param [in,out] grc: Estrutura de um arquivo GRC previamente inicializada.
+ * @param [in,out] grc: Previously created GRC structure.
  *
- * @return Retorna 0 em caso de sucesso ou -1 em caso de erro.
+ * @return On success returns 0 or -1 otherwise.
  */
 int al_grc_GRC_create_object(struct al_grc *grc);
 
 /**
  * @name al_grc_GRC_finish_object
- * @brief Finaliza o objeto que sera inserido no DIALOG.
+ * @brief Ends the object added to the DIALOG.
  *
- * @param [in,out] grc: Estrutura de um arquivo GRC previamente inicializada.
+ * @param [in,out] grc: Previously created GRC structure.
  *
- * @return Retorna 0 em caso de sucesso ou -1 em caso de erro.
+ * @return On success returns 0 or -1 otherwise.
  */
 int al_grc_GRC_finish_object(struct al_grc *grc);
 
 /**
  * @name al_grc_GRC_set_object_property
- * @brief Insere uma propriedade no objeto recem criado.
+ * @brief Add a property to a newly created object.
  *
- * @param [in,out] grc: Estrutura de um arquivo GRC previamente inicializada.
- * @param [in] prop: Propriedade que sera inserida no objeto.
- * @param [in] ...: Valor da propriedade.
+ * @param [in,out] grc: Previously created GRC structure.
+ * @param [in] prop: Inserted property.
+ * @param [in] ...: Property value.
  *
- * @return Retorna 0 em caso de sucesso ou -1 em caso de erro.
+ * @return On success returns 0 or -1 otherwise.
  */
 int al_grc_GRC_set_object_property(struct al_grc *grc,
                                    enum al_grc_object_property prop, ...);
 
 /**
  * @name al_grc_GRC_objects_finish
- * @brief Finaliza o objeto contendo os objetos principais suportados pelo DIALOG.
+ * @brief Ends the objects block.
  *
- * @param [in,out] grc: Estrutura de um arquivo GRC previamente inicializada.
+ * @param [in,out] grc: Previously created GRC structure.
  *
- * @return Retorna 0 em caso de sucesso ou -1 em caso de erro.
+ * @return On success returns 0 or -1 otherwise.
  */
 int al_grc_GRC_objects_finish(struct al_grc *grc);
 

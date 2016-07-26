@@ -43,18 +43,6 @@ static int create_root_object(struct al_grc *grc)
     return 0;
 }
 
-/**
- * @name al_grc_GRC_create_colors
- * @brief Create the color block information.
- *
- * Add information about the DIALOG main colors to a GRC file.
- *
- * @param [in,out] grc: Previously created GRC structure.
- * @param [in] foreground: Foreground color name.
- * @param [in] background: Background color name.
- *
- * @return On success returns 0 or -1 otherwise.
- */
 int LIBEXPORT al_grc_GRC_create_colors(struct al_grc *grc,
     const char *foreground, const char *background)
 {
@@ -97,22 +85,6 @@ int LIBEXPORT al_grc_GRC_create_colors(struct al_grc *grc,
     return 0;
 }
 
-/**
- * @name al_grc_GRC_create_info
- * @brief Cria o objeto com as informacoes principais do DIALOG.
- *
- * @param [in,out] grc: Previously created GRC structure.
- * @param [in] width: Largura da janela.
- * @param [in] height: Altura da janela.
- * @param [in] color: Quantidade de cores da janela.
- * @param [in] block_exit_keys: Flag indicando o bloqueio ou nao das teclas
- *                              ctrl+alt+end.
- * @param [in] mouse: Flag indicando ou nao o uso do mouse.
- * @param [in] ignore_esc_key: Flag indicando ou nao se a tecla ESC sera
- *                             ignorada.
- *
- * @return On success returns 0 or -1 otherwise.
- */
 int LIBEXPORT al_grc_GRC_create_info(struct al_grc *grc, unsigned int width,
     unsigned int height, enum al_grc_color_depth color,
     bool block_exit_keys, bool mouse, bool ignore_esc_key)
@@ -191,30 +163,11 @@ static int create_tmp_array(struct al_grc *grc)
     return 0;
 }
 
-/**
- * @name al_grc_GRC_keys_start
- * @brief Inicializa o objeto de teclas suportadas pelo DIALOG.
- *
- * @param [in,out] grc: Previously created GRC structure.
- *
- * @return On success returns 0 or -1 otherwise.
- */
 int LIBEXPORT al_grc_GRC_keys_start(struct al_grc *grc)
 {
     return create_tmp_array(grc);
 }
 
-/**
- * @name al_grc_GRC_add_key
- * @brief Adiciona uma tecla no objeto principal de teclas do DIALOG.
- *
- * @param [in,out] grc: Previously created GRC structure.
- * @param [in] key: Tecla que sera suportada pelo DIALOG. Deve ser uma string
- *                  no mesmo padrao do scancode da Allegro. Exemplo: KEY_A.
- * @param [in] name: Nome de identificacao do objeto para o usuario.
- *
- * @return On success returns 0 or -1 otherwise.
- */
 int LIBEXPORT al_grc_GRC_add_key(struct al_grc *grc, const char *key,
     const char *name)
 {
@@ -265,40 +218,16 @@ static int add_tmp_array(struct al_grc *grc, const char *array_name)
     return 0;
 }
 
-/**
- * @name al_grc_GRC_keys_finish
- * @brief Finaliza o objeto de teclas suportadas pelo DIALOG.
- *
- * @param [in,out] grc: Previously created GRC structure.
- *
- * @return On success returns 0 or -1 otherwise.
- */
 int LIBEXPORT al_grc_GRC_keys_finish(struct al_grc *grc)
 {
     return add_tmp_array(grc, OBJ_KEYS);
 }
 
-/**
- * @name al_grc_GRC_objects_start
- * @brief Inicializa o objeto que contera os objetos suportados pelo DIALOG.
- *
- * @param [in,out] grc: Previously created GRC structure.
- *
- * @return On success returns 0 or -1 otherwise.
- */
 int LIBEXPORT al_grc_GRC_objects_start(struct al_grc *grc)
 {
     return create_tmp_array(grc);
 }
 
-/**
- * @name al_grc_GRC_create_object
- * @brief Inicializa um objeto para ser inserido no DIALOG.
- *
- * @param [in,out] grc: Previously created GRC structure.
- *
- * @return On success returns 0 or -1 otherwise.
- */
 int LIBEXPORT al_grc_GRC_create_object(struct al_grc *grc)
 {
     al_errno_clear();
@@ -318,14 +247,6 @@ int LIBEXPORT al_grc_GRC_create_object(struct al_grc *grc)
     return 0;
 }
 
-/**
- * @name al_grc_GRC_finish_object
- * @brief Finaliza o objeto que sera inserido no DIALOG.
- *
- * @param [in,out] grc: Previously created GRC structure.
- *
- * @return On success returns 0 or -1 otherwise.
- */
 int LIBEXPORT al_grc_GRC_finish_object(struct al_grc *grc)
 {
     al_errno_clear();
@@ -340,16 +261,6 @@ int LIBEXPORT al_grc_GRC_finish_object(struct al_grc *grc)
     return 0;
 }
 
-/**
- * @name al_grc_GRC_set_object_property
- * @brief Insere uma propriedade no objeto recem criado.
- *
- * @param [in,out] grc: Previously created GRC structure.
- * @param [in] prop: Propriedade que sera inserida no objeto.
- * @param [in] ...: Valor da propriedade.
- *
- * @return On success returns 0 or -1 otherwise.
- */
 int LIBEXPORT al_grc_GRC_set_object_property(struct al_grc *grc,
     enum al_grc_object_property prop, ...)
 {
@@ -520,14 +431,6 @@ int LIBEXPORT al_grc_GRC_set_object_property(struct al_grc *grc,
     return 0;
 }
 
-/**
- * @name al_grc_GRC_objects_finish
- * @brief Finaliza o objeto contendo os objetos principais suportados pelo DIALOG.
- *
- * @param [in,out] grc: Previously created GRC structure.
- *
- * @return On success returns 0 or -1 otherwise.
- */
 int LIBEXPORT al_grc_GRC_objects_finish(struct al_grc *grc)
 {
     return add_tmp_array(grc, OBJ_OBJECTS);

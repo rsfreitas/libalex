@@ -35,117 +35,112 @@
 
 /**
  * @name al_grc_init_from_file
- * @brief Inicializa o ambiente e a interface grafica.
+ * @brief Initialize library environment and Allegro.
  *
- * As informacoes a respeito da interface grafica sao carregadas a partir de
- * um arquivo do tipo GRC informado em \a grc_file.
+ * All UI informations are loaded from a file of GRC type, passed in
+ * \a grc_file.
  *
- * O argumento \a gfx permite que varios arquivos GRC sejam carregados numa
- * mesma aplicacao, fazendo com que ela possua quantos DIALOGs forem
- * necessarios.
+ * The \a gfx argument allows that other GRC files be loaded in the same
+ * application, making it to have as many DIALOS as needed.
  *
- * @param [in] grc_file: Caminho do arquivo GRC contendo a interface grafica
- *                       que sera inicializada.
- * @param [in] gfx: Flag indicando se o ambiente grafico sera inicializado
- *                  ou nao.
+ * @param [in] grc_file: Complete path of the GRC file which will be loaded.
+ * @param [in] gfx: Flag to initialize internal Allegro gfx routines.
  *
- * @return Retorna uma estrutura para manipular a interface grafica em caso de
- *         sucesso ou NULL em caso de erro.
+ * @return Returns a 'struct al_grc' to handle UI calls on success or NULL
+ *         otherwise.
  */
 struct al_grc *al_grc_init_from_file(const char *grc_file, bool gfx);
 
 /**
  * @name al_grc_init_from_mem
- * @brief Inicializa o ambiente e a interface grafica.
+ * @brief Initialize library environment and Allegro.
  *
- * As informacoes a respeito da interface grafica sao carregadas a partir de
- * um buffer em memoria contendo um arquivo GRC previamente carregado.
+ * All UI informations are loaded from a memory buffer containing a previously
+ * loaded GRC file.
  *
- * O argumento \a gfx permite que varios arquivos GRC sejam carregados numa
- * mesma aplicacao, fazendo com que ela possua quantos DIALOGs forem
- * necessarios.
+ * The \a gfx argument allows that other GRC files be loaded in the same
+ * application, making it to have as many DIALOS as needed.
  *
- * @param [in] data: Buffer contendo o arquivo GRC previamente carregado.
- * @param [in] gfx: Flag indicando se o ambiente grafico sera inicializado
- *                  ou nao.
  *
- * @return Retorna uma estrutura para manipular a interface grafica em caso de
- *         sucesso ou NULL em caso de erro.
+ * @param [in] data: The buffer containing a previously loaded GRC file.
+ * @param [in] gfx: Flag to initialize internal Allegro gfx routines.
+ *
+ * @return Returns a 'struct al_grc' to handle UI calls on success or NULL
+ *         otherwise.
  */
 struct al_grc *al_grc_init_from_mem(const char *data, bool gfx);
 
 /**
  * @name al_grc_create
- * @brief Inicializa o ambiente para a criacao da interface grafica em tempo
- *        de execucao.
+ * @brief Initialize library environment to create UI in runtime.
  *
- * Esta funcao permite que o usuario defina e inicialize o ambiente de uma
- * interface grafica em tempo de execucao. A definicao da interface e realizada
- * atraves das funcoes com prefixo 'al_grc_GRC_'.
+ * This functions provides the user a way to define and initialize an UI
+ * in runtime. The creation of this UI is done by functions with prefix
+ * 'al_grc_GRC_'.
  *
- * @return Retorna uma estrutura para manipular a interface grafica em caso de
- *         sucesso ou NULL em caso de erro.
+ * @return Returns a 'struct al_grc' to handle UI calls on success or NULL
+ *         otherwise.
  */
 struct al_grc *al_grc_create(void);
 
 /**
  * @name al_grc_init_from_bare_data
- * @brief Inicializa a interface grafica a partir de informacoes criadas em
- *        tempo de execucao.
+ * @brief Initialize UI from runtime informations.
  *
- * @param [in] grc: Estrutura principal da biblioteca, previamente inicializada.
+ * @param [in] grc: Previously created UI structure.
  *
- * @return Retorna 0 em caso de sucesso ou -1 em caso de erro.
+ * @return On success returns 0 or -1 otherwise.
  */
 int al_grc_init_from_bare_data(struct al_grc *grc);
 
 /**
  * @name al_grc_uninit
- * @brief Finaliza a interface grafica.
+ * @brief Shutdown library environment.
  *
- * @param [in] grc: Estrutura da interface grafica que sera finalizada.
+ * This functions returns GFX to text mode.
  *
- * @return Retorna 0 em caso de sucesso ou -1 em caso de erro.
+ * @param [in] grc: UI structure which will be released.
+ *
+ * @return On success returns 0 or -1 otherwise.
  */
 int al_grc_uninit(struct al_grc *grc);
 
 /**
  * @name al_grc_prepare_dialog
- * @brief Inicializa o DIALOG que sera exibido na interface grafica.
+ * @brief Starts the next DIALOG to be on the screen.
  *
- * Esta funcao e responsavel por realizar toda inicializacao possivel do DIALOG
- * definido no arquivo GRC carregado previamente. Todo ajuste customizado pelo
- * usuario deve acontecer apos a sua chamada.
+ * This functions is responsible to make all initialization needed by a DIALOG,
+ * defined in a previously loaded GRC file. All custom adjusts by the user must
+ * happen after a call to it.
  *
- * @param [in] grc: Estrutura da interface grafica previamente inicializada.
+ * @param [in] grc: Previously created UI structure.
  *
- * @return Retorna 0 em caso de sucesso ou -1 em caso erro.
+ * @return On success returns 0 or -1 otherwise.
  */
 int al_grc_prepare_dialog(struct al_grc *grc);
 
 /**
  * @name al_grc_do_dialog
- * @brief Coloca o DIALOG em execucao.
+ * @brief Puts a DIALOG to run.
  *
- * Todo ajuste customizado em objetos do DIALOG deve ser realizado antes da
- * chamada desta funcao. Para que, quando ele for montado para exibicao na
- * tela, tudo ja esteja corretamente inicializado.
+ * All custom adjust in objects from the DIALOG must be made before a call to
+ * this function.
  *
- * @param [in] grc: Estrutura da interface grafica previamente inicializada.
+ * @param [in] grc: Previously created UI structure.
  *
- * @return Retorna 0 em caso de sucesso ou -1 em caso de erro.
+ * @return On success returns 0 or -1 otherwise.
  */
 int al_grc_do_dialog(struct al_grc *grc);
 
 /**
  * @name al_grc_set_callback
- * @brief Atribui uma funcao para ser chamada quando um objeto for ativado.
+ * @brief Assigns a callback function to an object.
  *
- * A funcao de resposta do objeto deve receber dois argumentos, sendo que o
- * primeiro pode variar de acordo com o objeto e o segundo indicado pelo
- * proprio usuario no argumento \a arg.
+ * The callback function must receive two arguments. The first may vary
+ * according the object and the second is designated by the user through
+ * \a arg.
  *
- * Objetos com suporte a funcao de resposta e seu respectivo argumento:
+ * The list of objects that may have a callback function:
  *
  *  button
  *  key
@@ -155,197 +150,195 @@ int al_grc_do_dialog(struct al_grc *grc);
  *  radio
  *  list
  *
- * @param [in] grc: Estrutura da interface grafica previamente inicializada.
- * @param [in] object_name: Nome do objeto que sera atualizado.
- * @param [in] callback: Ponteiro para a funcao de resposta do objeto.
- * @param [in] arg: Argumento para a funcao de resposta.
+ * @param [in] grc: Previously created UI structure.
+ * @param [in] object_name: The object name.
+ * @param [in] callback: Pointer the real function.
+ * @param [in] arg: Custom argument of the function.
  *
- * @return Retorna 0 em caso de sucesso ou -1 em caso de erro.
+ * @return On success returns 0 or -1 otherwise.
  */
 int al_grc_set_callback(struct al_grc *grc, const char *object_name,
                         int (*callback)(struct al_callback_data *), void *arg);
 
 /**
  * @name al_grc_get_callback_data
- * @brief Obtem dados do objeto de dentro da funcao de callback.
+ * @brief Gets the return value from a callback function call.
  *
- * @param [in] acd: Argumento da funcao de callback.
- * @param [in] data: Tipo de dado que sera extraido.
- * @param [out] ...: Variavel para armazenar o dado extraido.
+ * @param [in] acd: Callback function argument.
+ * @param [in] data: Type of the data.
+ * @param [out] ...: Custom data.
  *
- * @return Retorna 0 em caso de sucesso ou -1 em caso de erro.
+ * @return On success returns 0 or -1 otherwise.
  */
 int al_grc_get_callback_data(struct al_callback_data *acd,
                              enum al_data_type data, ...);
 
 /**
  * @name al_grc_get_callback_user_arg
- * @brief Obtem o dado passado ao registrar a funcao de callback do objeto.
+ * @brief Gets the custom data passed to a callback function.
  *
- * @param [in] acd: Argumento da funcao de callback.
+ * @param [in] acd: Callback function argument.
  *
- * @return Retorna o dado passado ao registrar a funcao de callback ou
- *         NULL em caso de erro.
+ * @return On success returns a pointer the the data passed as argument
+ *         to a callback function or NULL otherwise.
  */
 void *al_grc_get_callback_user_arg(struct al_callback_data *acd);
 
 /**
  * @name al_grc_get_callback_grc
- * @brief Obtem a estrutura principal da biblioteca de dentro de um funcao de
- *        callback.
+ * @brief Gets a pointer the the main library object.
  *
- * @param [in] acd: Argumento da funcao de callback.
+ * This function allows a callback function get a pointer to the main library
+ * object.
  *
- * @return Retorna um ponteiro para a estrutura principal da biblioteca ou NULL
- *         em caso de erro.
+ * @param [in] acd: Callback function argument.
+ *
+ * @return On success returns a pointer to the main library object or NULL
+ *         otherwise.
  */
 struct al_grc *al_grc_get_callback_grc(struct al_callback_data *acd);
 
+/* TODO: change data to const */
 /**
  * @name al_grc_object_set_data
- * @brief Inicializa membros do objeto capazes de receberem dados variaveis.
+ * @brief Initialized object members that can receive variable data.
  *
- * @param [in] grc: Estrutura da interface grafica previamente inicializada.
- * @param [in] object_name: Nome do objeto que sera atualizado.
- * @param [in] type: Tipo de dado que sera inicializado, referente ao membro
- *                   da estrutura do objeto.
- * @param [in] data: Valor que sera atribuido ao membro definido.
+ * @param [in] grc: Previously created UI structure.
+ * @param [in] object_name: The object name.
+ * @param [in] type: Object data type which will be initialized.
+ * @param [in] data: Value which will be assigned to the object member.
  *
- * @return Retorna 0 em caso de sucesso ou -1 em caso de erro.
+ * @return On success returns 0 or -1 otherwise.
  */
 int al_grc_object_set_data(struct al_grc *grc, const char *object_name,
                            enum al_data_type type, void *data);
 
 /**
  * @name al_grc_object_set_proc
- * @brief Atribui a funcao principal de um objeto.
+ * @brief Set an object main function.
  *
- * Esta funcao e responsavel por atribuir a funcao principal de objetos
- * customizados.
+ * This function assigns the main function of a custom object.
  *
- * @param [in] grc: Estrutura da interface grafica previamente inicializada.
- * @param [in] object_name: Nome do objeto que sera atualizado.
- * @param [in] function: Ponteiro para a funcao do objeto.
+ * @param [in] grc: Previously created UI structure.
+ * @param [in] object_name: The object name.
+ * @param [in] function: Pointer to the function.
  *
- * @return Retorna 0 em caso de sucesso ou -1 em caso de erro.
+ * @return On success returns 0 or -1 otherwise.
  */
 int al_grc_object_set_proc(struct al_grc *grc, const char *object_name,
                            int (*function)(int, DIALOG *, int));
 
 /**
  * @name al_grc_object_send_message
- * @brief Envia uma mensagem para um determinado objeto.
+ * @brief Send a message to an object.
  *
- * @param [in] grc: Estrutura da interface grafica previamente inicializada.
- * @param [in] object_name: Nome do objeto que sera atualizado.
- * @param [in] msg: Mensagem que esta sendo enviada.
- * @param [in] c: Argumento da mensagem.
+ * @param [in] grc: Previously created UI structure.
+ * @param [in] object_name: The object name.
+ * @param [in] msg: Sended message.
+ * @param [in] c: Message value.
  *
- * @return Retorna 0 em caso de sucesso ou -1 em caso de erro.
+ * @return On success returns 0 or -1 otherwise.
  */
 int al_grc_object_send_message(struct al_grc *grc, const char *object_name,
                                int msg, int c);
 
+/* TODO: Change this to use a cvalue_t */
 /**
  * @name al_grc_object_get_data
- * @brief Obtem valores atuais de objetos especificos.
+ * @brief Get current value from specific objects.
  *
- * @param [in] grc: Estrutura da interface grafica previamente inicializada.
- * @param [in] object_name: Nome do objeto que sera atualizado.
- * @param [in] type: Tipo de dado que sera inicializado, referente ao membro
- *                   da estrutura do objeto.
- * @param [out] ...: Variavel para armazenar o dado extraido.
+ * @param [in] grc: Previously created UI structure.
+ * @param [in] object_name: The object name.
+ * @param [in] type: Object data type which will be initialized.
+ * @param [out] ...: Data to store the extracted value.
  *
- * @return No caso de objetos com valores diferentes de numeros inteiros, retorna
- *         o valor ou NULL em caso de erro. No caso de objetos com valores sendo
- *         numeros inteiros, preenche um argumento com o valor e retorna um dado
- *         valido (que o usuario pode somente validar) ou NULL em caso de erro.
+ * @return If the object return value is not a int, on success returns the value
+ *         or NULL otherwise. If the object returns a int value, on success
+ *         returns a valid pointer or NULL otherwise.
  */
 void *al_grc_object_get_data(struct al_grc *grc, const char *object_name,
                              enum al_data_type type, ...);
 
 /**
  * @name al_grc_object_hide
- * @brief Esconde um determinado objeto.
+ * @brief Hide an object on the screen.
  *
- * @param [in] grc: Estrutura da interface grafica previamente inicializada.
- * @param [in] object_name: Nome do objeto que sera atualizado.
+ * @param [in] grc: Previously created UI structure.
+ * @param [in] object_name: The object name.
  *
- * @return Retorna 0 em caso de sucesso ou -1 em caso de erro.
+ * @return On success returns 0 or -1 otherwise.
  */
 int al_grc_object_hide(struct al_grc *grc, const char *object_name);
 
 /**
  * @name al_grc_object_show
- * @brief Exibe um determinado objeto (previamente escondido).
+ * @brief Show a previously hidden object on the screen.
  *
- * @param [in] grc: Estrutura da interface grafica previamente inicializada.
- * @param [in] object_name: Nome do objeto que sera atualizado.
+ * @param [in] grc: Previously created UI structure.
+ * @param [in] object_name: The object name.
  *
- * @return Retorna 0 em caso de sucesso ou -1 em caso de erro.
+ * @return On success returns 0 or -1 otherwise.
  */
 int al_grc_object_show(struct al_grc *grc, const char *object_name);
 
 /**
  * @name al_grc_log
- * @brief Insere uma mensagem num objeto do tipo 'message_log_box'.
+ * @brief Add a message in a 'message_log_box' object.
  *
- * @param [in] grc: Estrutura da interface grafica previamente inicializada.
- * @param [in] object_name: Nome do objeto que sera atualizado.
- * @param [in] msg: Mensagem que sera inserida.
- * @param [in] color: Cor da mensagem. Se for NULL, a cor default do objeto
- *                    sera utilizada.
+ * @param [in] grc: Previously created UI structure.
+ * @param [in] object_name: The object name.
+ * @param [in] msg: The message.
+ * @param [in] color: Message color. If it's NULL, a default color will be
+ *                    used.
  *
- * @return Retorna 0 em caso de sucesso ou -1 em caso de erro.
+ * @return On success returns 0 or -1 otherwise.
  */
 int al_grc_log(struct al_grc *grc, const char *object_name, const char *msg,
                const char *color);
 
 /**
  * @name al_grc_list_get_selected_index
- * @brief Obtem o indice do item selecionado atualmente num objeto do tipo
- *        'list'.
+ * @brief Gets the selected item index from a 'list' object.
  *
- * @param [in] grc: Estrutura da interface grafica previamente inicializada.
- * @param [in] object_name: Nome do objeto que sera procurado.
+ * @param [in] grc: Previously created UI structure.
+ * @param [in] object_name: The object name.
  *
- * @return Retorna o indice do item selecionado (que deve ser >= 0) ou -1 em
- *         caso de erro.
+ * @return On success returns the item index or -1 otherwise.
  */
 int al_grc_list_get_selected_index(struct al_grc *grc, const char *object_name);
 
 /**
  * @name al_grc_checkbox_get_status
- * @brief Obtem o estado atual de um objeto do tipo 'checkbox'.
+ * @brief Gets the current state of a 'checkbox' object.
  *
- * @param [in] grc: Estrutura da interface grafica previamente inicializada.
- * @param [in] object_name: Nome do objeto que sera procurado.
+ * @param [in] grc: Previously created UI structure.
+ * @param [in] object_name: The object name.
  *
- * @return Retorna o estado do objeto, sendo 1 para selecionado e 0 nao
- *         selecionado, ou -1 em caso de erro.
+ * @return On success return the object current state (1 - selected, 0 -
+ *         unselected) or -1 otherwise.
  */
 int al_grc_checkbox_get_status(struct al_grc *grc, const char *object_name);
 
 /**
  * @name al_grc_radio_get_status
- * @brief Obtem o estado atual de um objeto do tipo 'radio'.
+ * @brief Gets the current state of a 'radio' object.
  *
- * @param [in] grc: Estrutura da interface grafica previamente inicializada.
- * @param [in] object_name: Nome do objeto que sera procurado.
+ * @param [in] grc: Previously created UI structure.
+ * @param [in] object_name: The object name.
  *
- * @return Retorna o estado do objeto, sendo 1 para selecionado e 0 nao
- *         selecionado, ou -1 em caso de erro.
+ * @return On success return the object current state (1 - selected, 0 -
+ *         unselected) or -1 otherwise.
  */
 int al_grc_radio_get_status(struct al_grc *grc, const char *object_name);
 
 /**
  * @name al_grc_edit_get_data
- * @brief Obtem o valor atual de um objeto do tipo 'edit'.
+ * @brief Gets the current value of an 'edit' object.
  *
- * @param [in] grc: Estrutura da interface grafica previamente inicializada.
- * @param [in] object_name: Nome do objeto que sera procurado.
+ * @param [in] grc: Previously created UI structure.
+ * @param [in] object_name: The object name.
  *
- * @return Retorna o valor atual do objeto ou NULL em caso de erro.
+ * @return On success returns the object value or NULL othewise.
  */
 char *al_grc_edit_get_data(struct al_grc *grc, const char *object_name);
 
