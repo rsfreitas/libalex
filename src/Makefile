@@ -30,19 +30,19 @@ CFLAGS = -Wall -Wextra -fPIC -ggdb -O0 -g3 -fvisibility=hidden \
 GUI_PATH = ./gui
 VPATH = .:../include:.:$(GUI_PATH)
 
-GUI_OBJS =			\
-	gui_bitmap.o		\
-	gui_button.o		\
-	gui_check.o		\
-	gui_clock.o		\
-	gui_edit.o		\
-	gui_icon.o		\
-	gui_keyboard.o		\
-	gui_list.o		\
+GUI_OBJS =					\
+	gui_bitmap.o			\
+	gui_button.o			\
+	gui_check.o				\
+	gui_clock.o				\
+	gui_edit.o				\
+	gui_icon.o				\
+	gui_keyboard.o			\
+	gui_list.o				\
 	gui_messages_log_box.o	\
-	gui_radio.o		\
-	gui_slider.o		\
-	gui_textbox.o		\
+	gui_radio.o				\
+	gui_slider.o			\
+	gui_textbox.o			\
 	gui_vt_keyboard.o
 
 OBJS =				\

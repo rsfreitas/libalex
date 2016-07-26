@@ -271,8 +271,8 @@ struct al_grc {
     cjson_t                 *jtmp_obj;
 };
 
-#include "gui.h"
-#include "parser.h"
+#include "al_gui.h"
+#include "al_parser.h"
 
 #endif
 

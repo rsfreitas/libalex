@@ -236,16 +236,16 @@ enum al_key {
 #define MSG_UPDATE_CURSOR_POSITION      MSG_USER + 3
 
 #ifdef LIBALEX_COMPILE
-# include "alex/libalex_internal.h"
+# include "alex/al_internal.h"
 #else
 struct al_grc;
 struct al_callback_data;
 #endif
 
-#include "alex/error.h"
-#include "alex/common.h"
-#include "alex/api.h"
-#include "alex/write.h"
+#include "alex/al_error.h"
+#include "alex/al_common.h"
+#include "alex/al_api.h"
+#include "alex/al_write.h"
 
 #endif
 
