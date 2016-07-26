@@ -151,8 +151,8 @@ struct grc_obj_properties {
  * DIALOG structure.
  */
 struct dlg_obj_ref {
-    struct dlg_obj_ref  *prev;
-    struct dlg_obj_ref  *next;
+    clist_t             *prev;
+    clist_t             *next;
     char                *name;
     int                 dlg_index;
     enum al_grc_object  type;
@@ -160,15 +160,15 @@ struct dlg_obj_ref {
 
 /* Structure to be used in the callback functions */
 struct al_callback_data {
-    struct al_callback_data *prev;
-    struct al_callback_data *next;
-    char                    *value_string;
-    int                     value_int;
-    void                    *user_arg;
-    void                    *grc; /* Pointer to the main structure */
+    clist_t         *prev;
+    clist_t         *next;
+    char            *value_string;
+    int             value_int;
+    void            *user_arg;
+    void            *grc; /* Pointer to the main structure */
 
     /* internal */
-    int                     (*callback)(struct al_callback_data *);
+    int             (*callback)(struct al_callback_data *);
 };
 
 /* Graphic mode informations */
@@ -182,8 +182,8 @@ struct al_gfx_info {
 
 /* Menus loaded */
 struct grc_menu {
-    struct grc_menu *prev;
-    struct grc_menu *next;
+    clist_t         *prev;
+    clist_t         *next;
     char            *name;
     char            *parent;
 
@@ -196,18 +196,18 @@ struct grc_menu {
 
 /* List of menus and submenus from a DIALOG */
 struct al_menu {
-    struct al_menu  *prev;
-    struct al_menu  *next;
-    char            *name;
-    int             t_items;
-    char            *parent;
-    MENU            *menu;
+    clist_t     *prev;
+    clist_t     *next;
+    char        *name;
+    int         t_items;
+    char        *parent;
+    MENU        *menu;
 };
 
 struct grc_generic_data {
-    struct grc_generic_data   *prev;
-    struct grc_generic_data   *next;
-    char                      data[MAX_EDIT_SIZE];
+    clist_t     *prev;
+    clist_t     *next;
+    char        data[MAX_EDIT_SIZE];
 };
 
 /* Main structure to handle an Allegro DIALOG */

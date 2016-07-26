@@ -148,6 +148,8 @@ static void destroy_al_menu(void *a)
  */
 void destroy_grc(struct al_grc *grc)
 {
+    int i;
+
     if (grc->jgrc != NULL)
         cjson_delete(grc->jgrc);
 
@@ -163,8 +165,17 @@ void destroy_grc(struct al_grc *grc)
     if (grc->g_data != NULL)
         cdll_free(grc->g_data, NULL);
 
-    if (grc->dlg_menu != NULL)
+    if (grc->dlg_menu != NULL) {
+        for (i = 0; i < grc->dlg_menu_t_items; i++) {
+            if (grc->dlg_menu[i].text != NULL)
+                free(grc->dlg_menu[i].text);
+
+            if (grc->dlg_menu[i].dp != NULL)
+                free(grc->dlg_menu[i].dp);
+        }
+
         free(grc->dlg_menu);
+    }
 
     if (grc->menu != NULL)
         cdll_free(grc->menu, destroy_al_menu);

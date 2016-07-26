@@ -324,7 +324,7 @@ char *grc_get_object_str(cjson_t *object, const char *object_name)
         return NULL;
 
     s = cjson_get_object_value(n);
-    p = (char *)cstring_valueof(s);
+    p = strdup(cstring_valueof(s));
     cstring_unref(s);
 
     return p;
@@ -372,7 +372,7 @@ struct grc_key_data *new_key_data(cjson_t *key)
     if (NULL == tmp)
         goto undefined_grc_jkey_block;
 
-    k->key = strdup(tmp);
+    k->key = tmp;
 
     /* name */
     e = get_grc_json_key(AL_GRC_JOBJ_NAME);
@@ -381,7 +381,7 @@ struct grc_key_data *new_key_data(cjson_t *key)
         goto undefined_grc_jkey_block;
 
     tmp = grc_get_object_str(key, e->name);
-    k->name = strdup(tmp);
+    k->name = tmp;
 
     return k;
 
@@ -402,6 +402,9 @@ void destroy_obj_properties(struct grc_obj_properties *prop)
 
     if (prop->name != NULL)
         free(prop->name);
+
+    if (prop->text != NULL)
+        free(prop->text);
 
     if (prop->fg != NULL)
         free(prop->fg);
@@ -434,6 +437,7 @@ struct grc_obj_properties *new_obj_properties(cjson_t *object)
 
     tmp = grc_get_object_str(object, e->name);
     p->type = tr_str_type_to_grc_type(tmp);
+    free(tmp);
 
     /* name */
     e = get_grc_json_key(AL_GRC_JOBJ_NAME);
@@ -444,7 +448,7 @@ struct grc_obj_properties *new_obj_properties(cjson_t *object)
     tmp = grc_get_object_str(object, e->name);
 
     if (tmp != NULL)
-        p->name = strdup(tmp);
+        p->name = tmp;
     else
         p->name = NULL;
 
@@ -457,7 +461,7 @@ struct grc_obj_properties *new_obj_properties(cjson_t *object)
     tmp = grc_get_object_str(object, e->name);
 
     if (tmp != NULL)
-        p->parent = strdup(tmp);
+        p->parent = tmp;
     else
         p->parent = NULL;
 
@@ -483,7 +487,7 @@ struct grc_obj_properties *new_obj_properties(cjson_t *object)
     tmp = grc_get_object_str(object, e->name);
 
     if (tmp != NULL)
-        p->fg = strdup(tmp);
+        p->fg = tmp;
 
     /* pos_x */
     e = get_grc_json_key(AL_GRC_JOBJ_POS_X);
@@ -533,6 +537,7 @@ struct grc_obj_properties *new_obj_properties(cjson_t *object)
 
     tmp = grc_get_object_str(object, e->name);
     p->line_break_mode = tr_line_break(tmp);
+    free(tmp);
 
     /* input_length */
     e = get_grc_json_key(AL_GRC_JOBJ_INPUT_LENGTH);
@@ -558,6 +563,7 @@ struct grc_obj_properties *new_obj_properties(cjson_t *object)
 
     tmp = grc_get_object_str(object, e->name);
     p->radio_type = tr_radio_type(tmp);
+    free(tmp);
 
     /* password */
     e = get_grc_json_key(AL_GRC_JOBJ_PASSWORD_MODE);
@@ -575,6 +581,7 @@ struct grc_obj_properties *new_obj_properties(cjson_t *object)
 
     tmp = grc_get_object_str(object, e->name);
     p->horizontal_position = tr_horizontal_position(tmp);
+    free(tmp);
 
     /* fps */
     e = get_grc_json_key(AL_GRC_JOBJ_FPS);
@@ -643,7 +650,7 @@ struct grc_menu *new_menu(cjson_t *object)
         tmp = grc_get_object_str(object, e->name);
 
         if (tmp != NULL)
-            m->name = strdup(tmp);
+            m->name = tmp;
     }
 
     /* parent */
@@ -653,7 +660,7 @@ struct grc_menu *new_menu(cjson_t *object)
         tmp = grc_get_object_str(object, e->name);
 
         if (tmp != NULL)
-            m->parent = strdup(tmp);
+            m->parent = tmp;
     }
 
     /* text */
@@ -663,7 +670,7 @@ struct grc_menu *new_menu(cjson_t *object)
         tmp = grc_get_object_str(object, e->name);
 
         if (tmp != NULL)
-            m->text = strdup(tmp);
+            m->text = tmp;
     }
 
     /* options (items) */

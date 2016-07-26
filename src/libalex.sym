@@ -1,0 +1,41 @@
+LIBCOLLECTIONS_0.1 {
+    global:
+        al_grc_init_from_file;
+        al_grc_init_from_mem;
+        al_grc_create;
+        al_grc_init_from_bare_data;
+        al_grc_uninit;
+        al_grc_prepare_dialog;
+        al_grc_do_dialog;
+        al_grc_set_callback;
+        al_grc_get_callback_data;
+        al_grc_get_callback_user_arg;
+        al_grc_get_callback_grc;
+        al_grc_object_set_data;
+        al_grc_object_set_proc;
+        al_grc_object_send_message;
+        al_grc_object_get_data;
+        al_grc_object_hide;
+        al_grc_object_show;
+        al_grc_log;
+        al_grc_list_get_selected_index;
+        al_grc_checkbox_get_status;
+        al_grc_radio_get_status;
+        al_grc_edit_get_data;
+        al_get_last_error;
+        al_strerror;
+        al_grc_GRC_create_colors;
+        al_grc_GRC_create_info;
+        al_grc_GRC_keys_start;
+        al_grc_GRC_add_key;
+        al_grc_GRC_keys_finish;
+        al_grc_GRC_objects_start;
+        al_grc_GRC_create_object;
+        al_grc_GRC_finish_object;
+        al_grc_GRC_set_object_property;
+        al_grc_GRC_objects_finish;
+    local:
+        *;
+};
+
+

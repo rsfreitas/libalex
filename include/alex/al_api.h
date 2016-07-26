@@ -110,8 +110,8 @@ int al_grc_uninit(struct al_grc *grc);
  * @brief Starts the next DIALOG to be on the screen.
  *
  * This functions is responsible to make all initialization needed by a DIALOG,
- * defined in a previously loaded GRC file. All custom adjusts by the user must
- * happen after a call to it.
+ * defined in a previously loaded GRC file. All custom adjustments by the user
+ * must happen after a call to it.
  *
  * @param [in] grc: Previously created UI structure.
  *

@@ -474,6 +474,9 @@ int gui_load_colors(struct al_grc *grc)
     grc->fg = grc_tr_color_to_al_color(get_color_depth(), fg);
     grc->bg = grc_tr_color_to_al_color(get_color_depth(), bg);
 
+    free(bg);
+    free(fg);
+
     return 0;
 
 unknown_grc_key_block:
