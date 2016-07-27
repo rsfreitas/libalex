@@ -614,9 +614,9 @@ static int add_object(struct al_grc *grc, int dlg_index, cjson_t *object)
 
             if (prop->type == AL_GRC_OBJ_FIXED_TEXT) {
                 /*
-                 * Apesar da estrutura 'prop' ser desalocada logo abaixo, este
-                 * texto somente aponta para o texto original carregado do arquivo
-                 * GRC, desta forma o texto consegue ser exibido.
+                 * Although 'prop' structure is freed right here, this only
+                 * points to the original text, loaded from the GRC file.
+                 * This way we can display it.
                  */
                 d->dp = (char *)prop->text;
             }
@@ -628,7 +628,7 @@ static int add_object(struct al_grc *grc, int dlg_index, cjson_t *object)
             d->flags = D_EXIT;
             d->dp = (char *)prop->text;
 
-            /* Calcula largura e altura automaticamente, caso necessario */
+            /* We compute width and height automatically, case is necessary */
             if (prop->w < 0)
                 w = text_length(font, prop->text) + BUTTON_DEFAULT_SPACER;
 
@@ -649,15 +649,14 @@ static int add_object(struct al_grc *grc, int dlg_index, cjson_t *object)
                 d->proc = gui_d_password_proc;
 
                 /*
-                 * Cria um buffer temporario para armazenar a string contendo
-                 * os asteriscos.
+                 * Creates a temporary buffer to store the asterisks strings.
                  */
                 g_data = new_grc_generic_data();
                 grc->g_data = cdll_unshift(grc->g_data, g_data);
                 d->dp2 = g_data->data;
             }
 
-            /* Cria o buffer para armazenar a string digitada no objeto. */
+            /* Creates the buffer to store the typed string in the object. */
             g_data = new_grc_generic_data();
             grc->g_data = cdll_unshift(grc->g_data, g_data);
             d->dp = g_data->data;
@@ -666,12 +665,12 @@ static int add_object(struct al_grc *grc, int dlg_index, cjson_t *object)
             d->d1 = prop->data_length;
 
             /*
-             * Ajusta um tamanho default para permitir que o mouse possa
-             * atrair o foco para este objeto.
+             * Adjusts a default size allowing that the mouse may set the
+             * focus on this object.
              */
             h = DEFAULT_EDIT_HEIGHT;
 
-            /* Calcula a largura automaticamente, caso necessario */
+            /* We compute width automatically, case is necessary */
             if (prop->parent != NULL) {
                 p = get_DIALOG_from_grc(grc, prop->parent);
                 d->x = p->x + 3;
@@ -701,7 +700,7 @@ static int add_object(struct al_grc *grc, int dlg_index, cjson_t *object)
             else
                 d->d1 = 0;
 
-            /* Calcula largura e altura automaticamente, caso necessario */
+            /* We compute width and height automatically, case is necessary */
             if (prop->w < 0)
                 w = text_length(font, prop->text) + CHECKBOX_DEFAULT_SPACER;
 
@@ -716,7 +715,7 @@ static int add_object(struct al_grc *grc, int dlg_index, cjson_t *object)
             d->d1 = prop->radio_group;
             d->d2 = prop->radio_type;
 
-            /* Calcula largura e altura automaticamente, caso necessario */
+            /* We compute width and height automatically, case is necessary */
             if (prop->w < 0)
                 w = text_length(font, prop->text) + RADIO_DEFAULT_SPACER;
 
@@ -773,7 +772,7 @@ static int add_object(struct al_grc *grc, int dlg_index, cjson_t *object)
             return -1;
     }
 
-    /* Posicao do objeto na tela */
+    /* Object position into the screen */
     if (prop->parent == NULL) {
         d->x = prop->x;
         d->y = prop->y;
@@ -781,7 +780,7 @@ static int add_object(struct al_grc *grc, int dlg_index, cjson_t *object)
         d->h = (h == -1) ? prop->h : h;
     }
 
-    /* Define cores (especificas) do objeto */
+    /* Specific object colors */
     if (prop->fg != NULL)
         d->fg = grc_tr_color_to_al_color(get_color_depth(), prop->fg);
     else
@@ -789,19 +788,19 @@ static int add_object(struct al_grc *grc, int dlg_index, cjson_t *object)
 
     d->bg = grc->bg;
 
-    /* Mostra ou nao o objeto */
+    /* Hides the object or not */
     if (prop->hide == false)
         d->flags &= ~D_HIDDEN;
     else
         d->flags |= D_HIDDEN;
 
     /*
-     * Todo objeto ja possui acesso a informacoes internas da biblioteca,
-     * mesmo que eles nao possuam funcoes de callback.
+     * Every object already has access to internal library information,
+     * even if they do not have callback functions.
      */
     set_object_internal_data(d, grc);
 
-    /* Cria referencia para utilizacao posterior pelo usuario */
+    /* Creates a reference the be used by the user later */
     if (prop->name != NULL) {
         ref = new_obj_ref(prop->name, dlg_index, prop->type);
 
@@ -817,10 +816,9 @@ static int add_object(struct al_grc *grc, int dlg_index, cjson_t *object)
 }
 
 /*
- * Percorre o array de objetos que constituirao o DIALOG definido no arquivo
- * GRC. A funcao retorna o ultimo indice do ultimo objeto inserido no DIALOG
- * para permitir que as teclas adicionadas posteriormente estejam na sequencia,
- * em memoria.
+ * Traverses the object array that will compose the DIALOG from the GRC file.
+ * The function returns the last object index, allowing that the added keys may
+ * be in sequence.
  */
 static int DIALOG_add_objects(struct al_grc *grc, cjson_t *objects,
     int dlg_index)
@@ -856,18 +854,18 @@ static int add_key(struct al_grc *grc, int dlg_index, cjson_t *key)
     if (NULL == kdata)
         return -1;
 
-    /* Adiciona objeto no DIALOG */
+    /* Adds an object into the DIALOG */
     d->proc = gui_d_keyboard_proc;
     d->d1 = grc_tr_str_key_to_al_key(kdata->key);
 
     /*
-     * Caso esteja adicionando a tecla ESC, deixa avisado internamente,
-     * para nao sobrepo-la.
+     * Case we're adding the ESC key, we signal internally, so we don't
+     * override it.
      */
     if (d->d1 == KEY_ESC)
         grc->esc_key_user_defined = true;
 
-    /* Cria referencia para utilizacao posterior */
+    /* Creates a reference the be used by the user later */
     ref = new_obj_ref(kdata->name, dlg_index, AL_GRC_OBJ_KEY);
 
     if (NULL == ref)
@@ -880,7 +878,7 @@ static int add_key(struct al_grc *grc, int dlg_index, cjson_t *key)
 }
 
 /*
- * Funcao de callback simples para bloquear a tecla ESC para o usuario.
+ * Simple callback function to block ESC key to the user.
  */
 static int __disable_key(void *arg __attribute__((unused)))
 {
@@ -891,17 +889,17 @@ static void add_default_esc_key(struct al_grc *grc, int dlg_index)
 {
     DIALOG *d = &grc->dlg[dlg_index];
 
-    /* A tecla foi definida pelo usuario? */
+    /* Was the key defined by the user? */
     if (grc->esc_key_user_defined == true)
         return;
 
-    /* O usuario pediu para ignorar ESC default da Allegro? */
+    /* Did the user ask to ignore the ESC key? */
     if (grc->ignore_esc_key == false)
         return;
 
     /*
-     * Utiliza o objeto de teclas da Allegro para evitar a criacao de uma
-     * estrutura 'al_callback_data' desnecessaria.
+     * Uses the Allegro key object to avoid create an unecessary
+     * 'al_callback_data' structure.
      */
     d->proc = d_keyboard_proc;
     d->d1 = KEY_ESC;
@@ -909,8 +907,8 @@ static void add_default_esc_key(struct al_grc *grc, int dlg_index)
 }
 
 /*
- * Percorre o array de objetos de teclas definidos no arquivo GRC e faz a
- * sua insercao no DIALOG.
+ * Traverses the key array objects defined in the GRC file and insert
+ * them into the DIALOG.
  */
 static int DIALOG_add_keys(struct al_grc *grc, cjson_t *keys, int dlg_index)
 {
@@ -983,7 +981,7 @@ static int create_main_MENU(struct al_grc *grc, cjson_t *main_options)
     char *tmp;
     struct grc_json_key *e;
 
-    /* Cria menu principal */
+    /* Creates the main menu */
     t = cjson_get_array_size(main_options);
     grc->dlg_menu = calloc(t + 1, sizeof(MENU));
 
@@ -1050,8 +1048,8 @@ static MENU *search_MENU_item(struct al_grc *grc, const char *item_name)
 }
 
 /*
- * Faz o ajuste de alguns ponteiros nos itens dos menus para que apontem
- * corretamente para seus submenus (quando necessario).
+ * Adjusts some menu item pointers so that they correctly point to their
+ * submenus (when needed).
  */
 static int adjust_submenus(void *a, void *b)
 {
@@ -1062,7 +1060,7 @@ static int adjust_submenus(void *a, void *b)
     if (al_menu->parent == NULL)
         return 0;
 
-    /* Procura pelo item e aponta-o para este menu */
+    /* Searches for the item and point it to this menu */
     it = search_MENU_item(grc, al_menu->parent);
 
     if (it != NULL)
@@ -1072,9 +1070,8 @@ static int adjust_submenus(void *a, void *b)
 }
 
 /*
- * Cria a estrutura do tipo MENU que sera utilizada pelo objeto
- * 'd_menu_proc' posteriormente e adiciona todos os itens e submenus
- * definidos pelo usuario.
+ * Creates a MENU structure that will be used by the 'd_menu_proc' object
+ * and add all items and submenus defined by the user.
  */
 static void create_MENU(struct al_grc *grc, cjson_t *main_options)
 {
@@ -1082,7 +1079,7 @@ static void create_MENU(struct al_grc *grc, cjson_t *main_options)
 
     grc->dlg_menu_t_items = create_main_MENU(grc, main_options);
 
-    /* Ajusta menus principal */
+    /* Adjusts main menus */
     for (i = 0; i < grc->dlg_menu_t_items; i++) {
         if (grc->dlg_menu[i].text == NULL)
             continue;
@@ -1091,14 +1088,14 @@ static void create_MENU(struct al_grc *grc, cjson_t *main_options)
             grc->dlg_menu[i].child = search_child_MENU(grc, grc->dlg_menu[i].dp);
     }
 
-    /* Ajusta submenus */
+    /* Adjusts submenus */
     cdll_map(grc->menu, adjust_submenus, grc);
 }
 
 /*
- * Adiciona um objeto do tipo 'd_menu_proc' na lista de objetos do DIALOG
- * que esta sendo criado. Como nao existe nenhuma configuracao (ainda) sua
- * posicao na tela e fixa, no canto superior direito.
+ * Adds a 'd_menu_proc' object into the DIALOG objects. As there is any
+ * configuration (yet) its screen position is fixed into the upper right
+ * corner.
  */
 static void add_menu(struct al_grc *grc, int dlg_index)
 {
@@ -1107,21 +1104,20 @@ static void add_menu(struct al_grc *grc, int dlg_index)
     d->proc = d_menu_proc;
     d->dp = grc->dlg_menu;
 
-    /* Posicoes x e y fixas para o usuario (por enquanto) */
+    /* x and y fixe positions to the user (until now) */
     d->x = 0;
     d->y = 0;
 }
 
 /*
- * Todos items de menus definidos no arquivo GRC sao armazenados em
- * estruturas do tipo 'struct grc_menu'. Elas que serao "manipuladas" pelo
- * usuario, quando necessario, como no caso de ajustar a funcao de 'callback'
- * de um item.
+ * All menu items definied in the GRC file are stored in 'struct grc_menu'
+ * types. They will be "manipulated" by the user when needed, such as when
+ * we need to adjust an item callback function.
  *
- * A lista de estruturas do tipo 'struct al_menu' e utilizada para guardar
- * os menus agrupados numa estrutura entendida pela Allegro, a estrutura MENU.
- * E servir como origem para a montagem do menu que sera utilizado pelo objeto
- * 'd_menu_proc' do DIALOG.
+ * The 'struct al_menu' list is used to store the menus in a structure
+ * understood by Allegro, the MENU structure. And serve as a source to
+ * build the menu which will be used by the 'd_menu_proc' object from the
+ * DIALOG.
  */
 static void DIALOG_add_menu(struct al_grc *grc, cjson_t *menu, int dlg_index)
 {
@@ -1132,7 +1128,7 @@ static void DIALOG_add_menu(struct al_grc *grc, cjson_t *menu, int dlg_index)
     menu_options = cjson_get_object_item(menu, OBJ_MENU_OPTIONS);
     main_options = cjson_get_object_item(menu, OBJ_MAIN_OPTIONS);
 
-    /* Extrai as informacoes de menus e itens definidos */
+    /* Extracts menus and items informations */
     if ((NULL == menu_options) || (NULL == main_options))
         return;
 
@@ -1145,13 +1141,13 @@ static void DIALOG_add_menu(struct al_grc *grc, cjson_t *menu, int dlg_index)
         grc->grc_menu = cdll_unshift(grc->grc_menu, grcm);
     }
 
-    /* Converte menus GRC para menus MENU (Allegro) */
+    /* Converts GRC menus to Allegro MENUs */
     grc_menu_to_MENU(grc);
 
-    /* Realiza a "montagem" do(s) menu(s) no formato suportado pela Allegro */
+    /* Assembles the Allegro supported menu(s) */
     create_MENU(grc, main_options);
 
-    /* Adiciona um objeto 'd_menu_proc' no DIALOG que esta sendo criado */
+    /* Adds a 'd_menu_proc' object into the DIALOG */
     add_menu(grc, dlg_index);
 }
 
@@ -1171,8 +1167,8 @@ int create_DIALOG(struct al_grc *grc)
     menu = grc_get_object(grc, OBJ_MENU);
 
     /*
-     * O tamanho total do DIALOG sera a quantidade de teclas + a quantidade de
-     * objetos + menu + tecla ESC ignorada + d_yield_proc + d_clear_proc + 1.
+     * The total size of the DIALOG will be the amount of keys + the amount of
+     * objects + menu + ignored ESC key + d_yield_proc + d_clear_proc + 1.
      */
     total = cjson_get_array_size(objects);
     total += 1; /* d_yield_proc */
@@ -1184,15 +1180,14 @@ int create_DIALOG(struct al_grc *grc)
         total += cjson_get_array_size(keys);
 
     /*
-     * Caso um menu tenha sido definido, ele tambem precisara de espaco no
-     * DIALOG.
+     * Case a menu has been defined, it also needs a space inside the DIALOG
      */
     if (menu != NULL)
         total += 1;
 
     /*
-     * Mesmo que o usuario tenha definido a tecla ESC, aloca espaco para mais
-     * um objeto, pois neste caso ele nao sera utilizado.
+     * Even that the user has defined the ESC key, we allocate an extra space.
+     * It will not be used...
      */
     if (grc->ignore_esc_key)
         total += 1;
@@ -1204,38 +1199,38 @@ int create_DIALOG(struct al_grc *grc)
         return -1;
     }
 
-    /* Inicializa DIALOG */
+    /* Initializes the DIALOG */
     if (grc->use_gfx == true)
         DIALOG_creation_start(grc);
 
-    /* Adiciona objetos definidos no arquivo GRC */
+    /* Add user defined objects */
     p = DIALOG_add_objects(grc, objects, (grc->use_gfx == true) ? 1 : 0);
 
     if (p < 0)
         return -1;
 
-    /* Adiciona um (possivel) menu no DIALOG */
+    /* Add a menu */
     if (menu != NULL) {
         DIALOG_add_menu(grc, menu, p);
         p += 1;
 
         /*
-         * Muda as cores principais do ambiente grafico para que o menu tambem
-         * utilize as mesmas definidas para os objetos.
+         * Changes the main color so that the menu uses the same that the user
+         * defined.
          */
         gui_fg_color = grc->fg;
         gui_bg_color = grc->bg;
     }
 
-    /* Adiciona teclas (tambem) definidas no arquivo GRC */
+    /* Add keys */
     if (keys != NULL)
         if (DIALOG_add_keys(grc, keys, p) < 0)
             return -1;
 
-    /* Ignora tecla ESC (se necessario) */
+    /* We ignore the ESC key (if needed) */
     add_default_esc_key(grc, total - 2);
 
-    /* Finaliza o DIALOG */
+    /* Ends the DIALOG */
     DIALOG_creation_finish(grc, total - 1);
 
     return 0;
