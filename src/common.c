@@ -132,6 +132,9 @@ struct al_grc *new_grc(void)
      */
     g->virtual_keyboard = false;
 
+    /* We're not prepared yet */
+    g->are_we_prepared = false;
+
     return g;
 }
 
@@ -153,6 +156,9 @@ void destroy_grc(struct al_grc *grc)
     if (grc->jgrc != NULL)
         cjson_delete(grc->jgrc);
 
+    /*
+     * TODO: Here we need to destroy some objects info, like button text.
+     */
     if (grc->dlg != NULL)
         free(grc->dlg);
 

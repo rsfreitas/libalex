@@ -40,7 +40,7 @@ int gui_d_radio_proc(int msg, DIALOG *d, int c)
             else
                 acd->value_int = 0;
 
-            ret = run_callback(acd);
+            ret = run_callback(acd, D_O_K);
         }
     }
 

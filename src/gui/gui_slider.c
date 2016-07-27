@@ -32,7 +32,7 @@ static int internal_callback(void *arg, int pos)
 
     acd->value_int = pos;
 
-    return run_callback(acd);
+    return run_callback(acd, D_O_K);
 }
 
 int gui_d_slider_proc(int msg, DIALOG *d, int c)

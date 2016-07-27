@@ -141,6 +141,8 @@ int LIBEXPORT al_grc_uninit(struct al_grc *grc)
 
 int LIBEXPORT al_grc_prepare_dialog(struct al_grc *grc)
 {
+    int ret;
+
     al_errno_clear();
 
     if (NULL == grc) {
@@ -148,7 +150,12 @@ int LIBEXPORT al_grc_prepare_dialog(struct al_grc *grc)
         return -1;
     }
 
-    return create_DIALOG(grc);
+    ret = create_DIALOG(grc);
+
+    if (ret == 0)
+        grc->are_we_prepared = true;
+
+    return ret;
 }
 
 int LIBEXPORT al_grc_do_dialog(struct al_grc *grc)
@@ -157,6 +164,12 @@ int LIBEXPORT al_grc_do_dialog(struct al_grc *grc)
 
     if (NULL == grc) {
         al_set_errno(AL_ERROR_NULL_ARG);
+        return -1;
+    }
+
+    /* We're not prepared to run the DIALOG yet */
+    if (grc->are_we_prepared == false) {
+        al_set_errno(AL_ERROR_NOT_PREPARED_YET);
         return -1;
     }
 

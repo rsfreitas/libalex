@@ -47,7 +47,7 @@ int gui_d_keyboard_proc(int msg, DIALOG *d, int c)
         case MSG_KEY:
             if (d->dp3 != NULL) {
                 acd->value_int = d->d1;
-                ret |= run_callback(acd);
+                ret |= run_callback(acd, D_O_K);
             }
 
             break;

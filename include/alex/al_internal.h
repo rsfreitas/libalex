@@ -227,6 +227,7 @@ struct al_grc {
     /* Graphic mode info */
     bool                    use_gfx;
     struct al_gfx_info      gfx;
+    bool                    are_we_prepared;
 
     /* Main colors of the DIALOG */
     int                     fg;

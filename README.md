@@ -26,6 +26,12 @@ LGPLv2
 
 * Add reference count to the exported objects.
 
+* Add a storage structure to keep objects info, like the text from a button,
+  with the goal of center all this info in this structure, and be able to
+  release everything else.
+
+* Include some check while using a virtual keyboard without an edit object.
+
 * Change all exported data to opaque types.
 
 * Convert all string manipulation to use *cstring_t* from libcollections.
@@ -50,4 +56,9 @@ LGPLv2
 
 * Create some objects as dialog boxes, like a mainwindow (to act as a desktop),
   default dialogs (with minimize and maximize buttons).
+
+* Include field into the GRC file to set a default return value from a callback
+  function call when there is no callback function.
+
+* Add support for changing font using this library.
 

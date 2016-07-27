@@ -39,7 +39,7 @@ int gui_load_colors(struct al_grc *grc);
 void gui_reset_resolution(void);
 int create_DIALOG(struct al_grc *grc);
 void run_DIALOG(struct al_grc *grc);
-int run_callback(struct al_callback_data *acd);
+int run_callback(struct al_callback_data *acd, unsigned int default_return);
 
 int grc_tr_color_to_al_color(int color_depth, const char *color);
 DIALOG *get_DIALOG_from_grc(struct al_grc *grc, const char *object_name);

@@ -48,7 +48,7 @@ int gui_d_list_proc(int msg, DIALOG *d, int c)
     if (ret == D_CLOSE) {
         if (d->dp3 != NULL) {
             acd->value_int = d->d1;
-            run_callback(acd);
+            run_callback(acd, D_O_K);
 
             /*
              * We don't let the interface shutdown if the user forgets the

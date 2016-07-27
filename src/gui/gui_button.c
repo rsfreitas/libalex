@@ -28,7 +28,7 @@
 
 /*
  * This object allows that a function be called when activated (when
- * the buttone is pressed). The function must be passed in d->dp2, and
+ * the button is pressed). The function must be passed in d->dp2, and
  * its argument defined in d->dp3.
  *
  * If no function is passed the button makes the DIALOG close.
@@ -42,7 +42,7 @@ int gui_d_button_proc(int msg, DIALOG *d, int c)
 
     if (ret == D_CLOSE)
         if (d->dp3 != NULL)
-            ret = run_callback(acd);
+            ret = run_callback(acd, D_REDRAWME);
 
     return ret;
 }

@@ -618,7 +618,7 @@ static int add_object(struct al_grc *grc, int dlg_index, cjson_t *object)
                  * points to the original text, loaded from the GRC file.
                  * This way we can display it.
                  */
-                d->dp = (char *)prop->text;
+                d->dp = strdup(prop->text); /* TODO: Release this later */
             }
 
             break;
@@ -626,7 +626,7 @@ static int add_object(struct al_grc *grc, int dlg_index, cjson_t *object)
         case AL_GRC_OBJ_BUTTON:
             d->proc = gui_d_button_proc;
             d->flags = D_EXIT;
-            d->dp = (char *)prop->text;
+            d->dp = strdup(prop->text); /* TODO: Release this later */
 
             /* We compute width and height automatically, case is necessary */
             if (prop->w < 0)
@@ -693,7 +693,7 @@ static int add_object(struct al_grc *grc, int dlg_index, cjson_t *object)
 
         case AL_GRC_OBJ_CHECK:
             d->proc = gui_d_check_proc;
-            d->dp = (char *)prop->text;
+            d->dp = strdup(prop->text); /* TODO: Release this later */
 
             if (prop->horizontal_position == AL_GRC_H_POS_RIGHT)
                 d->d1 = 1;
@@ -711,7 +711,7 @@ static int add_object(struct al_grc *grc, int dlg_index, cjson_t *object)
 
         case AL_GRC_OBJ_RADIO:
             d->proc = gui_d_radio_proc;
-            d->dp = (char *)prop->text;
+            d->dp = strdup(prop->text); /* TODO: Release this later */
             d->d1 = prop->radio_group;
             d->d2 = prop->radio_type;
 
@@ -1244,11 +1244,15 @@ void run_DIALOG(struct al_grc *grc)
     do_dialog(grc->dlg, -1);
 }
 
-int run_callback(struct al_callback_data *acd)
+/*
+ * Execute a callback function from an object. If there is no function we
+ * return a @default_return value.
+ */
+int run_callback(struct al_callback_data *acd, unsigned int default_return)
 {
     if (acd->callback != NULL)
         return (acd->callback)(acd);
 
-    return D_O_K;
+    return default_return;
 }
 

@@ -322,7 +322,7 @@ static struct special_key __special_keys[] = {
     { SHIFT_TOK,        "S",        SPK_SHIFT       },
     { CHANGE_FMT_TOK,   "12#",      SPK_CHANGE_FMT  },
     { BACKSPACE_TOK,    "B",        SPK_BACKSPACE   },
-    { SPACEBAR_TOK,     "ESPACO",   SPK_SPACEBAR    },
+    { SPACEBAR_TOK,     "SPACE",    SPK_SPACEBAR    },
     { ENTER_TOK,        "E",        SPK_ENTER       }
 };
 
@@ -640,7 +640,7 @@ static void run_edit_callback(DIALOG *edit)
         return;
 
     acd->value_string = (char *)edit->dp;
-    run_callback(acd);
+    run_callback(acd, D_O_K);
 }
 
 static int update_last_edit_object_value(DIALOG *d, struct al_grc *grc,
@@ -807,7 +807,7 @@ int gui_d_vt_keyboard_proc(int msg, DIALOG *d, int c __attribute__((unused)))
                 acd->value_int = key->key[d->d2 & DLG_SPK_SHIFT].scancode;
 
                 /* Run the callback function */
-                run_callback(acd);
+                run_callback(acd, D_O_K);
             }
 
             break;

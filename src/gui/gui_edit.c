@@ -211,7 +211,7 @@ int gui_d_password_proc(int msg, DIALOG *d, int c)
     if (ret == D_CLOSE) {
         if (d->dp3 != NULL) {
             acd->value_string = (char *)d->dp;
-            run_callback(acd);
+            run_callback(acd, D_O_K);
 
             /*
              * We don't let the interface shutdown if the user forgets the
@@ -246,7 +246,7 @@ int gui_d_edit_proc(int msg, DIALOG *d, int c)
     if (ret == D_CLOSE) {
         if (d->dp3 != NULL) {
             acd->value_string = (char *)d->dp;
-            run_callback(acd);
+            run_callback(acd, D_O_K);
 
             /*
              * We don't let the interface shutdown if the user forgets the
