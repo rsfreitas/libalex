@@ -302,6 +302,7 @@ void al_set_errno(enum al_error_code code);
 
 /* al_callback.c */
 struct al_callback_data *new_callback_data(void);
+void destroy_callback_data(void *a);
 
 /* al_menu.c */
 void destroy_al_menu(void *a);
@@ -313,6 +314,7 @@ void destroy_grc(struct al_grc *grc);
 
 /* grc_generic.c */
 struct grc_generic_data *new_grc_generic_data(void);
+void destroy_grc_generic_data(void *a);
 
 /* grc_key.c */
 void destroy_key_data(struct grc_key_data *kdata);

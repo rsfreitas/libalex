@@ -40,5 +40,13 @@ struct grc_generic_data *new_grc_generic_data(void)
     return d;
 }
 
-/* TODO: destroy */
+void destroy_grc_generic_data(void *a)
+{
+    struct grc_generic_data *p = (struct grc_generic_data *)a;
+
+    if (NULL == a)
+        return;
+
+    free(p);
+}
 

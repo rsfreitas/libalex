@@ -49,10 +49,10 @@ void destroy_grc(struct al_grc *grc)
         cdll_free(grc->ref, destroy_obj_ref);
 
     if (grc->callback_data != NULL)
-        cdll_free(grc->callback_data, NULL);
+        cdll_free(grc->callback_data, destroy_callback_data);
 
     if (grc->g_data != NULL)
-        cdll_free(grc->g_data, NULL);
+        cdll_free(grc->g_data, destroy_grc_generic_data);
 
     if (grc->dlg_menu != NULL) {
         for (i = 0; i < grc->dlg_menu_t_items; i++) {

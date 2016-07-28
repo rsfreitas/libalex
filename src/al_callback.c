@@ -43,5 +43,13 @@ struct al_callback_data *new_callback_data(void)
     return cd;
 }
 
-/* TODO: Destroy */
+void destroy_callback_data(void *a)
+{
+    struct al_callback_data *p = (struct al_callback_data *)a;
+
+    if (NULL == p)
+        return;
+
+    free(p);
+}
 
