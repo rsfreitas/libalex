@@ -958,7 +958,7 @@ static int cvt_grc_menu(void *a, void *b)
             m[i].text = "";
     }
 
-    al_menu = calloc(1, sizeof(struct al_menu));
+    al_menu = new_al_menu();
     al_menu->name = menu->name;
     al_menu->parent = menu->parent;
     al_menu->menu = m;

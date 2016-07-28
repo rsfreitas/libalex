@@ -16,9 +16,6 @@ TARGET_DEST = ../bin/$(DEST_LIBNAME)
 
 INCLUDEDIR = -I../include
 INCLUDEDIR += -I/usr/local/include
-INCLUDEDIR += -I../../../libimg/include
-INCLUDEDIR += -I../../../libframe_grab/include
-INCLUDEDIR += -I/usr/include/freetype2
 
 LIBDIR = -L/usr/local/lib
 ALLEG_LIBS = -lalleg -lX11 -ldl -lXpm -lXxf86vm -lXcursor
@@ -45,13 +42,21 @@ GUI_OBJS =					\
 	gui_textbox.o			\
 	gui_vt_keyboard.o
 
-OBJS =				\
-	api.o			\
-	common.o 		\
-	error.o			\
-	gui.o			\
-	parser.o		\
-	writer.o		\
+OBJS =						\
+	al_callback.o			\
+	al_menu.o				\
+	api.o					\
+	error.o					\
+	grc.o					\
+	grc_generic.o			\
+	grc_key.o				\
+	grc_menu.o				\
+	grc_obj_properties.o	\
+	gui.o					\
+	obj_ref.o				\
+	parser.o				\
+	utils.o					\
+	writer.o				\
 	$(GUI_OBJS)
 
 $(TARGET): $(OBJS)

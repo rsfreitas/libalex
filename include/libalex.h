@@ -25,7 +25,7 @@
  */
 
 #ifndef _LIBALEX_H
-#define _LIBALEX_H		1
+#define _LIBALEX_H		        1
 
 #ifdef LIBALEX_COMPILE
 # define MAJOR_VERSION          0
@@ -35,7 +35,7 @@
 
 #ifndef LIBEXPORT
 # ifdef LINUX
-#  define LIBEXPORT     __attribute__((visibility("default")))
+#  define LIBEXPORT             __attribute__((visibility("default")))
 # else
 #  define LIBEXPORT
 # endif
@@ -55,7 +55,7 @@ enum al_grc_color_depth {
     AL_GRC_COLOR_15 = 15,
     AL_GRC_COLOR_16 = 16,
     AL_GRC_COLOR_24 = 24,
-    AL_GRC_COLOR_32
+    AL_GRC_COLOR_32 = 32
 };
 
 /* 'messages_log_box' breaking line types */
@@ -235,17 +235,17 @@ enum al_key {
 #define MSG_LOAD_IMAGE                  MSG_USER + 2
 #define MSG_UPDATE_CURSOR_POSITION      MSG_USER + 3
 
-#ifdef LIBALEX_COMPILE
-# include "alex/al_internal.h"
-#else
+/* Exported types */
 struct al_grc;
 struct al_callback_data;
-#endif
 
 #include "alex/al_error.h"
-#include "alex/al_common.h"
 #include "alex/al_api.h"
 #include "alex/al_write.h"
+
+#ifdef LIBALEX_COMPILE
+# include "alex/al_internal.h"
+#endif
 
 #endif
 

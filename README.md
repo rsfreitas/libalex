@@ -20,14 +20,17 @@ LGPLv2
 
 ## TODO
 
-* Add examples
+* Rename GRC to some other more clear extension that best matches our goal
+  with the library.
+
+* Add more examples
 
 * Add support to plugins from libcollections.
 
 * Add reference count to the exported objects.
 
 * Add a storage structure to keep objects info, like the text from a button,
-  with the goal of center all this info in this structure, and be able to
+  with the goal of centering all this info in this structure and be able to
   release everything else.
 
 * Include some check while using a virtual keyboard without an edit object.
@@ -42,7 +45,7 @@ LGPLv2
 
 * Create an object like a task manager.
 
-* When using a *digital_clock*, create a way that all DIALOG created after
+* When using a *digital_clock*, create a way that all DIALOGs created after
   may also have this object. Or update the clock inside a thread, so it may
   continue work outside your DIALOG.
 

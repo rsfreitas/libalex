@@ -62,11 +62,6 @@ enum al_error_code {
     AL_MAX_ERROR_CODE
 };
 
-#ifdef LIBALEX_COMPILE
-void al_errno_clear(void);
-void al_set_errno(enum al_error_code code);
-#endif
-
 /**
  * @name al_get_last_error
  * @brief Gets the last error code internally occurred.

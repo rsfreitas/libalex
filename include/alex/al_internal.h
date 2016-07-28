@@ -1,6 +1,6 @@
 
 /*
- * Description:
+ * Description: Internal library declarations only.
  *
  * Author: Rodrigo Freitas
  * Created at: Tue Dec  9 22:44:20 2014
@@ -42,7 +42,7 @@ enum grc_entry_type_value {
     GRC_BOOL
 };
 
-/* Main objects of GRC file */
+/* Main objects of a GRC file */
 #define OBJ_INFO                    "info"
 #define OBJ_OBJECTS                 "objects"
 #define OBJ_KEYS                    "keys"
@@ -52,7 +52,7 @@ enum grc_entry_type_value {
 #define OBJ_MENU_OPTIONS            "menu_options"
 #define OBJ_OPTIONS                 "options"
 
-/* Secondary objects of GRC file */
+/* Secondary objects of a GRC file */
 #define OBJ_WIDTH                   "width"
 #define OBJ_HEIGHT                  "height"
 #define OBJ_COLOR_DEPTH             "color_depth"
@@ -78,7 +78,7 @@ enum grc_entry_type_value {
 #define OBJ_FPS                     "fps"
 #define OBJ_DEVICES                 "devices"
 
-/* DIALOG supported object names */
+/* DIALOG supported object names (values) */
 #define DLG_OBJ_KEY                 "key"
 #define DLG_OBJ_BOX                 "box"
 #define DLG_OBJ_DIGITAL_CLOCK       "digital_clock"
@@ -135,7 +135,7 @@ struct grc_obj_properties {
     int                 y;
     int                 w;
     int                 h;
-    int                 hide;
+    bool                hide;
     int                 line_break_mode;
     int                 data_length;
     int                 radio_group;
@@ -173,11 +173,11 @@ struct al_callback_data {
 
 /* Graphic mode informations */
 struct al_gfx_info {
-    int width;
-    int height;
-    int color_depth;
-    int block_keys;
-    int use_mouse;
+    int     width;
+    int     height;
+    int     color_depth;
+    bool    block_keys;
+    bool    use_mouse;
 };
 
 /* Menus loaded */
@@ -210,9 +210,10 @@ struct grc_generic_data {
     char        data[MAX_EDIT_SIZE];
 };
 
+/* TODO Split this structure in others */
 /* Main structure to handle an Allegro DIALOG */
 struct al_grc {
-    /* GRC JSON */
+    /* GRC is a JSON object inside */
     cjson_t                 *jgrc;
 
     /* Allegro's DIALOG */
@@ -246,8 +247,8 @@ struct al_grc {
     bool                    virtual_keyboard;
 
     /*
-     * Pointer to the 'edit' object selected while activated the virtual
-     * keyboard.
+     * Pointer to the 'edit' object that was selected when the virtual
+     * keyboard is activated.
      */
     DIALOG                  *last_edit_object;
 
@@ -272,8 +273,74 @@ struct al_grc {
     cjson_t                 *jtmp_obj;
 };
 
-#include "al_gui.h"
-#include "al_parser.h"
+/* gui.c */
+int gui_change_resolution(struct al_grc *grc);
+int gui_load_colors(struct al_grc *grc);
+void gui_reset_resolution(void);
+int create_DIALOG(struct al_grc *grc);
+void run_DIALOG(struct al_grc *grc);
+int run_callback(struct al_callback_data *acd, unsigned int default_return);
+int grc_tr_color_to_al_color(int color_depth, const char *color);
+DIALOG *get_DIALOG_from_grc(struct al_grc *grc, const char *object_name);
+struct grc_menu *get_grc_menu_from_grc(struct al_grc *grc,
+                                       const char *object_name);
+
+MENU *get_MENU_from_grc(struct al_grc *grc, const char *object_name);
+
+/* parser.c */
+struct grc_json_key *get_grc_json_key(enum al_grc_object_property prop);
+int grc_get_object_value(cjson_t *object, const char *object_name,
+                         int default_value);
+
+char *grc_get_object_str(cjson_t *object, const char *object_name);
+int grc_parse_file(struct al_grc *grc, const char *grc_filename);
+int grc_parse_mem(struct al_grc *grc, const char *data);
+
+/* error.c */
+void al_errno_clear(void);
+void al_set_errno(enum al_error_code code);
+
+/* al_callback.c */
+struct al_callback_data *new_callback_data(void);
+
+/* al_menu.c */
+void destroy_al_menu(void *a);
+struct al_menu *new_al_menu(void);
+
+/* grc.c */
+struct al_grc *new_grc(void);
+void destroy_grc(struct al_grc *grc);
+
+/* grc_generic.c */
+struct grc_generic_data *new_grc_generic_data(void);
+
+/* grc_key.c */
+void destroy_key_data(struct grc_key_data *kdata);
+struct grc_key_data *new_key_data(cjson_t *key);
+
+/* grc_menu.c */
+void destroy_grc_menu(void *a);
+struct grc_menu *new_menu(cjson_t *object);
+
+/* grc_obj_properties.c */
+void destroy_obj_properties(struct grc_obj_properties *odata);
+struct grc_obj_properties *new_obj_properties(cjson_t *object);
+
+/* obj_ref.c */
+void destroy_obj_ref(void *a);
+struct dlg_obj_ref *new_obj_ref(const char *name, int dlg_index,
+                                enum al_grc_object type);
+
+/* utils.c */
+void dotted_rect(int x1, int y1, int x2, int y2, int fg, int bg);
+int tr_str_type_to_grc_type(const char *type_name);
+int tr_line_break(const char *mode);
+int tr_radio_type(const char *type);
+int tr_horizontal_position(const char *pos);
+const char *str_radio_type(enum al_grc_radio_button_fmt radio);
+const char *str_horizontal_position(enum al_grc_hpos hpos);
+const char *str_line_break(enum al_grc_line_break lbreak);
+const char *str_grc_obj_type(enum al_grc_object obj);
 
 #endif
 

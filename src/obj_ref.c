@@ -1,9 +1,9 @@
 
 /*
- * Description:
+ * Description: Functions to manipulate a 'struct dlg_obj_ref' structure.
  *
  * Author: Rodrigo Freitas
- * Created at: Sun Aug 24 21:05:01 2014
+ * Created at: Thu Jul 28 09:21:45 2016
  * Project: libalex
  *
  * Copyright (c) 2014 Rodrigo Freitas
@@ -24,26 +24,43 @@
  * USA
  */
 
-#ifndef _LIBALEX_COMMON_H
-#define _LIBALEX_COMMON_H                            1
+#include <stdlib.h>
+#include <string.h>
 
-#ifndef LIBALEX_COMPILE
-# ifndef _LIBALEX_H
-#  error "Never use <common.h> directly; include <libalex.h> instead."
-# endif
-#endif
+#include "libalex.h"
 
-#ifdef LIBALEX_COMPILE
+/*
+ * Create and return a structure of type 'struct dlg_obj_ref'.
+ */
 struct dlg_obj_ref *new_obj_ref(const char *name, int dlg_index,
-                                enum al_grc_object type);
+    enum al_grc_object type)
+{
+    struct dlg_obj_ref *r = NULL;
 
-void destroy_obj_ref(void *a);
-struct al_grc *new_grc(void);
-void destroy_grc(struct al_grc *grc);
-struct al_callback_data *new_callback_data(void);
-struct grc_generic_data *new_grc_generic_data(void);
-void dotted_rect(int x1, int y1, int x2, int y2, int fg, int bg);
-#endif
+    r = calloc(1, sizeof(struct dlg_obj_ref));
 
-#endif
+    if (NULL == r) {
+        al_set_errno(AL_ERROR_NEW_REF);
+        return NULL;
+    }
+
+    r->name = strdup(name);
+    r->dlg_index = dlg_index;
+    r->type = type;
+
+    return r;
+}
+
+/*
+ * Destroy a structure of type 'struct dlg_obj_ref'.
+ */
+void destroy_obj_ref(void *a)
+{
+    struct dlg_obj_ref *r = (struct dlg_obj_ref *)a;
+
+    if (r->name != NULL)
+        free(r->name);
+
+    free(r);
+}
 
