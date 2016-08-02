@@ -30,98 +30,6 @@
 #include "libalex.h"
 #include "gui/objects.h"
 
-/* Edit deafult height */
-#define DEFAULT_EDIT_HEIGHT                 15
-
-/* Space between buttons */
-#define BUTTON_DEFAULT_SPACER               4
-
-/* Button default height */
-#define DEFAULT_BUTTON_HEIGHT               30
-
-/* Space between checkboxes */
-#define CHECKBOX_DEFAULT_SPACER             13
-
-/* Checkbox default height */
-#define DEFAULT_CHECKBOX_HEIGHT             15
-
-/* Space between radio buttons */
-#define RADIO_DEFAULT_SPACER                13
-
-/* Radio button default height */
-#define DEFAULT_RADIO_HEIGHT                15
-
-struct rgb {
-    int r;
-    int g;
-    int b;
-};
-
-struct color {
-    char        name[128];
-    struct rgb  rgb;
-};
-
-static struct color __colors[] = {
-    { AL_BLACK,             { 0,    0,      0   }},
-    { AL_WHITE,             { 255,  255,    255 }},
-    { AL_LIGHT_RED,         { 255,  0,      0   }},
-    { AL_LIGHT_GREEN,       { 0,    255,    0   }},
-    { AL_LIGHT_BLUE,        { 0,    0,      255 }},
-    { AL_YELLOW,            { 240,  240,    0   }},
-    { AL_CYAN,              { 0,    255,    255 }},
-    { AL_MAGENTA,           { 255,  0,      255 }},
-    { AL_SILVER,            { 192,  192,    192 }},
-    { AL_GRAY,              { 128,  128,    128 }},
-    { AL_MAROON,            { 128,  0,      0   }},
-    { AL_OLIVE,             { 128,  128,    0   }},
-    { AL_PURPLE,            { 128,  0,      128 }},
-    { AL_TEAL,              { 0,    128,    128 }},
-    { AL_NAVY,              { 0,    0,      128 }},
-    { AL_BLUE,              { 0,    0,      150 }},
-    { AL_GREEN,             { 0,    150,    0   }},
-    { AL_RED,               { 150,  0,      0   }},
-    { AL_ORANGE_RED,        { 255,  69,     0   }},
-    { AL_ORANGE,            { 255,  165,    0   }},
-    { AL_KHAKI,             { 240,  230,    140 }},
-    { AL_BROWN,             { 165,  42,     42  }},
-    { AL_SADDLE_BROWN,      { 139,  69,     19  }},
-    { AL_BAKERS_CHOCOLATE,  { 92,   51,     23  }},
-    { AL_IVORY,             { 255,  255,    240 }},
-    { AL_SNOW,              { 255,  250,    250 }},
-    { AL_GHOST_WHITE,       { 248,  248,    255 }},
-    { AL_INDIGO,            { 75,   0,      130 }},
-    { AL_DARK_SLATE_BLUE,   { 72,   61,     139 }},
-    { AL_SKY_BLUE,          { 135,  206,    235 }},
-    { AL_SEA_GREEN,         { 46,   139,    87  }},
-    { AL_DARK_GREEN,        { 0,    100,    0   }},
-    { AL_FOREST_GREEN,      { 34,   139,    24  }},
-    { AL_GOLD,              { 255,  215,    0   }},
-    { AL_GOLDEN_ROD,        { 218,  165,    32  }},
-    { AL_SALMON,            { 250,  128,    114 }},
-    { AL_CORAL,             { 255,  127,    80  }},
-    { AL_TOMATO,            { 255,  99,     71  }},
-    { AL_DARK_SEA_GREEN,    { 143,  188,    143 }},
-    { AL_DARK_CYAN,         { 0,    139,    139 }},
-    { AL_TURQUOISE,         { 64,   224,    208 }},
-    { AL_DARK_TURQUOISE,    { 0,    206,    209 }},
-    { AL_CADET_BLUE,        { 95,   158,    160 }},
-    { AL_OLIVE_DRAB,        { 107,  142,    35  }},
-    { AL_STEEL_BLUE,        { 70,   130,    180 }},
-    { AL_DODGER_BLUE,       { 30,   144,    255 }},
-    { AL_MIDNIGHT_BLUE,     { 25,   25,     112 }},
-    { AL_SLATE_BLUE,        { 106,  90,     205 }},
-    { AL_SIENNA,            { 160,  82,     45  }},
-    { AL_PERU,              { 205,  133,    63  }},
-    { AL_TAN,               { 210,  180,    140 }},
-    { AL_SLATE_GRAY,        { 112,  128,    144 }},
-    { AL_DARK_KHAKI,        { 189,  183,    107 }},
-    { AL_INDIAN_RED,        { 205,  92,     92  }}
-};
-
-#define MAX_COLORS              \
-    (sizeof(__colors) / sizeof(__colors[0]))
-
 /*
  * Default DIALOG objects:
  *
@@ -207,32 +115,6 @@ end_block:
     return ret;
 }
 
-/*
- * Translate a string into a color. Dealing correctly with the number of
- * colors from the GFX mode.
- */
-int grc_tr_color_to_al_color(int color_depth, const char *color)
-{
-    struct color *c = NULL;
-    unsigned int i;
-
-    for (i = 0; i < MAX_COLORS; i++)
-        if (!strcmp(__colors[i].name, color)) {
-            c = &__colors[i];
-            break;
-        }
-
-    if (NULL == c)
-        return -1;
-
-    return makecol_depth(color_depth, c->rgb.r, c->rgb.g, c->rgb.b);
-}
-
-static cjson_t *grc_get_object(struct al_grc *grc, const char *object)
-{
-    return cjson_get_object_item(grc->jgrc, object);
-}
-
 static int search_object_ref(void *a, void *b)
 {
     struct dlg_obj_ref *r = (struct dlg_obj_ref *)a;
@@ -264,7 +146,7 @@ DIALOG *get_DIALOG_from_grc(struct al_grc *grc, const char *object_name)
         return NULL;
     }
 
-    return &grc->dlg[ref->dlg_index];
+    return ref->dlg;
 }
 
 static MENU *search_menu(MENU *menu, int t_items, const char *object_name)
@@ -320,7 +202,7 @@ MENU *get_MENU_from_grc(struct al_grc *grc, const char *object_name)
 
 static int real_change_resolution(struct al_grc *grc)
 {
-    if (install_allegro(SYSTEM_AUTODETECT, NULL, NULL)) {
+/*    if (install_allegro(SYSTEM_AUTODETECT, NULL, NULL)) {
         al_set_errno(AL_ERROR_LIB_INIT);
         return -1;
     }
@@ -332,7 +214,7 @@ static int real_change_resolution(struct al_grc *grc)
 
     install_timer();
     set_color_depth(grc->gfx.color_depth);
-
+*/
     if (set_gfx_mode(GFX_XWINDOWS, grc->gfx.width, grc->gfx.height,
                      0, 0) != 0)
     {
@@ -430,18 +312,18 @@ unknown_grc_key_block:
  * Load main information from a GRC file GFX related and sets the screen
  * resolution so we can display some nice UI.
  */
-int gui_change_resolution(struct al_grc *grc)
+/*int gui_change_resolution(struct al_grc *grc)
 {
-    if (load_resolution_info(grc) < 0)
-        return -1;
+//    if (load_resolution_info(grc) < 0)
+//        return -1;
 
     return real_change_resolution(grc);
-}
+}*/
 
 /*
  * Load main colors of the DIALOG.
  */
-int gui_load_colors(struct al_grc *grc)
+/*int gui_load_colors(struct al_grc *grc)
 {
     cjson_t *jcolors;
     struct grc_json_key *e;
@@ -453,26 +335,26 @@ int gui_load_colors(struct al_grc *grc)
         al_set_errno(AL_ERROR_COLORS_BLOCK_NOT_FOUND);
         return -1;
     }
-
+*/
     /* foreground */
-    e = get_grc_json_key(AL_GRC_JOBJ_FOREGROUND);
+/*    e = get_grc_json_key(AL_GRC_JOBJ_FOREGROUND);
 
     if (NULL == e)
         goto unknown_grc_key_block;
 
     fg = grc_get_object_str(jcolors, e->name);
-
+*/
     /* background */
-    e = get_grc_json_key(AL_GRC_JOBJ_BACKGROUND);
+/*    e = get_grc_json_key(AL_GRC_JOBJ_BACKGROUND);
 
     if (NULL == e)
         goto unknown_grc_key_block;
 
     bg = grc_get_object_str(jcolors, e->name);
-
+*/
     /* Global colors */
-    grc->fg = grc_tr_color_to_al_color(get_color_depth(), fg);
-    grc->bg = grc_tr_color_to_al_color(get_color_depth(), bg);
+/*    grc->fg = color_grc_to_al(get_color_depth(), fg);
+    grc->bg = color_grc_to_al(get_color_depth(), bg);
 
     free(bg);
     free(fg);
@@ -482,7 +364,7 @@ int gui_load_colors(struct al_grc *grc)
 unknown_grc_key_block:
     al_set_errno(AL_ERROR_UNDEFINED_GRC_KEY);
     return -1;
-}
+}*/
 
 /*
  * Turn back to text mode.
@@ -499,354 +381,63 @@ void gui_reset_resolution(void)
  * ------- DIALOG handling functions -------
  */
 
-static void DIALOG_creation_start(struct al_grc *grc)
+static void DIALOG_creation_start(DIALOG *dlg, struct al_grc *grc)
 {
-    DIALOG *d = &grc->dlg[0];
+    DIALOG *p;
+    struct grc_object *gobj = NULL;
 
-    d->proc = d_clear_proc;
-}
+    gobj = new_grc_object();
 
-static void DIALOG_creation_finish(struct al_grc *grc, int dlg_size)
-{
-    DIALOG *d = &grc->dlg[dlg_size];
-
-    d->proc = d_yield_proc;
-}
-
-static void set_object_internal_data(DIALOG *d, struct al_grc *grc)
-{
-    struct al_callback_data *acd;
-
-    acd = new_callback_data();
-
-    if (NULL == acd) {
-        al_set_errno(AL_ERROR_MEMORY);
+    if (NULL == gobj)
         return;
-    }
 
-    acd->grc = (void *)grc;
-    d->dp3 = acd;
+    /* Sets the DIALOG object */
+    p = gobj->dlg;
+    p->proc = d_clear_proc;
+    dlg[0] = *p;
 
-    grc->callback_data = cdll_unshift(grc->callback_data, acd);
+    /* Saves this new objects so we can free it later */
+    grc->ui_objects = cdll_unshift(grc->ui_objects, gobj);
 }
 
-static int add_object(struct al_grc *grc, int dlg_index, cjson_t *object)
+static void DIALOG_creation_finish(DIALOG *dlg, unsigned int dlg_size,
+    struct al_grc *grc)
 {
-    struct grc_obj_properties *prop;
-    DIALOG *d = &grc->dlg[dlg_index], *p;
-    struct dlg_obj_ref *ref = NULL;
-    struct grc_generic_data *g_data;
-    int w = -1, h = -1;
-    char tmp[MAX_EDIT_SIZE] = {0};
+    DIALOG *p;
+    struct grc_object *gobj = NULL;
 
-    prop = new_obj_properties(object);
+    gobj = new_grc_object();
 
-    if (NULL == prop)
-        return -1;
+    if (NULL == gobj)
+        return;
 
-    /*
-     * Objects that the user MUST define _width_ and _height_:
-     *
-     *  listbox
-     *  box
-     *  slider
-     */
+    /* Sets the DIALOG last known object */
+    p = gobj->dlg;
+    p->proc = d_yield_proc;
+    dlg[dlg_size - 1] = *p;
 
-    /*
-     * Add an object into the DIALOG. It is recommended that 'boxes' be the
-     * first objects defined, so that no text be superimposed.
-     */
-    switch (prop->type) {
-        case AL_GRC_OBJ_BOX:
-            d->proc = d_box_proc;
-            break;
+    /* Saves this new objects so we can free it later */
+    grc->ui_objects = cdll_unshift(grc->ui_objects, gobj);
 
-        case AL_GRC_OBJ_DIGITAL_CLOCK:
-            d->proc = gui_clock_proc;
-            d->dp = grc->dlg_clock_str;
-            break;
+    /* Create the real end of the DIALOG */
+    gobj = new_grc_object();
 
-        case AL_GRC_OBJ_IMAGE:
-        case AL_GRC_OBJ_MESSAGES_LOG_BOX:
-            if (prop->type == AL_GRC_OBJ_MESSAGES_LOG_BOX) {
-                d->proc = gui_messages_log_proc;
-                d->d1 = prop->line_break_mode;
-            } else {
-                d->proc = gui_d_bitmap_proc;
+    if (NULL == gobj)
+        return;
 
-                /*
-                 * We set as NULL here so no error will be thrown when trying
-                 * to draw the object and no image exists.
-                 */
-                d->dp = NULL;
-            }
+    /* Sets the DIALOG end mark */
+    p = gobj->dlg;
+    p->proc = NULL;
+    dlg[dlg_size] = *p;
 
-            /*
-             * If we have a reference to a "father" object, the object position
-             * will derived from his position. Worth mentioning that, for this
-             * work correctly the "father" object must have been defined BEFORE
-             * the object, otherwise we can't get his positions. ;-)
-             */
-            if (prop->parent != NULL) {
-                p = get_DIALOG_from_grc(grc, prop->parent);
-                d->x = p->x + 2;
-                d->y = p->y + 2;
-                d->w = p->w - 2;
-                d->h = p->h - 2;
-            }
-
-            break;
-
-        case AL_GRC_OBJ_CUSTOM:
-            /*
-             * Neste objeto, tanto a funcao de proprio objeto quanto a funcao
-             * de callback, devem ser definidas em tempo de execucao, antes
-             * da execucao do DIALOG.
-             *
-             * d->proc -> Funcao do objeto
-             * d->dp3  -> callback
-             */
-            break;
-
-        case AL_GRC_OBJ_VAR_TEXT:
-        case AL_GRC_OBJ_FIXED_TEXT:
-            d->proc = d_text_proc;
-
-            if (prop->type == AL_GRC_OBJ_FIXED_TEXT) {
-                /*
-                 * Although 'prop' structure is freed right here, this only
-                 * points to the original text, loaded from the GRC file.
-                 * This way we can display it.
-                 */
-                d->dp = strdup(prop->text); /* TODO: Release this later */
-            }
-
-            break;
-
-        case AL_GRC_OBJ_BUTTON:
-            d->proc = gui_d_button_proc;
-            d->flags = D_EXIT;
-            d->dp = strdup(prop->text); /* TODO: Release this later */
-
-            /* We compute width and height automatically, case is necessary */
-            if (prop->w < 0)
-                w = text_length(font, prop->text) + BUTTON_DEFAULT_SPACER;
-
-            if (prop->h < 0)
-                h = DEFAULT_BUTTON_HEIGHT;
-
-            break;
-
-        case AL_GRC_OBJ_EDIT:
-            if (prop->data_length >= MAX_EDIT_SIZE) {
-                al_set_errno(AL_ERROR_UNSUPPORTED_EDIT_INPUT_LENGTH);
-                return -1;
-            }
-
-            if (prop->password_mode == false)
-                d->proc = gui_d_edit_proc;
-            else {
-                d->proc = gui_d_password_proc;
-
-                /*
-                 * Creates a temporary buffer to store the asterisks strings.
-                 */
-                g_data = new_grc_generic_data();
-                grc->g_data = cdll_unshift(grc->g_data, g_data);
-                d->dp2 = g_data->data;
-            }
-
-            /* Creates the buffer to store the typed string in the object. */
-            g_data = new_grc_generic_data();
-            grc->g_data = cdll_unshift(grc->g_data, g_data);
-            d->dp = g_data->data;
-
-            d->flags = D_EXIT;
-            d->d1 = prop->data_length;
-
-            /*
-             * Adjusts a default size allowing that the mouse may set the
-             * focus on this object.
-             */
-            h = DEFAULT_EDIT_HEIGHT;
-
-            /* We compute width automatically, case is necessary */
-            if (prop->parent != NULL) {
-                p = get_DIALOG_from_grc(grc, prop->parent);
-                d->x = p->x + 3;
-                d->y = p->y + 3;
-                d->w = p->w - 4;
-                d->h = h;
-            } else {
-                if (prop->w < 0) {
-                    memset(tmp, '0', prop->data_length + 1);
-                    w = text_length(font, tmp);
-                }
-            }
-
-            break;
-
-        case AL_GRC_OBJ_LIST:
-            d->proc = gui_d_list_proc;
-            d->flags = D_EXIT;
-            break;
-
-        case AL_GRC_OBJ_CHECK:
-            d->proc = gui_d_check_proc;
-            d->dp = strdup(prop->text); /* TODO: Release this later */
-
-            if (prop->horizontal_position == AL_GRC_H_POS_RIGHT)
-                d->d1 = 1;
-            else
-                d->d1 = 0;
-
-            /* We compute width and height automatically, case is necessary */
-            if (prop->w < 0)
-                w = text_length(font, prop->text) + CHECKBOX_DEFAULT_SPACER;
-
-            if (prop->h < 0)
-                h = DEFAULT_CHECKBOX_HEIGHT;
-
-            break;
-
-        case AL_GRC_OBJ_RADIO:
-            d->proc = gui_d_radio_proc;
-            d->dp = strdup(prop->text); /* TODO: Release this later */
-            d->d1 = prop->radio_group;
-            d->d2 = prop->radio_type;
-
-            /* We compute width and height automatically, case is necessary */
-            if (prop->w < 0)
-                w = text_length(font, prop->text) + RADIO_DEFAULT_SPACER;
-
-            if (prop->h < 0)
-                h = DEFAULT_RADIO_HEIGHT;
-
-            break;
-
-        case AL_GRC_OBJ_SLIDER:
-            d->proc = gui_d_slider_proc;
-            d->d1 = prop->data_length;
-            break;
-
-        /* Not implemented yet */
-/*        case AL_GRC_OBJ_LIVE_IMAGE:
-        case AL_GRC_OBJ_MULTLIVE_IMAGE:
-            if (prop->type == AL_GRC_OBJ_LIVE_IMAGE)
-                d->proc = gui_d_live_image;
-            else {
-                d->proc = gui_d_multlive_image;
-                d->d2 = prop->devices;
-            }
-
-            d->d1 = prop->fps;
-
-            if (prop->parent != NULL) {
-                p = get_DIALOG_from_grc(grc, prop->parent);
-                d->x = p->x + 2;
-                d->y = p->y + 2;
-                d->w = p->w - 4;
-                d->h = p->h - 4;
-            }
-
-            break;*/
-
-        case AL_GRC_OBJ_VT_KEYBOARD:
-            d->proc = gui_d_vt_keyboard_proc;
-            d->d1 = GRC_KLAYOUT_LETTERS;
-            d->dp = grc;
-            grc->virtual_keyboard = true;
-            break;
-
-        case AL_GRC_OBJ_ICON:
-            d->proc = gui_d_icon_proc;
-            d->flags = D_EXIT;
-            break;
-
-        case AL_GRC_OBJ_TEXTBOX:
-            d->proc = d_textbox_proc;
-            break;
-
-        default:
-            al_set_errno(AL_ERROR_UNKNOWN_OBJECT_TYPE);
-            return -1;
-    }
-
-    /* Object position into the screen */
-    if (prop->parent == NULL) {
-        d->x = prop->x;
-        d->y = prop->y;
-        d->w = (w == -1) ? prop->w : w;
-        d->h = (h == -1) ? prop->h : h;
-    }
-
-    /* Specific object colors */
-    if (prop->fg != NULL)
-        d->fg = grc_tr_color_to_al_color(get_color_depth(), prop->fg);
-    else
-        d->fg = grc->fg;
-
-    d->bg = grc->bg;
-
-    /* Hides the object or not */
-    if (prop->hide == false)
-        d->flags &= ~D_HIDDEN;
-    else
-        d->flags |= D_HIDDEN;
-
-    /*
-     * Every object already has access to internal library information,
-     * even if they do not have callback functions.
-     */
-    set_object_internal_data(d, grc);
-
-    /* Creates a reference the be used by the user later */
-    if (prop->name != NULL) {
-        ref = new_obj_ref(prop->name, dlg_index, prop->type);
-
-        if (NULL == ref)
-            return -1;
-
-        grc->ref = cdll_unshift(grc->ref, ref);
-    }
-
-    destroy_obj_properties(prop);
-
-    return 0;
-}
-
-/*
- * Traverses the object array that will compose the DIALOG from the GRC file.
- * The function returns the last object index, allowing that the added keys may
- * be in sequence.
- */
-static int DIALOG_add_objects(struct al_grc *grc, cjson_t *objects,
-    int dlg_index)
-{
-    int i, t = 0, p;
-    cjson_t *o;
-
-    t = cjson_get_array_size(objects);
-
-    if (t <= 0) {
-        al_set_errno(AL_ERROR_NO_OBJECTS);
-        return -1;
-    }
-
-    for (i = 0, p = dlg_index; i < t; i++, p++) {
-        o = cjson_get_array_item(objects, i);
-
-        if (add_object(grc, p, o) < 0)
-            return -1;
-    }
-
-    return p;
+    /* Saves this new objects so we can free it later */
+    grc->ui_objects = cdll_unshift(grc->ui_objects, gobj);
 }
 
 static int add_key(struct al_grc *grc, int dlg_index, cjson_t *key)
 {
     DIALOG *d = &grc->dlg[dlg_index];
-    struct dlg_obj_ref *ref = NULL;
+//    struct dlg_obj_ref *ref = NULL;
     struct grc_key_data *kdata;
 
     kdata = new_key_data(key);
@@ -866,12 +457,12 @@ static int add_key(struct al_grc *grc, int dlg_index, cjson_t *key)
         grc->esc_key_user_defined = true;
 
     /* Creates a reference the be used by the user later */
-    ref = new_obj_ref(kdata->name, dlg_index, AL_GRC_OBJ_KEY);
+/*    ref = new_obj_ref(kdata->name, dlg_index, AL_GRC_OBJ_KEY);
 
     if (NULL == ref)
         return -1;
 
-    grc->ref = cdll_unshift(grc->ref, ref);
+    grc->ref = cdll_unshift(grc->ref, ref);*/
     destroy_key_data(kdata);
 
     return 0;
@@ -885,10 +476,8 @@ static int __disable_key(void *arg __attribute__((unused)))
     return D_O_K;
 }
 
-static void add_default_esc_key(struct al_grc *grc, int dlg_index)
+static void add_default_esc_key(struct al_grc *grc, DIALOG *dlg)
 {
-    DIALOG *d = &grc->dlg[dlg_index];
-
     /* Was the key defined by the user? */
     if (grc->esc_key_user_defined == true)
         return;
@@ -897,13 +486,15 @@ static void add_default_esc_key(struct al_grc *grc, int dlg_index)
     if (grc->ignore_esc_key == false)
         return;
 
+    dlg = calloc(1, sizeof(DIALOG));
+
     /*
      * Uses the Allegro key object to avoid create an unecessary
      * 'al_callback_data' structure.
      */
-    d->proc = d_keyboard_proc;
-    d->d1 = KEY_ESC;
-    d->dp = __disable_key;
+    dlg->proc = d_keyboard_proc;
+    dlg->d1 = KEY_ESC;
+    dlg->dp = __disable_key;
 }
 
 /*
@@ -1151,7 +742,111 @@ static void DIALOG_add_menu(struct al_grc *grc, cjson_t *menu, int dlg_index)
     add_menu(grc, dlg_index);
 }
 
-int create_DIALOG(struct al_grc *grc)
+int gui_init(struct al_grc *grc)
+{
+    if (install_allegro(SYSTEM_AUTODETECT, NULL, NULL)) {
+        al_set_errno(AL_ERROR_LIB_INIT);
+        return -1;
+    }
+
+    if (install_keyboard()) {
+        al_set_errno(AL_ERROR_KEYBOARD_INIT);
+        return -1;
+    }
+
+    install_timer();
+    set_color_depth(info_color_depth(grc));
+
+    if (set_gfx_mode(GFX_XWINDOWS, grc->gfx.width, grc->gfx.height,
+                     0, 0) != 0)
+    {
+        if (set_gfx_mode(GFX_FBCON, grc->gfx.width, grc->gfx.height,
+                         0, 0) != 0)
+        {
+            remove_keyboard();
+            allegro_exit();
+            al_set_errno(AL_ERROR_SET_GFX_MODE);
+            return -1;
+        }
+    } else {
+        if (grc->gfx.use_mouse == true) {
+            install_mouse();
+            gui_mouse_focus = FALSE;
+        }
+    }
+
+    /* Disable ctrl+alt+end */
+    if (grc->gfx.block_keys == true)
+        three_finger_flag = FALSE;
+
+    return 0;
+}
+
+/*
+ * Here we create the Allegro DIALOG array pointing to every previously loaded
+ * object.
+ */
+int DIALOG_create(struct al_grc *grc)
+{
+    int dlg_items = 0, index = 0;
+    DIALOG *d, *q;
+    struct grc_object *p = NULL;
+
+    /* d_yield_proc */
+    dlg_items += 1;
+
+    /* d_clear_proc */
+    if (grc->use_gfx == true)
+        dlg_items += 1;
+
+    /*
+     * Even that the user has defined the ESC key, we allocate an extra space.
+     * It will not be used...
+     */
+    if (grc->ignore_esc_key)
+        dlg_items += 1;
+
+    dlg_items += cdll_size(grc->ui_objects);
+
+    /*
+     * The total size of the DIALOG will be the amount of keys + the amount of
+     * objects + menu + ignored ESC key + d_yield_proc + d_clear_proc +
+     * 1 (NULL proc).
+     */
+    d = calloc(dlg_items + 1, sizeof(DIALOG));
+
+    if (NULL == d) {
+        al_set_errno(AL_ERROR_MEMORY);
+        return -1;
+    }
+
+    /* Initializes the DIALOG */
+    if (grc->use_gfx == true)
+        DIALOG_creation_start(d, grc);
+
+    /* Add user defined objects */
+    for (p = grc->ui_objects, index = 1; p; p = p->next, index++) {
+        q = grc_object_get_DIALOG(p);
+        d[index] = *q;
+    }
+    
+    /* TODO Add a menu */
+
+    /* TODO Add keys */
+
+    /* We ignore the ESC key (if needed) */
+    add_default_esc_key(grc, &d[dlg_items - 2]);
+
+    /* Ends the DIALOG */
+    DIALOG_creation_finish(d, dlg_items, grc);
+
+    /* Points to the new DIALOG */
+    grc->al_dlg = d;
+
+    return 0;
+}
+
+/*int create_DIALOG(struct al_grc *grc)
 {
     cjson_t *objects, *keys = NULL, *menu = NULL;
     int total = 0, p = 0;
@@ -1165,31 +860,31 @@ int create_DIALOG(struct al_grc *grc)
 
     keys = grc_get_object(grc, OBJ_KEYS);
     menu = grc_get_object(grc, OBJ_MENU);
-
+*/
     /*
      * The total size of the DIALOG will be the amount of keys + the amount of
      * objects + menu + ignored ESC key + d_yield_proc + d_clear_proc + 1.
      */
-    total = cjson_get_array_size(objects);
-    total += 1; /* d_yield_proc */
+//    total = cjson_get_array_size(objects);
+//    total += 1; /* d_yield_proc */
 
-    if (grc->use_gfx == true)
-        total += 1; /* d_clear_proc */
+//    if (grc->use_gfx == true)
+//        total += 1; /* d_clear_proc */
 
-    if (keys != NULL)
-        total += cjson_get_array_size(keys);
+//    if (keys != NULL)
+//        total += cjson_get_array_size(keys);
 
     /*
      * Case a menu has been defined, it also needs a space inside the DIALOG
      */
-    if (menu != NULL)
-        total += 1;
+//    if (menu != NULL)
+//        total += 1;
 
     /*
      * Even that the user has defined the ESC key, we allocate an extra space.
      * It will not be used...
      */
-    if (grc->ignore_esc_key)
+/*    if (grc->ignore_esc_key)
         total += 1;
 
     grc->dlg = calloc(total + 1, sizeof(DIALOG));
@@ -1198,50 +893,50 @@ int create_DIALOG(struct al_grc *grc)
         al_set_errno(AL_ERROR_MEMORY);
         return -1;
     }
-
+*/
     /* Initializes the DIALOG */
-    if (grc->use_gfx == true)
-        DIALOG_creation_start(grc);
+//    if (grc->use_gfx == true)
+//        DIALOG_creation_start(grc);
 
     /* Add user defined objects */
-    p = DIALOG_add_objects(grc, objects, (grc->use_gfx == true) ? 1 : 0);
+/*    p = DIALOG_add_objects(grc, objects, (grc->use_gfx == true) ? 1 : 0);
 
     if (p < 0)
         return -1;
-
+*/
     /* Add a menu */
-    if (menu != NULL) {
+/*    if (menu != NULL) {
         DIALOG_add_menu(grc, menu, p);
         p += 1;
-
+*/
         /*
          * Changes the main color so that the menu uses the same that the user
          * defined.
          */
-        gui_fg_color = grc->fg;
+/*        gui_fg_color = grc->fg;
         gui_bg_color = grc->bg;
     }
-
+*/
     /* Add keys */
-    if (keys != NULL)
+/*    if (keys != NULL)
         if (DIALOG_add_keys(grc, keys, p) < 0)
             return -1;
-
+*/
     /* We ignore the ESC key (if needed) */
-    add_default_esc_key(grc, total - 2);
+//    add_default_esc_key(grc, total - 2);
 
     /* Ends the DIALOG */
-    DIALOG_creation_finish(grc, total - 1);
+/*    DIALOG_creation_finish(grc, total - 1);
 
     return 0;
-}
+}*/
 
 void run_DIALOG(struct al_grc *grc)
 {
     if (grc->use_gfx == false)
-        centre_dialog(grc->dlg);
+        centre_dialog(grc->al_dlg);
 
-    do_dialog(grc->dlg, -1);
+    do_dialog(grc->al_dlg, -1);
 }
 
 /*

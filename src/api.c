@@ -33,14 +33,14 @@
 
 static int start_grc(struct al_grc *grc)
 {
-    if (grc->use_gfx == true) {
+/*    if (grc->use_gfx == true) {
         if (gui_change_resolution(grc) < 0)
             return -1;
     }
 
     if (gui_load_colors(grc) < 0)
-        return -1;;
-
+        return -1;
+*/
     return 0;
 }
 
@@ -53,18 +53,14 @@ static struct al_grc *al_grc_init(const char *grc_data, int load_mode,
     al_errno_clear();
     grc = new_grc();
 
-    if (NULL == grc) {
-        al_set_errno(AL_ERROR_MEMORY);
+    if (NULL == grc)
         return NULL;
-    }
 
-    grc->use_gfx = gfx;
-
-    /* Makes parse from a file or from a buffer */
+    /* Load the GRC (file or buffer) to the memory */
     if (load_mode == LOAD_FROM_FILE)
-        ret = grc_parse_file(grc, grc_data);
+        ret = parse_file(grc, grc_data);
     else if (load_mode == LOAD_FROM_MEM)
-        ret = grc_parse_mem(grc, grc_data);
+        ret = parse_mem(grc, grc_data);
     else if (load_mode == LOAD_BARE_DATA) {
         /*
          * We allow creating an object in this mode only when creating a
@@ -81,7 +77,24 @@ static struct al_grc *al_grc_init(const char *grc_data, int load_mode,
         goto end_block;
     }
 
-    if (start_grc(grc) < 0)
+    grc->use_gfx = gfx;
+
+    if (info_parse(grc) < 0)
+        goto end_block;
+
+    /*
+     * We initialize Allegro here, so we can use anything from it from 
+     * this point. Like their color conversion, we need to do this things
+     * rigth after...
+     */
+    if (gui_init(grc) < 0)
+        goto end_block;
+
+    if (color_parse(grc) < 0)
+        goto end_block;
+
+    /* Do the translation of every GRC object to internal grc_object. */
+    if (parse_objects(grc) < 0)
         goto end_block;
 
     return grc;
@@ -108,6 +121,7 @@ struct al_grc LIBEXPORT *al_grc_create(void)
     return al_grc_init(NULL, LOAD_BARE_DATA, 0);
 }
 
+/* TODO: Why do we need this function? */
 int LIBEXPORT al_grc_init_from_bare_data(struct al_grc *grc)
 {
     al_errno_clear();
@@ -117,6 +131,8 @@ int LIBEXPORT al_grc_init_from_bare_data(struct al_grc *grc)
         return -1;
     }
 
+    /* TODO: Parse? */
+    /* TODO: Start gui? */
     return start_grc(grc);
 }
 
@@ -135,6 +151,7 @@ int LIBEXPORT al_grc_uninit(struct al_grc *grc)
 
     /* Free the object */
     destroy_grc(grc);
+    cexit();
 
     return 0;
 }
@@ -150,9 +167,10 @@ int LIBEXPORT al_grc_prepare_dialog(struct al_grc *grc)
         return -1;
     }
 
-    ret = create_DIALOG(grc);
+    ret = DIALOG_create(grc);
 
     if (ret == 0)
+        /* And now we're prepared to run the DIALOG */
         grc->are_we_prepared = true;
 
     return ret;
@@ -185,7 +203,7 @@ static bool object_has_callback_data(struct al_grc *grc, DIALOG *d)
     acd = d->dp3;
 
     if (NULL == acd)
-        return 0;
+        return false;
 
     /* This should not happen at all. */
     return (acd->grc == grc) ? true : false;
@@ -215,11 +233,12 @@ int LIBEXPORT al_grc_set_callback(struct al_grc *grc, const char *object_name,
             return -1;
 
         /*
-         * Although the callback functions reveice a structure as an argument,
-         * in case of a menu item, it does not receive none, due an internal
+         * Although the callback functions receive a structure as an argument,
+         * in case of a menu item, it does receive none, due an internal
          * Allegro implementation.
          */
         m->proc = (int (*)(void))callback;
+
         return 0;
     }
 
@@ -245,6 +264,7 @@ int LIBEXPORT al_grc_set_callback(struct al_grc *grc, const char *object_name,
     } else
         acd = d->dp3;
 
+    /* Replace the callback */
     acd->callback = callback;
     acd->user_arg = arg;
 

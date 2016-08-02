@@ -32,7 +32,7 @@
 /*
  * Create and return a structure of type 'struct dlg_obj_ref'.
  */
-struct dlg_obj_ref *new_obj_ref(const char *name, int dlg_index,
+struct dlg_obj_ref *new_obj_ref(const char *name, DIALOG *dlg,
     enum al_grc_object type)
 {
     struct dlg_obj_ref *r = NULL;
@@ -45,7 +45,7 @@ struct dlg_obj_ref *new_obj_ref(const char *name, int dlg_index,
     }
 
     r->name = strdup(name);
-    r->dlg_index = dlg_index;
+    r->dlg = dlg;
     r->type = type;
 
     return r;
@@ -62,5 +62,36 @@ void destroy_obj_ref(void *a)
         free(r->name);
 
     free(r);
+}
+
+static int search_object_ref(void *a, void *b)
+{
+    struct dlg_obj_ref *r = (struct dlg_obj_ref *)a;
+    char *name = (char *)b;
+
+    if (!strcmp(r->name, name))
+        return 1;
+
+    return 0;
+}
+
+DIALOG *get_DIALOG_from_obj_ref(struct dlg_obj_ref *head,
+    const char *object_name)
+{
+    struct dlg_obj_ref *ref = NULL;
+
+    if (NULL == object_name) {
+        al_set_errno(AL_ERROR_NULL_ARG);
+        return NULL;
+    }
+
+    ref = cdll_map(head, search_object_ref, (void *)object_name);
+
+    if (NULL == ref) {
+        al_set_errno(AL_ERROR_OBJECT_NOT_FOUND);
+        return NULL;
+    }
+
+    return ref->dlg;
 }
 

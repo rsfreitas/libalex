@@ -65,3 +65,6 @@ LGPLv2
 
 * Add support for changing font using this library.
 
+* Maybe remove the *al_grc_prepare_dialog* and pass all Allegro initialization
+  to the *al_grc_prepare_dialog*.
+

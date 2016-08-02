@@ -29,6 +29,28 @@
 
 #include "libalex.h"
 
+/* Structure to store an object "object" of a GRC file */
+struct grc_obj_properties {
+    enum al_grc_object  type;
+    char                *name;
+    char                *parent;
+    char                *text;
+    char                *fg;
+    int                 x;
+    int                 y;
+    int                 w;
+    int                 h;
+    bool                hide;
+    int                 line_break_mode;
+    int                 data_length;
+    int                 radio_group;
+    int                 radio_type;
+    int                 password_mode;
+    int                 horizontal_position;
+    int                 fps;
+    int                 devices;
+};
+
 /*
  * Destroy a structure 'struct grc_obj_properties'.
  */
@@ -243,5 +265,166 @@ undefined_grc_jkey_block:
     destroy_obj_properties(p);
 
     return NULL;
+}
+
+bool grc_obj_properties_has_name(struct grc_obj_properties *prop)
+{
+    if (NULL == prop)
+        return false;
+
+    if (NULL == prop->name)
+        return false;
+
+    return true;
+}
+
+bool grc_obj_properties_has_parent(struct grc_obj_properties *prop)
+{
+    if (NULL == prop)
+        return false;
+
+    if (NULL == prop->parent)
+        return false;
+
+    return true;
+}
+
+bool grc_obj_properties_has_fg(struct grc_obj_properties *prop)
+{
+    if (NULL == prop)
+        return false;
+
+    if (NULL == prop->fg)
+        return false;
+
+    return true;
+}
+
+const char *grc_obj_properties_name(struct grc_obj_properties *prop)
+{
+    if (NULL == prop)
+        return NULL;
+
+    return prop->name;
+}
+
+const char *grc_obj_properties_parent(struct grc_obj_properties *prop)
+{
+    if (NULL == prop)
+        return NULL;
+
+    return prop->parent;
+}
+
+const char *grc_obj_properties_text(struct grc_obj_properties *prop)
+{
+    if (NULL == prop)
+        return NULL;
+
+    return prop->text;
+}
+
+const char *grc_obj_properties_fg(struct grc_obj_properties *prop)
+{
+    if (NULL == prop)
+        return NULL;
+
+    return prop->fg;
+}
+
+enum al_grc_object grc_obj_properties_type(struct grc_obj_properties *prop)
+{
+    if (NULL == prop)
+        return -1;
+
+    return prop->type;
+}
+
+int grc_obj_properties_x(struct grc_obj_properties *prop)
+{
+    if (NULL == prop)
+        return -1;
+
+    return prop->x;
+}
+
+int grc_obj_properties_y(struct grc_obj_properties *prop)
+{
+    if (NULL == prop)
+        return -1;
+
+    return prop->y;
+}
+
+int grc_obj_properties_w(struct grc_obj_properties *prop)
+{
+    if (NULL == prop)
+        return -1;
+
+    return prop->w;
+}
+
+int grc_obj_properties_h(struct grc_obj_properties *prop)
+{
+    if (NULL == prop)
+        return -1;
+
+    return prop->h;
+}
+
+bool grc_obj_properties_hide(struct grc_obj_properties *prop)
+{
+    if (NULL == prop)
+        return false;
+
+    return prop->hide;
+}
+
+int grc_obj_properties_line_break_mode(struct grc_obj_properties *prop)
+{
+    if (NULL == prop)
+        return -1;
+
+    return prop->line_break_mode;
+}
+
+int grc_obj_properties_data_length(struct grc_obj_properties *prop)
+{
+    if (NULL == prop)
+        return -1;
+
+    return prop->data_length;
+}
+
+int grc_obj_properties_radio_group(struct grc_obj_properties *prop)
+{
+    if (NULL == prop)
+        return -1;
+
+    return prop->radio_group;
+}
+
+int grc_obj_properties_radio_type(struct grc_obj_properties *prop)
+{
+    if (NULL == prop)
+        return -1;
+
+    return prop->radio_type;
+}
+
+int grc_obj_properties_password_mode(struct grc_obj_properties *prop)
+{
+    if (NULL == prop)
+        return -1;
+
+    return prop->password_mode;
+}
+
+int grc_obj_properties_horizontal_position(struct grc_obj_properties *prop)
+{
+    if (NULL == prop)
+        return -1;
+
+    return prop->horizontal_position;
 }
 

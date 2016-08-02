@@ -35,6 +35,12 @@ void destroy_grc(struct al_grc *grc)
 {
     int i;
 
+    if (grc->ui_objects != NULL)
+        cdll_free(grc->ui_objects, destroy_grc_object);
+
+    if (grc->al_dlg != NULL)
+        free(grc->al_dlg);
+
     if (grc->jgrc != NULL)
         cjson_delete(grc->jgrc);
 
@@ -42,17 +48,17 @@ void destroy_grc(struct al_grc *grc)
      * TODO: Here we need to destroy some objects info, like button text
      *       and other stuff. Some Allegro's DIALOG internal fields...
      */
-    if (grc->dlg != NULL)
-        free(grc->dlg);
+//    if (grc->dlg != NULL)
+//        free(grc->dlg);
 
     if (grc->ref != NULL)
         cdll_free(grc->ref, destroy_obj_ref);
 
-    if (grc->callback_data != NULL)
-        cdll_free(grc->callback_data, destroy_callback_data);
+//    if (grc->callback_data != NULL)
+//        cdll_free(grc->callback_data, destroy_callback_data);
 
-    if (grc->g_data != NULL)
-        cdll_free(grc->g_data, destroy_grc_generic_data);
+//    if (grc->g_data != NULL)
+//        cdll_free(grc->g_data, destroy_grc_generic_data);
 
     if (grc->dlg_menu != NULL) {
         for (i = 0; i < grc->dlg_menu_t_items; i++) {
@@ -84,14 +90,19 @@ struct al_grc *new_grc(void)
 
     g = calloc(1, sizeof(struct al_grc));
 
-    if (NULL == g)
+    if (NULL == g) {
+        al_set_errno(AL_ERROR_MEMORY);
         return NULL;
+    }
 
     g->jgrc = NULL;
     g->ref = NULL;
-    g->dlg = NULL;
-    g->callback_data = NULL;
-    g->g_data = NULL;
+    g->al_dlg = NULL;
+    g->ui_objects = NULL;
+    g->ui_menu = NULL;
+//    g->dlg = NULL;
+//    g->callback_data = NULL;
+//    g->g_data = NULL;
     g->grc_menu = NULL;
     g->menu = NULL;
 
@@ -108,5 +119,32 @@ struct al_grc *new_grc(void)
     g->are_we_prepared = false;
 
     return g;
+}
+
+void grc_creates_reference(struct al_grc *grc, struct grc_object *object)
+{
+    struct grc_obj_properties *prop;
+    struct dlg_obj_ref *ref;
+
+    if ((NULL == object) || (NULL == grc))
+        return;
+
+    prop = grc_object_get_properties(object);
+
+    /*
+     * If the object has no 'name' propertie it's not a parent, we don't need
+     * to create a reference to it.
+     */
+    if (grc_obj_properties_has_name(prop) == false)
+        return;
+
+    ref = new_obj_ref(grc_obj_properties_name(prop),
+                      grc_object_get_DIALOG(object),
+                      grc_obj_properties_type(prop));
+
+    if (NULL == ref)
+        return;
+
+    grc->ref = cdll_unshift(grc->ref, ref);
 }
 

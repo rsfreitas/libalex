@@ -109,9 +109,9 @@ int al_grc_uninit(struct al_grc *grc);
  * @name al_grc_prepare_dialog
  * @brief Starts the next DIALOG to be on the screen.
  *
- * This functions is responsible to make all initialization needed by a DIALOG,
- * defined in a previously loaded GRC file. All custom adjustments by the user
- * must happen after a call to it.
+ * This functions is responsible to make all initialization Allegro needs to
+ * use the DIALOG defined in a previously loaded GRC file. All custom
+ * adjustments required by the user must happen before a call to it.
  *
  * @param [in] grc: Previously created UI structure.
  *

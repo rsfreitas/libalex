@@ -216,3 +216,8 @@ const char *str_grc_obj_type(enum al_grc_object obj)
     return n;
 }
 
+cjson_t *grc_get_object(struct al_grc *grc, const char *object)
+{
+    return cjson_get_object_item(grc->jgrc, object);
+}
+

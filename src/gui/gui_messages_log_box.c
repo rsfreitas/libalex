@@ -63,7 +63,7 @@ static struct line *new_line(const char *msg, int fg_color, const char *color)
     if (NULL == color)
         l->fg = fg_color;
     else
-        l->fg = grc_tr_color_to_al_color(get_color_depth(), color);
+        l->fg = color_grc_to_al(get_color_depth(), color);
 
     l->next = NULL;
 

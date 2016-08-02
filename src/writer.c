@@ -59,8 +59,8 @@ int LIBEXPORT al_grc_GRC_create_colors(struct al_grc *grc,
         return -1;
 
     /* Invalid colors? */
-    if ((grc_tr_color_to_al_color(OUT_GFX_COLOR_DEPTH, foreground) < 0) ||
-        (grc_tr_color_to_al_color(OUT_GFX_COLOR_DEPTH, background) < 0))
+    if ((color_grc_to_al(OUT_GFX_COLOR_DEPTH, foreground) < 0) ||
+        (color_grc_to_al(OUT_GFX_COLOR_DEPTH, background) < 0))
     {
         al_set_errno(AL_ERROR_UNSUPPORTED_COLORS);
         return -1;
@@ -297,7 +297,7 @@ int LIBEXPORT al_grc_GRC_set_object_property(struct al_grc *grc,
             jkey = OBJ_FOREGROUND;
             s = va_arg(ap, char *);
 
-            if (grc_tr_color_to_al_color(AL_DEFAULT_COLOR_DEPTH, s) < 0) {
+            if (color_grc_to_al(AL_DEFAULT_COLOR_DEPTH, s) < 0) {
                 al_set_errno(AL_ERROR_UNSUPPORTED_COLOR_DEPTH);
                 return -1;
             }

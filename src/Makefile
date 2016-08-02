@@ -46,12 +46,15 @@ OBJS =						\
 	al_callback.o			\
 	al_menu.o				\
 	api.o					\
+	colors.o				\
 	error.o					\
 	grc.o					\
 	grc_generic.o			\
 	grc_key.o				\
 	grc_menu.o				\
+	grc_object.o			\
 	grc_obj_properties.o	\
+	info.o					\
 	gui.o					\
 	obj_ref.o				\
 	parser.o				\
