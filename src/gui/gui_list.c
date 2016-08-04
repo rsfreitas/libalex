@@ -40,14 +40,14 @@
  */
 int gui_d_list_proc(int msg, DIALOG *d, int c)
 {
-    struct al_callback_data *acd = d->dp3;
+    struct callback_data *acd = d->dp3;
     int ret;
 
     ret = d_list_proc(msg, d, c);
 
     if (ret == D_CLOSE) {
         if (d->dp3 != NULL) {
-            acd->value_int = d->d1;
+            callback_set_int(acd, d->d1);
             run_callback(acd, D_O_K);
 
             /*

@@ -121,8 +121,8 @@ int color_grc_to_al(int color_depth, const char *color_name)
 int color_parse(struct al_grc *grc)
 {
     cjson_t *jcolors;
-    struct grc_json_key *e;
-    char *fg, *bg;
+    struct property_detail *dt;
+    cstring_t *fg, *bg;
 
     jcolors = grc_get_object(grc, OBJ_COLORS);
 
@@ -132,30 +132,30 @@ int color_parse(struct al_grc *grc)
     }
 
     /* foreground */
-    e = get_grc_json_key(AL_GRC_JOBJ_FOREGROUND);
+    dt = get_property_detail(AL_GRC_JOBJ_FOREGROUND);
 
-    if (NULL == e)
+    if (NULL == dt)
         goto unknown_grc_key_block;
 
-    fg = grc_get_object_str(jcolors, e->name);
+    fg = grc_get_object_str(jcolors, property_detail_string(dt));
 
     /* background */
-    e = get_grc_json_key(AL_GRC_JOBJ_BACKGROUND);
+    dt = get_property_detail(AL_GRC_JOBJ_BACKGROUND);
 
-    if (NULL == e)
+    if (NULL == dt)
         goto unknown_grc_key_block;
 
-    bg = grc_get_object_str(jcolors, e->name);
+    bg = grc_get_object_str(jcolors, property_detail_string(dt));
 
     /*
      * Global colors. We don't call get_color_depth() from Allegro because
      * at this point it hasn't been initialized yet.
      */
-    grc->fg = color_grc_to_al(info_color_depth(grc), fg);
-    grc->bg = color_grc_to_al(info_color_depth(grc), bg);
+    grc->fg = color_grc_to_al(info_color_depth(grc), cstring_valueof(fg));
+    grc->bg = color_grc_to_al(info_color_depth(grc), cstring_valueof(bg));
 
-    free(bg);
-    free(fg);
+    cstring_unref(bg);
+    cstring_unref(fg);
 
     return 0;
 

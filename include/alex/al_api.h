@@ -158,7 +158,7 @@ int al_grc_do_dialog(struct al_grc *grc);
  * @return On success returns 0 or -1 otherwise.
  */
 int al_grc_set_callback(struct al_grc *grc, const char *object_name,
-                        int (*callback)(struct al_callback_data *), void *arg);
+                        int (*callback)(struct callback_data *), void *arg);
 
 /**
  * @name al_grc_get_callback_data
@@ -170,7 +170,7 @@ int al_grc_set_callback(struct al_grc *grc, const char *object_name,
  *
  * @return On success returns 0 or -1 otherwise.
  */
-int al_grc_get_callback_data(struct al_callback_data *acd,
+int al_grc_get_callback_data(struct callback_data *acd,
                              enum al_data_type data, ...);
 
 /**
@@ -182,7 +182,7 @@ int al_grc_get_callback_data(struct al_callback_data *acd,
  * @return On success returns a pointer the the data passed as argument
  *         to a callback function or NULL otherwise.
  */
-void *al_grc_get_callback_user_arg(struct al_callback_data *acd);
+void *al_grc_get_callback_user_arg(struct callback_data *acd);
 
 /**
  * @name al_grc_get_callback_grc
@@ -196,7 +196,7 @@ void *al_grc_get_callback_user_arg(struct al_callback_data *acd);
  * @return On success returns a pointer to the main library object or NULL
  *         otherwise.
  */
-struct al_grc *al_grc_get_callback_grc(struct al_callback_data *acd);
+struct al_grc *al_grc_get_callback_grc(struct callback_data *acd);
 
 /* TODO: change data to const */
 /**

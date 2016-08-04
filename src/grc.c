@@ -33,50 +33,20 @@
  */
 void destroy_grc(struct al_grc *grc)
 {
-    int i;
-
     if (grc->ui_objects != NULL)
         cdll_free(grc->ui_objects, destroy_grc_object);
+
+    if (grc->tmp_objects != NULL)
+        cdll_free(grc->tmp_objects, destroy_grc_object);
+
+    if (grc->ui_keys != NULL)
+        cdll_free(grc->ui_keys, destroy_grc_object);
 
     if (grc->al_dlg != NULL)
         free(grc->al_dlg);
 
     if (grc->jgrc != NULL)
         cjson_delete(grc->jgrc);
-
-    /*
-     * TODO: Here we need to destroy some objects info, like button text
-     *       and other stuff. Some Allegro's DIALOG internal fields...
-     */
-//    if (grc->dlg != NULL)
-//        free(grc->dlg);
-
-    if (grc->ref != NULL)
-        cdll_free(grc->ref, destroy_obj_ref);
-
-//    if (grc->callback_data != NULL)
-//        cdll_free(grc->callback_data, destroy_callback_data);
-
-//    if (grc->g_data != NULL)
-//        cdll_free(grc->g_data, destroy_grc_generic_data);
-
-    if (grc->dlg_menu != NULL) {
-        for (i = 0; i < grc->dlg_menu_t_items; i++) {
-            if (grc->dlg_menu[i].text != NULL)
-                free(grc->dlg_menu[i].text);
-
-            if (grc->dlg_menu[i].dp != NULL)
-                free(grc->dlg_menu[i].dp);
-        }
-
-        free(grc->dlg_menu);
-    }
-
-    if (grc->menu != NULL)
-        cdll_free(grc->menu, destroy_al_menu);
-
-    if (grc->grc_menu != NULL)
-        cdll_free(grc->grc_menu, destroy_grc_menu);
 
     free(grc);
 }
@@ -96,15 +66,11 @@ struct al_grc *new_grc(void)
     }
 
     g->jgrc = NULL;
-    g->ref = NULL;
     g->al_dlg = NULL;
     g->ui_objects = NULL;
+    g->tmp_objects = NULL;
+    g->ui_keys = NULL;
     g->ui_menu = NULL;
-//    g->dlg = NULL;
-//    g->callback_data = NULL;
-//    g->g_data = NULL;
-    g->grc_menu = NULL;
-    g->menu = NULL;
 
     /*
      * Let the virtual keyboard disabled by now. If there is such an object
@@ -121,30 +87,38 @@ struct al_grc *new_grc(void)
     return g;
 }
 
-void grc_creates_reference(struct al_grc *grc, struct grc_object *object)
+DIALOG *grc_get_DIALOG_from_tag(struct al_grc *grc, const char *tag)
 {
-    struct grc_obj_properties *prop;
-    struct dlg_obj_ref *ref;
+    struct tmp_list {
+        struct grc_object *ui;
+    };
 
-    if ((NULL == object) || (NULL == grc))
-        return;
+    DIALOG *d = NULL;
+    unsigned int i, t;
+    struct grc_object *p;
+    struct tmp_list ui_list[] = {
+        { grc->ui_objects },
+        { grc->ui_keys },
+        { grc->ui_menu },
+        { grc->tmp_objects }
+    };
 
-    prop = grc_object_get_properties(object);
+    t = sizeof(ui_list) / sizeof(ui_list[0]);
 
-    /*
-     * If the object has no 'name' propertie it's not a parent, we don't need
-     * to create a reference to it.
-     */
-    if (grc_obj_properties_has_name(prop) == false)
-        return;
+    for (i = 0; i < t; i++) {
+        p = ui_list[i].ui;
+        d = grc_object_get_DIALOG_from_tag(p, tag);
 
-    ref = new_obj_ref(grc_obj_properties_name(prop),
-                      grc_object_get_DIALOG(object),
-                      grc_obj_properties_type(prop));
+        if (d != NULL)
+            return d;
+    }
 
-    if (NULL == ref)
-        return;
+    return NULL;
+}
 
-    grc->ref = cdll_unshift(grc->ref, ref);
+MENU *grc_get_MENU_from_tag(struct al_grc *grc, const char *tag)
+{
+    // TODO
+    return NULL;
 }
 

@@ -33,7 +33,7 @@
 int info_parse(struct al_grc *grc)
 {
     cjson_t *jinfo;
-    struct grc_json_key *e;
+    struct property_detail *dt;
 
     jinfo = grc_get_object(grc, OBJ_INFO);
 
@@ -43,53 +43,60 @@ int info_parse(struct al_grc *grc)
     }
 
     /* width */
-    e = get_grc_json_key(AL_GRC_JOBJ_WIDTH);
+    dt = get_property_detail(AL_GRC_JOBJ_WIDTH);
 
-    if (NULL == e)
+    if (NULL == dt)
         goto unknown_grc_key_block;
 
-    grc->gfx.width = grc_get_object_value(jinfo, e->name, AL_DEFAULT_WIDTH);
+    grc->gfx.width = grc_get_object_value(jinfo, property_detail_string(dt),
+                                          AL_DEFAULT_WIDTH);
 
     /* height */
-    e = get_grc_json_key(AL_GRC_JOBJ_HEIGHT);
+    dt = get_property_detail(AL_GRC_JOBJ_HEIGHT);
 
-    if (NULL == e)
+    if (NULL == dt)
         goto unknown_grc_key_block;
 
-    grc->gfx.height = grc_get_object_value(jinfo, e->name, AL_DEFAULT_HEIGHT);
+    grc->gfx.height = grc_get_object_value(jinfo,
+                                           property_detail_string(dt),
+                                           AL_DEFAULT_HEIGHT);
 
     /* color depth */
-    e = get_grc_json_key(AL_GRC_JOBJ_COLOR_DEPTH);
+    dt = get_property_detail(AL_GRC_JOBJ_COLOR_DEPTH);
 
-    if (NULL == e)
+    if (NULL == dt)
         goto unknown_grc_key_block;
 
-    grc->gfx.color_depth = grc_get_object_value(jinfo, e->name,
+    grc->gfx.color_depth = grc_get_object_value(jinfo, property_detail_string(dt),
                                                 AL_DEFAULT_COLOR_DEPTH);
 
     /* block exit keys */
-    e = get_grc_json_key(AL_GRC_JOBJ_BLOCK_EXIT_KEYS);
+    dt = get_property_detail(AL_GRC_JOBJ_BLOCK_EXIT_KEYS);
 
-    if (NULL == e)
+    if (NULL == dt)
         goto unknown_grc_key_block;
 
-    grc->gfx.block_keys = grc_get_object_value(jinfo, e->name, true);
+    grc->gfx.block_keys = grc_get_object_value(jinfo, property_detail_string(dt),
+                                               true);
 
     /* mouse */
-    e = get_grc_json_key(AL_GRC_JOBJ_MOUSE);
+    dt = get_property_detail(AL_GRC_JOBJ_MOUSE);
 
-    if (NULL == e)
+    if (NULL == dt)
         goto unknown_grc_key_block;
 
-    grc->gfx.use_mouse = grc_get_object_value(jinfo, e->name, false);
+    grc->gfx.use_mouse = grc_get_object_value(jinfo, property_detail_string(dt),
+                                              false);
 
     /* ignore_esc_key */
-    e = get_grc_json_key(AL_GRC_JOBJ_IGNORE_ESC_KEY);
+    dt = get_property_detail(AL_GRC_JOBJ_IGNORE_ESC_KEY);
 
-    if (NULL == e)
+    if (NULL == dt)
         goto unknown_grc_key_block;
 
-    grc->ignore_esc_key = grc_get_object_value(jinfo, e->name, false);
+    grc->ignore_esc_key = grc_get_object_value(jinfo,
+                                               property_detail_string(dt),
+                                               false);
 
     return 0;
 

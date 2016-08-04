@@ -192,13 +192,13 @@ int LIBEXPORT al_grc_GRC_add_key(struct al_grc *grc, const char *key,
         return -1;
     }
 
-    /* Cria objeto */
+    /* Create the object */
     cjson_add_item_to_object(p, OBJ_KEY, k);
 
     if (n != NULL)
-        cjson_add_item_to_object(p, OBJ_NAME, n);
+        cjson_add_item_to_object(p, OBJ_TAG, n);
 
-    /* Adiciona ao array */
+    /* Add to the array */
     cjson_add_item_to_array(grc->jtmp, p);
 
     return 0;
@@ -330,8 +330,8 @@ int LIBEXPORT al_grc_GRC_set_object_property(struct al_grc *grc,
             grc_value = GRC_NUMBER;
             break;
 
-        case AL_GRC_JOBJ_NAME:
-            jkey = OBJ_NAME;
+        case AL_GRC_JOBJ_TAG:
+            jkey = OBJ_TAG;
             s = va_arg(ap, char *);
             grc_value = GRC_STRING;
             break;

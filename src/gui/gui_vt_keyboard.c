@@ -634,12 +634,12 @@ static char *add_char(const char *s, unsigned int pos, char *c)
 
 static void run_edit_callback(DIALOG *edit)
 {
-    struct al_callback_data *acd = edit->dp3;
+    struct callback_data *acd = edit->dp3;
 
     if (NULL == acd)
         return;
 
-    acd->value_string = (char *)edit->dp;
+    callback_set_string(acd, (char *)edit->dp);
     run_callback(acd, D_O_K);
 }
 
@@ -752,10 +752,12 @@ static int update_last_edit_object_value(DIALOG *d, struct al_grc *grc,
 int gui_d_vt_keyboard_proc(int msg, DIALOG *d, int c __attribute__((unused)))
 {
     struct screen_key *key;
-    struct al_callback_data *acd = d->dp3;
-    struct al_grc *grc = acd->grc;
+    struct callback_data *acd = d->dp3;
+    struct al_grc *grc;
     enum grc_keyboard_layout klayout = d->d1;
     int mx, my, ret, draw = false;
+
+    grc = get_callback_grc(acd);
 
     switch (msg) {
         case MSG_START:
@@ -804,7 +806,8 @@ int gui_d_vt_keyboard_proc(int msg, DIALOG *d, int c __attribute__((unused)))
                 object_message(d, MSG_DRAW, 0);
 
                 /* Makes available which key is been activated */
-                acd->value_int = key->key[d->d2 & DLG_SPK_SHIFT].scancode;
+                callback_set_int(acd,
+                                 key->key[d->d2 & DLG_SPK_SHIFT].scancode);
 
                 /* Run the callback function */
                 run_callback(acd, D_O_K);

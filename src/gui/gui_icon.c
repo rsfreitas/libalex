@@ -96,7 +96,7 @@ static int simple_d_icon_proc(int msg, DIALOG *d, int c)
 
 int gui_d_icon_proc(int msg, DIALOG *d, int c)
 {
-    struct al_callback_data *acd = d->dp3;
+    struct callback_data *acd = d->dp3;
     int ret;
 
     /*

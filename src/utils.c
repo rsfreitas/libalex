@@ -24,6 +24,8 @@
  * USA
  */
 
+#include <ctype.h>
+
 #include "libalex.h"
 
 /* Used to map possible objects from a DIALOG */
@@ -219,5 +221,78 @@ const char *str_grc_obj_type(enum al_grc_object obj)
 cjson_t *grc_get_object(struct al_grc *grc, const char *object)
 {
     return cjson_get_object_item(grc->jgrc, object);
+}
+
+static int special_keys(const char *key)
+{
+    int ret = KEY_F1 - 1, k = 0;
+    char *tmp;
+
+    if (!strcmp(key, "ESC"))
+        return KEY_ESC;
+
+    if (key[0] == 'F') {
+        tmp = (char *)&key[1];
+        k = strtol(tmp, NULL, 10);
+        return ret + k;
+    }
+
+    return -1;
+}
+
+static int key_char(const char *key)
+{
+    int c = key[0];
+
+    if (isalpha(c))
+        return c - '@';
+
+    if (isdigit(c))
+        return c - 21;
+
+    return -1;
+}
+
+/*
+ * Translate a key string, since it is in the format 'KEY_X', to its
+ * corresponding scancode.
+ */
+int tr_str_key_to_al_key(const char *skey)
+{
+    cstring_t *tmp = NULL, *p = NULL;
+    cstring_list_t *list = NULL;
+    int ret = -1;
+
+    tmp = cstring_create("%s", skey);
+
+    if (NULL == tmp)
+        return -1;
+
+    list = cstring_split(tmp, "_");
+
+    if (NULL == list)
+        goto end_block;
+
+    if (cstring_list_size(list) != 2)
+        goto end_block;
+
+    /* ok */
+    p = cstring_list_get(list, 1);
+
+    if (cstring_length(p) == 1)
+        ret = key_char(cstring_valueof(p));
+    else
+        ret = special_keys(cstring_valueof(p));
+
+    cstring_unref(p);
+
+end_block:
+    if (tmp != NULL)
+        cstring_unref(tmp);
+
+    if (list != NULL)
+        cstring_list_destroy(list);
+
+    return ret;
 }
 

@@ -173,14 +173,14 @@ static int d_password_proc(int msg, DIALOG *d, int c)
     return D_O_K;
 }
 
-static void set_actual_edit_object(DIALOG *d, struct al_callback_data *acd)
+static void set_actual_edit_object(DIALOG *d, struct callback_data *acd)
 {
     struct al_grc *grc;
 
     if (NULL == acd)
         return;
 
-    grc = acd->grc;
+    grc = get_callback_grc(acd);
 
     if (NULL == grc)
         return;
@@ -196,7 +196,7 @@ static void set_actual_edit_object(DIALOG *d, struct al_callback_data *acd)
 
 int gui_d_password_proc(int msg, DIALOG *d, int c)
 {
-    struct al_callback_data *acd = d->dp3;
+    struct callback_data *acd = d->dp3;
     int ret;
 
     /* Received an update from the virtual keyboard? */
@@ -210,7 +210,7 @@ int gui_d_password_proc(int msg, DIALOG *d, int c)
 
     if (ret == D_CLOSE) {
         if (d->dp3 != NULL) {
-            acd->value_string = (char *)d->dp;
+            callback_set_string(acd, (char *)d->dp);
             run_callback(acd, D_O_K);
 
             /*
@@ -227,7 +227,7 @@ int gui_d_password_proc(int msg, DIALOG *d, int c)
 
 int gui_d_edit_proc(int msg, DIALOG *d, int c)
 {
-    struct al_callback_data *acd = d->dp3;
+    struct callback_data *acd = d->dp3;
     int ret;
 
     /* Received an update from the virtual keyboard? */
@@ -245,7 +245,7 @@ int gui_d_edit_proc(int msg, DIALOG *d, int c)
 
     if (ret == D_CLOSE) {
         if (d->dp3 != NULL) {
-            acd->value_string = (char *)d->dp;
+            callback_set_string(acd, (char *)d->dp);
             run_callback(acd, D_O_K);
 
             /*

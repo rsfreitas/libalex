@@ -35,7 +35,7 @@
  */
 int gui_d_button_proc(int msg, DIALOG *d, int c)
 {
-    struct al_callback_data *acd = d->dp3;
+    struct callback_data *acd = d->dp3;
     int ret;
 
     ret = d_button_proc(msg, d, c);

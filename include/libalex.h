@@ -121,7 +121,9 @@ enum al_grc_object {
     AL_GRC_OBJ_MULTLIVE_IMAGE,
     AL_GRC_OBJ_VT_KEYBOARD,
     AL_GRC_OBJ_ICON,
-    AL_GRC_OBJ_TEXTBOX
+    AL_GRC_OBJ_TEXTBOX,
+    AL_GRC_OBJ_MENU,
+    AL_GRC_OBJ_MENU_ITEM
 };
 
 /* JSON objects of the GRC file */
@@ -136,7 +138,7 @@ enum al_grc_object_property {
     AL_GRC_JOBJ_TYPE,
     AL_GRC_JOBJ_POS_X,
     AL_GRC_JOBJ_POS_Y,
-    AL_GRC_JOBJ_NAME,
+    AL_GRC_JOBJ_TAG,
     AL_GRC_JOBJ_PARENT,
     AL_GRC_JOBJ_KEY,
     AL_GRC_JOBJ_TEXT,
@@ -237,7 +239,7 @@ enum al_key {
 
 /* Exported types */
 struct al_grc;
-struct al_callback_data;
+struct callback_data;
 
 #include "alex/al_error.h"
 #include "alex/al_api.h"

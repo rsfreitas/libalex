@@ -29,6 +29,28 @@
             "pos_x": 646,
             "pos_y": 472
         }
+    ],
+    "keys": [
+        { "key": "KEY_X", "name": "key_esc" }
+    ],
+    "menu": [
+        {
+            "text": "&Main",
+            "items": [
+                { "text": "New", "tag": "m_new" },
+                { "text": "Open", "tag": "m_open" },
+                { "text": "separator" },
+                { "text": "Exit", "tag": "m_exit" }
+            ]
+        },
+        {
+            "text": "&Help",
+            "items": [
+                { "text": "Details", "tag": "m_details" },
+                { "text": "separator" },
+                { "text": "About", "tag": "m_about" }
+            ]
+        }
     ]
 }
 

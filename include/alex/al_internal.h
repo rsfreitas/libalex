@@ -27,6 +27,8 @@
 #ifndef _LIBALEX_INTERNAL_H
 #define _LIBALEX_INTERNAL_H         1
 
+/** Defines */
+
 /* Maximum string size supported by an 'edit' object */
 #define MAX_EDIT_SIZE               1024
 
@@ -34,13 +36,6 @@
 #define AL_DEFAULT_WIDTH            800
 #define AL_DEFAULT_HEIGHT           600
 #define AL_DEFAULT_COLOR_DEPTH      32
-
-/* Values supported inside a GRC file */
-enum grc_entry_type_value {
-    GRC_NUMBER,
-    GRC_STRING,
-    GRC_BOOL
-};
 
 /* Main objects of a GRC file */
 #define OBJ_INFO                    "info"
@@ -63,7 +58,7 @@ enum grc_entry_type_value {
 #define OBJ_TYPE                    "type"
 #define OBJ_POS_X                   "pos_x"
 #define OBJ_POS_Y                   "pos_y"
-#define OBJ_NAME                    "name"
+#define OBJ_TAG                     "tag"
 #define OBJ_PARENT                  "parent"
 #define OBJ_KEY                     "key"
 #define OBJ_TEXT                    "text"
@@ -123,11 +118,38 @@ enum grc_entry_type_value {
 /* Radio button default height */
 #define DEFAULT_RADIO_HEIGHT        15
 
+/** Enumerators */
+
 /* Keyboard layout */
 enum grc_keyboard_layout {
     GRC_KLAYOUT_LETTERS,
     GRC_KLAYOUT_NUMBERS
 };
+
+/* Values supported inside a GRC file */
+enum grc_entry_type_value {
+    GRC_NUMBER,
+    GRC_STRING,
+    GRC_BOOL
+};
+
+enum grc_object_type {
+    GRC_OBJ_STANDARD,
+    GRC_OBJ_MENU,
+    GRC_OBJ_KEY,
+    GRC_OBJ_MENU_ITEM
+};
+
+/** Structures */
+
+/** Object's properties loaded from a GRC file */
+struct grc_obj_properties;
+
+/** A structure to get a property detail */
+struct property_detail;
+
+/** Structure to be used in the callback functions */
+struct callback_data;
 
 /*
  * Structure to identify possible objects of type { "string": value }
@@ -139,41 +161,6 @@ struct grc_json_key {
     enum grc_entry_type_value   type;
 };
 
-/* Structure to store an object "key" of a GRC file */
-struct grc_key_data {
-    char    *key;
-    char    *name;
-};
-
-/* Object's properties loaded from a GRC file */
-struct grc_obj_properties;
-
-/*
- * Structure to map objects able to be referenced by the user inside a
- * DIALOG structure.
- */
-struct dlg_obj_ref {
-    clist_t             *prev;
-    clist_t             *next;
-    char                *name;
-    enum al_grc_object  type;
-    DIALOG              *dlg;
-};
-
-/* Structure to be used in the callback functions */
-/* TODO: Maybe this don't need to be a list */
-struct al_callback_data {
-//    clist_t         *prev;
-//    clist_t         *next;
-    char            *value_string;
-    int             value_int;
-    void            *user_arg;
-    void            *grc; /* Pointer to the main structure */
-
-    /* internal */
-    int             (*callback)(struct al_callback_data *);
-};
-
 /* Graphic mode informations */
 struct al_gfx_info {
     int     width;
@@ -181,30 +168,6 @@ struct al_gfx_info {
     int     color_depth;
     bool    block_keys;
     bool    use_mouse;
-};
-
-/* Menus loaded */
-struct grc_menu {
-    clist_t         *prev;
-    clist_t         *next;
-    char            *name;
-    char            *parent;
-
-    /* Items from menu */
-    struct grc_menu *items;
-
-    /* Item info */
-    char            *text;
-};
-
-/* List of menus and submenus from a DIALOG */
-struct al_menu {
-    clist_t     *prev;
-    clist_t     *next;
-    char        *name;
-    int         t_items;
-    char        *parent;
-    MENU        *menu;
 };
 
 struct grc_generic_data {
@@ -217,16 +180,22 @@ struct grc_object {
     clist_t                     *prev;
     clist_t                     *next;
 
+    enum grc_object_type        type;       /** Object type */
+    char                        *tag;       /** Reference tag */
+
     DIALOG                      *dlg;       /** Real Allegro's DIALOG object */
-    struct al_callback_data     *cb_data;   /** Object's callback */
+    struct callback_data        *cb_data;   /** Object's callback */
     struct grc_generic_data     *g_data; // TODO: Replace this for a cstring_list_t
     struct grc_obj_properties   *prop;
 
     /* Maybe this a 'digital_clock' object */
     char                        dlg_clock_str[256];
+
+    /* Is this a menu? */
+    MENU                        *menu;
+    struct grc_object           *items;
 };
 
-/* TODO Split this structure in others */
 /* Main structure to handle an Allegro DIALOG */
 struct al_grc {
     /* GRC is a JSON object inside */
@@ -237,18 +206,10 @@ struct al_grc {
      * to be the real DIALOG, the one used by Allegro.
      */
     DIALOG                  *al_dlg;
-    MENU                    *al_menu;
     struct grc_object       *ui_objects;
-    struct grc_menu         *ui_menu;
-
-    /* Allegro's DIALOG */
-    DIALOG                  *dlg;
-
-    /* Objects with property 'name' (parents of someone) */
-    struct dlg_obj_ref      *ref;
-
-    /* Callback functions */
-    struct al_callback_data *callback_data;
+    struct grc_object       *tmp_objects;
+    struct grc_object       *ui_keys;
+    struct grc_object       *ui_menu;
 
     /* Graphic mode info */
     bool                    use_gfx;
@@ -272,7 +233,7 @@ struct al_grc {
     bool                    virtual_keyboard;
 
     /*
-     * Pointer to the 'edit' object that was selected when the virtual
+     * Pointer to the 'edit' object that was selected when a virtual
      * keyboard is activated.
      */
     DIALOG                  *last_edit_object;
@@ -281,32 +242,18 @@ struct al_grc {
     char                    dlg_clock_str[256];
     struct tm               dlg_tm;
 
-    /*
-     * List of values to store texts with asterisks '*' in a 'edit' object with
-     * 'password = true' or data from a 'text' object.
-     */
-    struct grc_generic_data *g_data;
-
-    /* Used to control a menu from an object */
-    struct grc_menu         *grc_menu;
-    struct al_menu          *menu;
-    MENU                    *dlg_menu;
-    int                     dlg_menu_t_items;
-
     /* Temporary values while creating a GRC file. */
     cjson_t                 *jtmp;
     cjson_t                 *jtmp_obj;
 };
 
+/** Prototypes */
+
 /* gui.c */
 int gui_init(struct al_grc *grc);
-//int gui_change_resolution(struct al_grc *grc);
-//int gui_load_colors(struct al_grc *grc);
 void gui_reset_resolution(void);
 int DIALOG_create(struct al_grc *grc);
-//int create_DIALOG(struct al_grc *grc);
 void run_DIALOG(struct al_grc *grc);
-int run_callback(struct al_callback_data *acd, unsigned int default_return);
 int grc_tr_color_to_al_color(int color_depth, const char *color);
 DIALOG *get_DIALOG_from_grc(struct al_grc *grc, const char *object_name);
 struct grc_menu *get_grc_menu_from_grc(struct al_grc *grc,
@@ -319,7 +266,7 @@ struct grc_json_key *get_grc_json_key(enum al_grc_object_property prop);
 int grc_get_object_value(cjson_t *object, const char *object_name,
                          int default_value);
 
-char *grc_get_object_str(cjson_t *object, const char *object_name);
+cstring_t *grc_get_object_str(cjson_t *object, const char *object_name);
 int parse_file(struct al_grc *grc, const char *grc_filename);
 int parse_mem(struct al_grc *grc, const char *data);
 int parse_colors(struct al_grc *grc);
@@ -329,73 +276,86 @@ int parse_objects(struct al_grc *grc);
 void al_errno_clear(void);
 void al_set_errno(enum al_error_code code);
 
-/* al_callback.c */
-struct al_callback_data *new_callback_data(void);
+/* callback.c */
+struct callback_data *new_callback_data(void);
 void destroy_callback_data(void *a);
+void set_object_callback_data(struct grc_object *gobject,
+                              struct al_grc *grc);
 
-/* al_menu.c */
-void destroy_al_menu(void *a);
-struct al_menu *new_al_menu(void);
+int get_callback_data(struct callback_data *acd, enum al_data_type data,
+                      va_list ap);
+void *get_callback_user_arg(struct callback_data *acd);
+struct al_grc *get_callback_grc(struct callback_data *acd);
+int set_callback(struct al_grc *grc, DIALOG *dlg,
+                 int (*callback)(struct callback_data *), void *arg);
+
+int run_callback(struct callback_data *acd, unsigned int default_return);
+void callback_set_int(struct callback_data *acd, int value);
+void callback_set_string(struct callback_data *acd, char *value);
 
 /* grc.c */
 struct al_grc *new_grc(void);
 void destroy_grc(struct al_grc *grc);
 void grc_creates_reference(struct al_grc *grc, struct grc_object *object);
+DIALOG *grc_get_DIALOG_from_tag(struct al_grc *grc, const char *tag);
 
 /* grc_generic.c */
 struct grc_generic_data *new_grc_generic_data(void);
 void destroy_grc_generic_data(void *a);
 
-/* grc_key.c */
-void destroy_key_data(struct grc_key_data *kdata);
-struct grc_key_data *new_key_data(cjson_t *key);
-
 /* grc_object.c */
 void destroy_grc_object(void *a);
-struct grc_object *new_grc_object(void);
+struct grc_object *new_grc_object(enum grc_object_type type);
 struct grc_obj_properties *grc_object_get_properties(struct grc_object *object);
 DIALOG *grc_object_get_DIALOG(struct grc_object *object);
+MENU *grc_object_get_MENU(struct grc_object *object);
+void grc_object_set_MENU(struct grc_object *object, MENU *menu);
+void grc_object_set_tag(struct grc_object *object, const char *tag);
+DIALOG *grc_object_get_DIALOG_from_tag(struct grc_object *object,
+                                       const char *tag);
 
-/* grc_menu.c */
-void destroy_grc_menu(void *a);
-struct grc_menu *new_menu(cjson_t *object);
+MENU *grc_object_get_MENU_from_tag(struct grc_object *object, const char *tag);
 
-/* grc_obj_properties.c */
+/* object_properties.c */
 void destroy_obj_properties(struct grc_obj_properties *odata);
 struct grc_obj_properties *new_obj_properties(cjson_t *object);
 bool grc_obj_properties_has_name(struct grc_obj_properties *prop);
 bool grc_obj_properties_has_parent(struct grc_obj_properties *prop);
 bool grc_obj_properties_has_fg(struct grc_obj_properties *prop);
-const char *grc_obj_properties_name(struct grc_obj_properties *prop);
-const char *grc_obj_properties_parent(struct grc_obj_properties *prop);
-const char *grc_obj_properties_text(struct grc_obj_properties *prop);
-const char *grc_obj_properties_fg(struct grc_obj_properties *prop);
-enum al_grc_object grc_obj_properties_type(struct grc_obj_properties *prop);
-int grc_obj_properties_x(struct grc_obj_properties *prop);
-int grc_obj_properties_y(struct grc_obj_properties *prop);
-int grc_obj_properties_w(struct grc_obj_properties *prop);
-int grc_obj_properties_h(struct grc_obj_properties *prop);
-int grc_obj_properties_line_break_mode(struct grc_obj_properties *prop);
-int grc_obj_properties_data_length(struct grc_obj_properties *prop);
-int grc_obj_properties_radio_group(struct grc_obj_properties *prop);
-int grc_obj_properties_radio_type(struct grc_obj_properties *prop);
-int grc_obj_properties_password_mode(struct grc_obj_properties *prop);
-int grc_obj_properties_horizontal_position(struct grc_obj_properties *prop);
-bool grc_obj_properties_hide(struct grc_obj_properties *prop);
+const char *grc_obj_get_property_name(struct grc_obj_properties *prop);
+const char *grc_obj_get_property_parent(struct grc_obj_properties *prop);
+const char *grc_obj_get_property_text(struct grc_obj_properties *prop);
+const char *grc_obj_get_property_fg(struct grc_obj_properties *prop);
+const char *grc_obj_get_property_key(struct grc_obj_properties *prop);
+enum al_grc_object grc_obj_get_property_type(struct grc_obj_properties *prop);
+int grc_obj_get_property_x(struct grc_obj_properties *prop);
+int grc_obj_get_property_y(struct grc_obj_properties *prop);
+int grc_obj_get_property_w(struct grc_obj_properties *prop);
+int grc_obj_get_property_h(struct grc_obj_properties *prop);
+int grc_obj_get_property_line_break_mode(struct grc_obj_properties *prop);
+int grc_obj_get_property_data_length(struct grc_obj_properties *prop);
+int grc_obj_get_property_radio_group(struct grc_obj_properties *prop);
+int grc_obj_get_property_radio_type(struct grc_obj_properties *prop);
+int grc_obj_get_property_password_mode(struct grc_obj_properties *prop);
+int grc_obj_get_property_horizontal_position(struct grc_obj_properties *prop);
+bool grc_obj_get_property_hide(struct grc_obj_properties *prop);
+
+int grc_obj_set_property_type(struct grc_obj_properties *prop,
+                              enum al_grc_object type);
 
 #define PROP_get(prop, name)    \
-    grc_obj_properties_##name(prop)
+    grc_obj_get_property_##name(prop)
 
 #define PROP_check(prop, name)  \
     grc_obj_properties_has_##name(prop)
 
-/* obj_ref.c */
-void destroy_obj_ref(void *a);
-struct dlg_obj_ref *new_obj_ref(const char *name, DIALOG *dlg,
-                                enum al_grc_object type);
+#define PROP_set(prop, name, value) \
+    grc_obj_set_property_##name(prop, value)
 
-DIALOG *get_DIALOG_from_obj_ref(struct dlg_obj_ref *head,
-                                const char *object_name);
+struct property_detail *get_property_detail(enum al_grc_object_property prop);
+const char *property_detail_string(struct property_detail *d);
+enum al_grc_object_property property_detail(struct property_detail *d);
+enum grc_entry_type_value propery_detail_type(struct property_detail *d);
 
 /* utils.c */
 void dotted_rect(int x1, int y1, int x2, int y2, int fg, int bg);
@@ -403,6 +363,7 @@ int tr_str_type_to_grc_type(const char *type_name);
 int tr_line_break(const char *mode);
 int tr_radio_type(const char *type);
 int tr_horizontal_position(const char *pos);
+int tr_str_key_to_al_key(const char *skey);
 const char *str_radio_type(enum al_grc_radio_button_fmt radio);
 const char *str_horizontal_position(enum al_grc_hpos hpos);
 const char *str_line_break(enum al_grc_line_break lbreak);

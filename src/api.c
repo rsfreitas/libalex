@@ -31,7 +31,7 @@
 #define LOAD_FROM_FILE      1
 #define LOAD_BARE_DATA      2
 
-static int start_grc(struct al_grc *grc)
+static int start_grc(struct al_grc *grc __attribute__((unused)))
 {
 /*    if (grc->use_gfx == true) {
         if (gui_change_resolution(grc) < 0)
@@ -196,24 +196,10 @@ int LIBEXPORT al_grc_do_dialog(struct al_grc *grc)
     return 0;
 }
 
-static bool object_has_callback_data(struct al_grc *grc, DIALOG *d)
-{
-    struct al_callback_data *acd = NULL;
-
-    acd = d->dp3;
-
-    if (NULL == acd)
-        return false;
-
-    /* This should not happen at all. */
-    return (acd->grc == grc) ? true : false;
-}
-
 int LIBEXPORT al_grc_set_callback(struct al_grc *grc, const char *object_name,
-    int (*callback)(struct al_callback_data *), void *arg)
+    int (*callback)(struct callback_data *), void *arg)
 {
     DIALOG *d;
-    struct al_callback_data *acd = NULL;
     MENU *m;
 
     al_errno_clear();
@@ -223,63 +209,36 @@ int LIBEXPORT al_grc_set_callback(struct al_grc *grc, const char *object_name,
         return -1;
     }
 
-    d = get_DIALOG_from_grc(grc, object_name);
+    d = grc_get_DIALOG_from_tag(grc, object_name);
 
     if (NULL == d) {
         /* Checks if it's a menu item or not */
-        m = get_MENU_from_grc(grc, object_name);
+        m = grc_get_MENU_from_tag(grc, object_name);
 
         if (NULL == m)
             return -1;
 
         /*
          * Although the callback functions receive a structure as an argument,
-         * in case of a menu item, it does receive none, due an internal
-         * Allegro implementation.
+         * in case of a menu item, it receives none, due an internal Allegro
+         * implementation.
          */
         m->proc = (int (*)(void))callback;
 
         return 0;
     }
 
-    /*
-     * @dp3 is used by the library as a way to store informations related to
-     * the object callback function.
-     */
-
-    if (object_has_callback_data(grc, d) == false) {
-        acd = new_callback_data();
-
-        if (NULL == acd) {
-            al_set_errno(AL_ERROR_MEMORY);
-            return -1;
-        }
-
-        acd->grc = (void *)grc;
-        d->dp3 = acd;
-
-        /* lock */
-        grc->callback_data = cdll_unshift(grc->callback_data, acd);
-        /* unlock */
-    } else
-        acd = d->dp3;
-
-    /* Replace the callback */
-    acd->callback = callback;
-    acd->user_arg = arg;
-
-    return 0;
+    return set_callback(grc, d, callback, arg);
 }
 
 /*
  * TODO: Change this to use a cvalue_t.
  */
-int LIBEXPORT al_grc_get_callback_data(struct al_callback_data *acd,
+int LIBEXPORT al_grc_get_callback_data(struct callback_data *acd,
     enum al_data_type data, ...)
 {
-    const char *ifmt = "%d\0", *sfmt = "%[^|]";
     va_list ap;
-    char tmp[512] = {0};
+    int ret;
 
     al_errno_clear();
 
@@ -289,33 +248,13 @@ int LIBEXPORT al_grc_get_callback_data(struct al_callback_data *acd,
     }
 
     va_start(ap, NULL);
-
-    switch (data) {
-        case AL_DT_KEY_SCANCODE:
-        case AL_DT_SLIDER_POSITION:
-        case AL_DT_CHECKBOX_STATE:
-        case AL_DT_RADIO_STATE:
-        case AL_DT_LIST_POSITION:
-            snprintf(tmp, sizeof(tmp) - 1, ifmt, acd->value_int);
-            vsscanf(tmp, ifmt, ap);
-            break;
-
-        case AL_DT_EDIT_VALUE:
-            snprintf(tmp, sizeof(tmp) - 1, "%s", acd->value_string);
-            vsscanf(tmp, sfmt, ap);
-            break;
-
-        default:
-            al_set_errno(AL_ERROR_UNSUPPORTED_DATA_TYPE);
-            return -1;
-    }
-
+    ret = get_callback_data(acd, data, ap);
     va_end(ap);
 
-    return 0;
+    return ret;
 }
 
-void LIBEXPORT *al_grc_get_callback_user_arg(struct al_callback_data *acd)
+void LIBEXPORT *al_grc_get_callback_user_arg(struct callback_data *acd)
 {
     al_errno_clear();
 
@@ -324,10 +263,10 @@ void LIBEXPORT *al_grc_get_callback_user_arg(struct al_callback_data *acd)
         return NULL;
     }
 
-    return acd->user_arg;
+    return get_callback_user_arg(acd);
 }
 
-struct al_grc LIBEXPORT *al_grc_get_callback_grc(struct al_callback_data *acd)
+struct al_grc LIBEXPORT *al_grc_get_callback_grc(struct callback_data *acd)
 {
     al_errno_clear();
 
@@ -336,7 +275,7 @@ struct al_grc LIBEXPORT *al_grc_get_callback_grc(struct al_callback_data *acd)
         return NULL;
     }
 
-    return acd->grc;
+    return get_callback_grc(acd);
 }
 
 int LIBEXPORT al_grc_object_set_data(struct al_grc *grc, const char *object_name,
@@ -344,7 +283,6 @@ int LIBEXPORT al_grc_object_set_data(struct al_grc *grc, const char *object_name
 {
     DIALOG *d;
     int s;
-    struct al_callback_data *acd = NULL;
 
     al_errno_clear();
 
@@ -353,7 +291,7 @@ int LIBEXPORT al_grc_object_set_data(struct al_grc *grc, const char *object_name
         return -1;
     }
 
-    d = get_DIALOG_from_grc(grc, object_name);
+    d = grc_get_DIALOG_from_tag(grc, object_name);
 
     if (NULL == d)
         return -1;
@@ -397,21 +335,7 @@ int LIBEXPORT al_grc_object_set_data(struct al_grc *grc, const char *object_name
              * To keep a standard in all object implemented internally we
              * manipulate the callback structure from the object.
              */
-            acd = d->dp3;
-
-            if (NULL == acd) {
-                acd = new_callback_data();
-
-                if (NULL == acd) {
-                    al_set_errno(AL_ERROR_MEMORY);
-                    return -1;
-                }
-
-                acd->grc = (void *)grc;
-                d->dp3 = acd;
-            }
-
-            acd->user_arg = data;
+            set_callback(grc, d, NULL, data);
             break;
 
         default:
@@ -434,7 +358,7 @@ int LIBEXPORT al_grc_object_set_proc(struct al_grc *grc,
         return -1;
     }
 
-    d = get_DIALOG_from_grc(grc, object_name);
+    d = grc_get_DIALOG_from_tag(grc, object_name);
 
     if (NULL == d)
         return -1;
@@ -456,7 +380,7 @@ int LIBEXPORT al_grc_object_send_message(struct al_grc *grc,
         return -1;
     }
 
-    d = get_DIALOG_from_grc(grc, object_name);
+    d = grc_get_DIALOG_from_tag(grc, object_name);
 
     if (NULL == d)
         return -1;
@@ -483,7 +407,7 @@ void LIBEXPORT *al_grc_object_get_data(struct al_grc *grc,
         return NULL;
     }
 
-    d = get_DIALOG_from_grc(grc, object_name);
+    d = grc_get_DIALOG_from_tag(grc, object_name);
 
     if (NULL == d)
         return NULL;
@@ -557,7 +481,7 @@ int LIBEXPORT al_grc_object_hide(struct al_grc *grc, const char *object_name)
         return -1;
     }
 
-    d = get_DIALOG_from_grc(grc, object_name);
+    d = grc_get_DIALOG_from_tag(grc, object_name);
 
     if (NULL == d)
         return -1;
@@ -578,7 +502,7 @@ int LIBEXPORT al_grc_object_show(struct al_grc *grc, const char *object_name)
         return -1;
     }
 
-    d = get_DIALOG_from_grc(grc, object_name);
+    d = grc_get_DIALOG_from_tag(grc, object_name);
 
     if (NULL == d)
         return -1;
@@ -600,7 +524,7 @@ int LIBEXPORT al_grc_log(struct al_grc *grc, const char *object_name,
         return -1;
     }
 
-    d = get_DIALOG_from_grc(grc, object_name);
+    d = grc_get_DIALOG_from_tag(grc, object_name);
 
     if (NULL == d)
         return -1;

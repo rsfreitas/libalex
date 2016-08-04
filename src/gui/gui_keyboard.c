@@ -28,7 +28,7 @@
 
 int gui_d_keyboard_proc(int msg, DIALOG *d, int c)
 {
-    struct al_callback_data *acd = d->dp3;
+    struct callback_data *acd = d->dp3;
     int ret = D_O_K;
 
     switch (msg) {
@@ -46,7 +46,7 @@ int gui_d_keyboard_proc(int msg, DIALOG *d, int c)
 
         case MSG_KEY:
             if (d->dp3 != NULL) {
-                acd->value_int = d->d1;
+                callback_set_int(acd, d->d1);
                 ret |= run_callback(acd, D_O_K);
             }
 

@@ -36,13 +36,13 @@
  */
 int gui_clock_proc(int msg, DIALOG *d, int c)
 {
-    struct al_callback_data *acd = d->dp3;
+    struct callback_data *acd = d->dp3;
     struct al_grc *grc = NULL;
     int ret;
     struct tm *t;
     time_t tp;
 
-    grc = acd->grc;
+    grc = get_callback_grc(acd);
     ret = d_text_proc(msg, d, c);
 
     switch (msg) {
