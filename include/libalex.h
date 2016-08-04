@@ -25,7 +25,7 @@
  */
 
 #ifndef _LIBALEX_H
-#define _LIBALEX_H		1
+#define _LIBALEX_H		        1
 
 #ifdef LIBALEX_COMPILE
 # define MAJOR_VERSION          0
@@ -35,7 +35,7 @@
 
 #ifndef LIBEXPORT
 # ifdef LINUX
-#  define LIBEXPORT     __attribute__((visibility("default")))
+#  define LIBEXPORT             __attribute__((visibility("default")))
 # else
 #  define LIBEXPORT
 # endif
@@ -55,7 +55,7 @@ enum al_grc_color_depth {
     AL_GRC_COLOR_15 = 15,
     AL_GRC_COLOR_16 = 16,
     AL_GRC_COLOR_24 = 24,
-    AL_GRC_COLOR_32
+    AL_GRC_COLOR_32 = 32
 };
 
 /* 'messages_log_box' breaking line types */
@@ -121,7 +121,9 @@ enum al_grc_object {
     AL_GRC_OBJ_MULTLIVE_IMAGE,
     AL_GRC_OBJ_VT_KEYBOARD,
     AL_GRC_OBJ_ICON,
-    AL_GRC_OBJ_TEXTBOX
+    AL_GRC_OBJ_TEXTBOX,
+    AL_GRC_OBJ_MENU,
+    AL_GRC_OBJ_MENU_ITEM
 };
 
 /* JSON objects of the GRC file */
@@ -136,7 +138,7 @@ enum al_grc_object_property {
     AL_GRC_JOBJ_TYPE,
     AL_GRC_JOBJ_POS_X,
     AL_GRC_JOBJ_POS_Y,
-    AL_GRC_JOBJ_NAME,
+    AL_GRC_JOBJ_TAG,
     AL_GRC_JOBJ_PARENT,
     AL_GRC_JOBJ_KEY,
     AL_GRC_JOBJ_TEXT,
@@ -235,17 +237,17 @@ enum al_key {
 #define MSG_LOAD_IMAGE                  MSG_USER + 2
 #define MSG_UPDATE_CURSOR_POSITION      MSG_USER + 3
 
-#ifdef LIBALEX_COMPILE
-# include "alex/libalex_internal.h"
-#else
+/* Exported types */
 struct al_grc;
-struct al_callback_data;
-#endif
+struct callback_data;
 
-#include "alex/error.h"
-#include "alex/common.h"
-#include "alex/api.h"
-#include "alex/write.h"
+#include "alex/al_error.h"
+#include "alex/al_api.h"
+#include "alex/al_write.h"
+
+#ifdef LIBALEX_COMPILE
+# include "alex/al_internal.h"
+#endif
 
 #endif
 

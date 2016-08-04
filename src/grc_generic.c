@@ -1,9 +1,9 @@
 
 /*
- * Description:
+ * Description: Functions to manipulate a 'struct grc_generic_data' structure.
  *
  * Author: Rodrigo Freitas
- * Created at: Sun Aug 24 21:05:01 2014
+ * Created at: Thu Jul 28 09:22:12 2016
  * Project: libalex
  *
  * Copyright (c) 2014 Rodrigo Freitas
@@ -24,26 +24,29 @@
  * USA
  */
 
-#ifndef _LIBALEX_COMMON_H
-#define _LIBALEX_COMMON_H                            1
+#include <stdlib.h>
 
-#ifndef LIBALEX_COMPILE
-# ifndef _LIBALEX_H
-#  error "Never use <common.h> directly; include <libalex.h> instead."
-# endif
-#endif
+#include "libalex.h"
 
-#ifdef LIBALEX_COMPILE
-struct dlg_obj_ref *new_obj_ref(const char *name, int dlg_index,
-                                enum al_grc_object type);
+struct grc_generic_data *new_grc_generic_data(void)
+{
+    struct grc_generic_data *d = NULL;
 
-void destroy_obj_ref(void *a);
-struct al_grc *new_grc(void);
-void destroy_grc(struct al_grc *grc);
-struct al_callback_data *new_callback_data(void);
-struct grc_generic_data *new_grc_generic_data(void);
-void dotted_rect(int x1, int y1, int x2, int y2, int fg, int bg);
-#endif
+    d = calloc(1, sizeof(struct grc_generic_data));
 
-#endif
+    if (NULL == d)
+        return NULL;
+
+    return d;
+}
+
+void destroy_grc_generic_data(void *a)
+{
+    struct grc_generic_data *p = (struct grc_generic_data *)a;
+
+    if (NULL == a)
+        return;
+
+    free(p);
+}
 

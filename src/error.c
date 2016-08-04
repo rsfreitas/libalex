@@ -48,7 +48,8 @@ static const char *__error_descriptions[] = {
     "Unsupported colors",
     "Unsupported number of colors",
     "Unknown property",
-    "Unsupported type"
+    "Unsupported type",
+    "The DIALOG is not prepared to run"
 };
 
 static int __al_errno;

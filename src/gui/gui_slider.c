@@ -28,11 +28,11 @@
 
 static int internal_callback(void *arg, int pos)
 {
-    struct al_callback_data *acd = (struct al_callback_data *)arg;
+    struct callback_data *acd = (struct callback_data *)arg;
 
-    acd->value_int = pos;
+    callback_set_int(acd, pos);
 
-    return run_callback(acd);
+    return run_callback(acd, D_O_K);
 }
 
 int gui_d_slider_proc(int msg, DIALOG *d, int c)

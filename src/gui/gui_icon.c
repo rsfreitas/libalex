@@ -96,7 +96,7 @@ static int simple_d_icon_proc(int msg, DIALOG *d, int c)
 
 int gui_d_icon_proc(int msg, DIALOG *d, int c)
 {
-    struct al_callback_data *acd = d->dp3;
+    struct callback_data *acd = d->dp3;
     int ret;
 
     /*
@@ -110,7 +110,7 @@ int gui_d_icon_proc(int msg, DIALOG *d, int c)
 
     if (ret == D_CLOSE) {
         if (acd != NULL) {
-            run_callback(acd);
+            run_callback(acd, D_O_K);
 
             /*
              * We don't let the interface shutdown if the user forgets the

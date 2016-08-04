@@ -1,6 +1,6 @@
 
 /*
- * Description: Functions to parse an UI file.
+ * Description: Functions to parse an GRC UI file.
  *
  * Author: Rodrigo Freitas
  * Created at: Tue Dec  9 22:42:05 2014
@@ -28,12 +28,7 @@
 #include <string.h>
 
 #include "libalex.h"
-
-/* Used to map possible objects from a DIALOG */
-struct grc_dlg_object {
-    char                name[256];
-    enum al_grc_object  type;
-};
+#include "gui/objects.h"
 
 static struct grc_json_key __entries[] = {
     { OBJ_WIDTH,                AL_GRC_JOBJ_WIDTH,              GRC_NUMBER  },
@@ -46,7 +41,7 @@ static struct grc_json_key __entries[] = {
     { OBJ_TYPE,                 AL_GRC_JOBJ_TYPE,               GRC_STRING  },
     { OBJ_POS_X,                AL_GRC_JOBJ_POS_X,              GRC_NUMBER  },
     { OBJ_POS_Y,                AL_GRC_JOBJ_POS_Y,              GRC_NUMBER  },
-    { OBJ_NAME,                 AL_GRC_JOBJ_NAME,               GRC_STRING  },
+    { OBJ_TAG,                  AL_GRC_JOBJ_TAG,                GRC_STRING  },
     { OBJ_PARENT,               AL_GRC_JOBJ_PARENT,             GRC_STRING  },
     { OBJ_KEY,                  AL_GRC_JOBJ_KEY,                GRC_STRING  },
     { OBJ_TEXT,                 AL_GRC_JOBJ_TEXT,               GRC_STRING  },
@@ -65,174 +60,9 @@ static struct grc_json_key __entries[] = {
 #define MAX_GRC_ENTRIES             \
     (sizeof(__entries) / sizeof(__entries[0]))
 
-/* Supported objects from a DIALOG */
-static struct grc_dlg_object __dlg_objects [] = {
-    { DLG_OBJ_KEY,              AL_GRC_OBJ_KEY                  },
-    { DLG_OBJ_BOX,              AL_GRC_OBJ_BOX                  },
-    { DLG_OBJ_DIGITAL_CLOCK,    AL_GRC_OBJ_DIGITAL_CLOCK        },
-    { DLG_OBJ_IMAGE,            AL_GRC_OBJ_IMAGE                },
-    { DLG_OBJ_MESSAGES_LOG_BOX, AL_GRC_OBJ_MESSAGES_LOG_BOX     },
-    { DLG_OBJ_VAR_TEXT,         AL_GRC_OBJ_VAR_TEXT             },
-    { DLG_OBJ_FIXED_TEXT,       AL_GRC_OBJ_FIXED_TEXT           },
-    { DLG_OBJ_CUSTOM,           AL_GRC_OBJ_CUSTOM               },
-    { DLG_OBJ_BUTTON,           AL_GRC_OBJ_BUTTON               },
-    { DLG_OBJ_EDIT,             AL_GRC_OBJ_EDIT                 },
-    { DLG_OBJ_LIST,             AL_GRC_OBJ_LIST                 },
-    { DLG_OBJ_CHECKBOX,         AL_GRC_OBJ_CHECK                },
-    { DLG_OBJ_RADIO,            AL_GRC_OBJ_RADIO                },
-    { DLG_OBJ_SLIDER,           AL_GRC_OBJ_SLIDER               },
-    { DLG_OBJ_LIVE_IMAGE,       AL_GRC_OBJ_LIVE_IMAGE           },
-    { DLG_OBJ_MULTLIVE_IMAGE,   AL_GRC_OBJ_MULTLIVE_IMAGE       },
-    { DLG_OBJ_VT_KEYBOARD,      AL_GRC_OBJ_VT_KEYBOARD          },
-    { DLG_OBJ_ICON,             AL_GRC_OBJ_ICON                 },
-    { DLG_OBJ_TEXTBOX,          AL_GRC_OBJ_TEXTBOX              }
-};
-
-#define MAX_DLG_SUPPORTED_OBJECTS   \
-    (sizeof(__dlg_objects) / sizeof(__dlg_objects[0]))
-
-/* 'messages_log_box' line break types */
-#define LBREAK_RAW_STR      "raw"
-#define LBREAK_SMART_STR    "smart"
-
-/* Radio button types */
-#define RADIO_CIRCLE        "circle"
-#define RADIO_SQUARE        "square"
-
-/* Horizontal positions */
-#define POS_H_LEFT          "left"
-#define POS_H_RIGHT         "right"
-
-/*
- * ------- Common functions -------
- */
-
-/*
- * Translate a string into a line break mode.
- */
-static int tr_line_break(const char *mode)
-{
-    /* default option in case there is no key */
-    if ((NULL == mode) || !strcmp(mode, LBREAK_SMART_STR))
-        return AL_GRC_LBREAK_SMART;
-
-    if (!strcmp(mode, LBREAK_RAW_STR))
-        return AL_GRC_LBREAK_RAW;
-
-    return -1;
-}
-
-const char *str_line_break(enum al_grc_line_break lbreak)
-{
-    switch (lbreak) {
-        case AL_GRC_LBREAK_SMART:
-            return LBREAK_SMART_STR;
-
-        case AL_GRC_LBREAK_RAW:
-            return LBREAK_RAW_STR;
-    }
-
-    return NULL;
-}
-
-/*
- * Translate a string to the radio button type.
- */
-static int tr_radio_type(const char *type)
-{
-    /* default option in case there is no key */
-    if ((NULL == type) || !strcmp(type, RADIO_CIRCLE))
-        return AL_GRC_RADIO_CIRCLE;
-
-    if (!strcmp(type, RADIO_SQUARE))
-        return AL_GRC_RADIO_SQUARE;
-
-    return -1;
-}
-
-const char *str_radio_type(enum al_grc_radio_button_fmt radio)
-{
-    switch (radio) {
-        case AL_GRC_RADIO_CIRCLE:
-            return RADIO_CIRCLE;
-
-        case AL_GRC_RADIO_SQUARE:
-            return RADIO_SQUARE;
-    }
-
-    return NULL;
-}
-
-/*
- * Translate a string pointing to a horizontal position from an object.
- */
-static int tr_horizontal_position(const char *pos)
-{
-    /* default option in case there is no key */
-    if ((NULL == pos) || !strcmp(pos, POS_H_RIGHT))
-        return AL_GRC_H_POS_RIGHT;
-
-    if (!strcmp(pos, POS_H_LEFT))
-        return AL_GRC_H_POS_LEFT;
-
-    return -1;
-}
-
-const char *str_horizontal_position(enum al_grc_hpos hpos)
-{
-    switch (hpos) {
-        case AL_GRC_H_POS_RIGHT:
-            return POS_H_RIGHT;
-
-        case AL_GRC_H_POS_LEFT:
-            return POS_H_LEFT;
-    }
-
-    return NULL;
-}
-
 /*
  * ------- GRC object handling -------
  */
-
-/*
- * Search for an object able to be used in a DIALOG through its name. This
- * name is the same loaded from the GRC file.
- *
- * Returns an int to allow negative values without compile warnings.
- *
- * @type_name: Object name which will be searched.
- */
-static int tr_str_type_to_grc_type(const char *type_name)
-{
-    unsigned int i;
-    int ret = -1;
-
-    if (NULL == type_name)
-        return -1;
-
-    for (i = 0; i < MAX_DLG_SUPPORTED_OBJECTS; i++)
-        if (!strcmp(__dlg_objects[i].name, type_name)) {
-            ret = __dlg_objects[i].type;
-            break;
-        }
-
-    return ret;
-}
-
-const char *str_grc_obj_type(enum al_grc_object obj)
-{
-    unsigned int i;
-    char *n = NULL;
-
-    for (i = 0; i < MAX_DLG_SUPPORTED_OBJECTS; i++)
-        if (__dlg_objects[i].type == obj) {
-            n = __dlg_objects[i].name;
-            break;
-        }
-
-    return n;
-}
 
 /*
  * Search for an information structure from a JSON object in the supported
@@ -253,9 +83,10 @@ struct grc_json_key *get_grc_json_key(enum al_grc_object_property prop)
 }
 
 /*
- * THE parse ;-) (from a file)
+ * THE parse ;-) (from a file). Just keep the DIALOG information as a JSON
+ * internally.
  */
-int grc_parse_file(struct al_grc *grc, const char *grc_filename)
+int parse_file(struct al_grc *grc, const char *grc_filename)
 {
     grc->jgrc = cjson_read_file(grc_filename);
 
@@ -266,13 +97,579 @@ int grc_parse_file(struct al_grc *grc, const char *grc_filename)
 }
 
 /*
- * THE parse ;-) (from a buffer)
+ * THE parse ;-) (from a buffer). Just keep the DIALOG information as a JSON
+ * internally.
  */
-int grc_parse_mem(struct al_grc *grc, const char *data)
+int parse_mem(struct al_grc *grc, const char *data)
 {
     grc->jgrc = cjson_parse(data);
 
     if (NULL == grc->jgrc)
+        return -1;
+
+    return 0;
+}
+
+/*
+ * Creates an internal DIALOG (standard object) from a 'struct grc_object'
+ * object from its own properties.
+ */
+static int grc_to_DIALOG(struct grc_object *gobject, struct al_grc *grc)
+{
+    DIALOG *d, *p = NULL;
+    struct grc_obj_properties *prop;
+    struct grc_generic_data *gdata;
+    int w = -1, h = -1;
+    char tmp[MAX_EDIT_SIZE] = {0};
+    enum al_grc_object type;
+
+    prop = grc_object_get_properties(gobject);
+    type = PROP_get(prop, type);
+    d = grc_object_get_DIALOG(gobject);
+
+    /*
+     * Objects that the user MUST define _width_ and _height_:
+     *
+     *  listbox
+     *  box
+     *  slider
+     */
+
+    /*
+     * Add an object into the DIALOG. It is recommended that 'boxes' be the
+     * first objects defined, so that no text be superimposed.
+     */
+    switch (type) {
+        case AL_GRC_OBJ_BOX:
+            d->proc = d_box_proc;
+            break;
+
+        case AL_GRC_OBJ_DIGITAL_CLOCK:
+            d->proc = gui_clock_proc;
+            d->dp = gobject->dlg_clock_str;
+            break;
+
+        case AL_GRC_OBJ_IMAGE:
+        case AL_GRC_OBJ_MESSAGES_LOG_BOX:
+            if (type == AL_GRC_OBJ_MESSAGES_LOG_BOX) {
+                d->proc = gui_messages_log_proc;
+                d->d1 = PROP_get(prop, line_break_mode);
+            } else {
+                d->proc = gui_d_bitmap_proc;
+
+                /*
+                 * We set as NULL here so no error will be thrown when trying
+                 * to draw the object and no image exists.
+                 */
+                d->dp = NULL;
+            }
+
+            /*
+             * If we have a reference to a "father" object, the object position
+             * will derived from his position. Worth mentioning that, for this
+             * work correctly the "father" object must have been defined BEFORE
+             * the object, otherwise we can't get his positions. ;-)
+             */
+            if (PROP_check(prop, parent) == true) {
+                p = grc_get_DIALOG_from_tag(grc,
+                                            PROP_get(prop, parent));
+
+                d->x = p->x + 2;
+                d->y = p->y + 2;
+                d->w = p->w - 2;
+                d->h = p->h - 2;
+            }
+
+            break;
+
+        case AL_GRC_OBJ_CUSTOM:
+            /*
+             * In this object, both the object and the callback functions must
+             * be defined in runtime, before the DIALOG executes.
+             *
+             * d->proc -> Funcao do objeto
+             * d->dp3  -> callback
+             */
+            break;
+
+        case AL_GRC_OBJ_VAR_TEXT:
+        case AL_GRC_OBJ_FIXED_TEXT:
+            d->proc = d_text_proc;
+
+            if (type == AL_GRC_OBJ_FIXED_TEXT)
+                d->dp = (char *)PROP_get(prop, text);
+
+            break;
+
+        case AL_GRC_OBJ_BUTTON:
+            d->proc = gui_d_button_proc;
+            d->flags = D_EXIT;
+            d->dp = (char *)PROP_get(prop, text);
+
+            /* We compute width and height automatically, case is necessary */
+            if (PROP_get(prop, w) < 0)
+                w = text_length(font, d->dp) + BUTTON_DEFAULT_SPACER;
+
+            if (PROP_get(prop, h) < 0)
+                h = DEFAULT_BUTTON_HEIGHT;
+
+            break;
+
+        case AL_GRC_OBJ_EDIT:
+            if (PROP_get(prop, data_length) >= MAX_EDIT_SIZE) {
+                al_set_errno(AL_ERROR_UNSUPPORTED_EDIT_INPUT_LENGTH);
+                return -1;
+            }
+
+            if (PROP_get(prop, password_mode) == false)
+                d->proc = gui_d_edit_proc;
+            else {
+                d->proc = gui_d_password_proc;
+
+                /*
+                 * Creates a temporary buffer to store the asterisks strings.
+                 */
+                gdata = new_grc_generic_data();
+                gobject->g_data = cdll_unshift(gobject->g_data, gdata);
+                d->dp2 = gdata->data;
+            }
+
+            /* Creates the buffer to store the typed string in the object. */
+            gdata = new_grc_generic_data();
+            gobject->g_data = cdll_unshift(gobject->g_data, gdata);
+            d->dp = gdata->data;
+
+            d->flags = D_EXIT;
+            d->d1 = PROP_get(prop, data_length);
+
+            /*
+             * Adjusts a default size allowing that the mouse may set the
+             * focus on this object.
+             */
+            h = DEFAULT_EDIT_HEIGHT;
+
+            /* We compute width automatically, case is necessary */
+            if (PROP_check(prop, parent) == true) {
+                p = grc_get_DIALOG_from_tag(grc,
+                                            PROP_get(prop, parent));
+
+                d->x = p->x + 3;
+                d->y = p->y + 3;
+                d->w = p->w - 4;
+                d->h = h;
+            } else {
+                if (PROP_get(prop, w) < 0) {
+                    memset(tmp, '0', PROP_get(prop, data_length) + 1);
+                    w = text_length(font, tmp);
+                }
+            }
+
+            break;
+
+        case AL_GRC_OBJ_LIST:
+            d->proc = gui_d_list_proc;
+            d->flags = D_EXIT;
+            break;
+
+        case AL_GRC_OBJ_CHECK:
+            d->proc = gui_d_check_proc;
+            d->dp = (char *)PROP_get(prop, text);
+
+            if (PROP_get(prop, horizontal_position) == AL_GRC_H_POS_RIGHT)
+                d->d1 = 1;
+            else
+                d->d1 = 0;
+
+            /* We compute width and height automatically, case is necessary */
+            if (PROP_get(prop, w) < 0)
+                w = text_length(font, d->dp) + CHECKBOX_DEFAULT_SPACER;
+
+            if (PROP_get(prop, h) < 0)
+                h = DEFAULT_CHECKBOX_HEIGHT;
+
+            break;
+
+        case AL_GRC_OBJ_RADIO:
+            d->proc = gui_d_radio_proc;
+            d->dp = (char *)PROP_get(prop, text);
+            d->d1 = PROP_get(prop, radio_group);
+            d->d2 = PROP_get(prop, radio_type);
+
+            /* We compute width and height automatically, case is necessary */
+            if (PROP_get(prop, w) < 0)
+                w = text_length(font, d->dp) + RADIO_DEFAULT_SPACER;
+
+            if (PROP_get(prop, h) < 0)
+                h = DEFAULT_RADIO_HEIGHT;
+
+            break;
+
+        case AL_GRC_OBJ_SLIDER:
+            d->proc = gui_d_slider_proc;
+            d->d1 = PROP_get(prop, data_length);
+            break;
+
+        case AL_GRC_OBJ_VT_KEYBOARD:
+            d->proc = gui_d_vt_keyboard_proc;
+            d->d1 = GRC_KLAYOUT_LETTERS;
+            d->dp = grc;
+
+            /*
+             * Set that the virtual keyboard is enabled to this DIALOG
+             * so that every object may known this.
+             */
+            grc->virtual_keyboard = true;
+            break;
+
+        case AL_GRC_OBJ_ICON:
+            d->proc = gui_d_icon_proc;
+            d->flags = D_EXIT;
+            break;
+
+        case AL_GRC_OBJ_TEXTBOX:
+            d->proc = d_textbox_proc;
+            break;
+
+        default:
+            al_set_errno(AL_ERROR_UNKNOWN_OBJECT_TYPE);
+            return -1;
+    }
+
+    /* Object position into the screen */
+    if (PROP_check(prop, parent) == false) {
+        d->x = PROP_get(prop, x);
+        d->y = PROP_get(prop, y);
+        d->w = (w == -1) ? PROP_get(prop, w) : w;
+        d->h = (h == -1) ? PROP_get(prop, h) : h;
+    }
+
+    /* Specific object colors */
+    if (PROP_check(prop, fg) == true)
+        d->fg = color_grc_to_al(info_color_depth(grc), PROP_get(prop, fg));
+    else
+        d->fg = color_get_global_fg(grc);
+
+    d->bg = color_get_global_bg(grc);
+
+    /* Hides the object or not */
+    if (PROP_get(prop, hide) == false)
+        d->flags &= ~D_HIDDEN;
+    else
+        d->flags |= D_HIDDEN;
+
+    return 0;
+}
+
+/*
+ * Load a standard object to the internal 'struct grc_object' list.
+ */
+static int __load_object_to_grc(cjson_t *object, struct al_grc *grc)
+{
+    struct grc_object *gobj = NULL;
+
+    gobj = new_grc_object(GRC_OBJ_STANDARD);
+
+    if (NULL == gobj)
+        return -1;
+
+    /* Load object properties from the GRC */
+    gobj->prop = new_obj_properties(object);
+
+    if (NULL == gobj->prop)
+        goto error_block;
+
+    /* Translate this to Allegro's DIALOG format */
+    if (grc_to_DIALOG(gobj, grc) < 0)
+        goto error_block;
+
+    /*
+     * Every object already has access to internal library information,
+     * even if they do not have callback functions.
+     */
+    set_object_callback_data(gobj, grc);
+
+    /* Creates a reference for this object, if it has a tag */
+    grc_object_set_tag(gobj, PROP_get(gobj->prop, name));
+
+    /* Store the loaded object */
+    grc->ui_objects = cdll_unshift(grc->ui_objects, gobj);
+
+    return 0;
+
+error_block:
+    if (gobj != NULL)
+        destroy_grc_object(gobj);
+
+    return -1;
+}
+
+/*
+ * Load all standard objects to the memory.
+ */
+static int load_objects_to_grc(struct al_grc *grc, cjson_t *objects)
+{
+    int t_objects, i;
+    cjson_t *p;
+
+    t_objects = cjson_get_array_size(objects);
+
+    if (t_objects <= 0) {
+        al_set_errno(AL_ERROR_NO_OBJECTS);
+        return -1;
+    }
+
+    for (i = 0; i < t_objects; i++) {
+        p = cjson_get_array_item(objects, i);
+
+        if (NULL == p)
+            /* TODO: set error code */
+            return -1;
+
+        if (__load_object_to_grc(p, grc) < 0)
+            /* TODO: set error code */
+            return -1;
+    }
+
+    return 0;
+}
+
+/*
+ * Creates an internal DIALOG (a key) from a 'struct grc_object' object from
+ * its own properties.
+ */
+static int grc_to_key_DIALOG(struct grc_object *gobject, struct al_grc *grc)
+{
+    DIALOG *d;
+    struct grc_obj_properties *prop;
+
+    d = grc_object_get_DIALOG(gobject);
+    prop = grc_object_get_properties(gobject);
+
+    /* Adds an object into the DIALOG */
+    d->proc = gui_d_keyboard_proc;
+    d->d1 = tr_str_key_to_al_key(PROP_get(prop, key));
+
+    /*
+     * Case we're adding the ESC key, we signal internally, so we don't
+     * override it.
+     */
+    if (d->d1 == KEY_ESC)
+        grc->esc_key_user_defined = true;
+
+    return 0;
+}
+
+/*
+ * Load a key object to the internal 'struct grc_object' list.
+ */
+static int __load_key_to_grc(cjson_t *key, struct al_grc *grc)
+{
+    struct grc_object *gobj = NULL;
+
+    gobj = new_grc_object(GRC_OBJ_KEY);
+
+    if (NULL == gobj)
+        return -1;
+
+    gobj->prop = new_obj_properties(key);
+
+    if (NULL == gobj->prop)
+        goto error_block;
+
+    /* We set the object property to a key */
+    PROP_set(gobj->prop, type, AL_GRC_OBJ_KEY);
+
+    /* Translate this to Allegro's DIALOG format */
+    if (grc_to_key_DIALOG(gobj, grc) < 0)
+        goto error_block;
+
+    /* Creates a reference for this object, if it has a tag */
+    grc_object_set_tag(gobj, PROP_get(gobj->prop, name));
+
+    /* Store the loaded key */
+    grc->ui_keys = cdll_unshift(grc->ui_keys, gobj);
+
+    return 0;
+
+error_block:
+    if (gobj != NULL)
+        destroy_grc_object(gobj);
+
+    return -1;
+}
+
+/*
+ * Load all key objects to the memory.
+ */
+static int load_keys_to_grc(struct al_grc *grc, cjson_t *keys)
+{
+    int t_keys, i;
+    cjson_t *p;
+
+    /* Maybe there is no "keys" object inside the GRC */
+    if (NULL == keys)
+        return 0;
+
+    t_keys = cjson_get_array_size(keys);
+
+    if (t_keys <= 0) {
+        al_set_errno(AL_ERROR_NO_KEYS);
+        return -1;
+    }
+
+    grc->esc_key_user_defined = false;
+
+    for (i = 0; i < t_keys; i++) {
+        p = cjson_get_array_item(keys, i);
+
+        if (NULL == p)
+            /* TODO: set error code */
+            return -1;
+
+        if (__load_key_to_grc(p, grc) < 0)
+            /* TODO: set error code */
+            return -1;
+    }
+
+    return 0;
+}
+
+static int load_menu_items(cjson_t *menu, struct grc_object *gobject)
+{
+    cjson_t *items, *p;
+    int i, t;
+    struct grc_object *gobj = NULL;
+
+    items = cjson_get_object_item(menu, "items");
+    t = cjson_get_array_size(items);
+
+    for (i = 0; i < t; i++) {
+        p = cjson_get_array_item(items, i);
+
+        if (NULL == p)
+            /* TODO: set error code */
+            return -1;
+
+        gobj = new_grc_object(GRC_OBJ_MENU_ITEM);
+
+        if (NULL == gobj)
+            return -1;
+
+        gobj->prop = new_obj_properties(p);
+
+        if (NULL == gobj->prop)
+            goto error_block;
+
+        /* We set the object property to a menu */
+        PROP_set(gobj->prop, type, AL_GRC_OBJ_MENU);
+
+        /* Creates a reference for this object, if it has a tag */
+        grc_object_set_tag(gobj, PROP_get(gobj->prop, name));
+
+        /* Store the item */
+        gobject->items = cdll_unshift(gobject->items, gobj);
+    }
+
+    return 0;
+
+error_block:
+    if (gobj != NULL)
+        destroy_grc_object(gobj);
+
+    return -1;
+}
+
+static int __load_menu_to_grc(cjson_t *menu, struct al_grc *grc)
+{
+    struct grc_object *gobj = NULL;
+
+    gobj = new_grc_object(GRC_OBJ_MENU);
+
+    if (NULL == gobj)
+        return -1;
+
+    gobj->prop = new_obj_properties(menu);
+
+    if (NULL == gobj->prop)
+        goto error_block;
+
+    /* We set the object property to a menu */
+    PROP_set(gobj->prop, type, AL_GRC_OBJ_MENU);
+
+    /* We parse the "items" object here, because a menu is a special object */
+    load_menu_items(menu, gobj);
+
+    /* Store the loaded menu */
+    grc->ui_menu = cdll_unshift(grc->ui_menu, gobj);
+
+    return 0;
+
+error_block:
+    if (gobj != NULL)
+        destroy_grc_object(gobj);
+
+    return -1;
+}
+
+/*
+ * Load the menu to the memory.
+ */
+static int load_menu_to_grc(struct al_grc *grc, cjson_t *menu)
+{
+    cjson_t *p;
+    int i, t_menu;
+
+    /* Maybe there is no "menu" object inside the GRC */
+    if (NULL == menu)
+        return 0;
+
+    /* Extracts menus and items informations */
+    t_menu = cjson_get_array_size(menu);
+
+    for (i = 0; i < t_menu; i++) {
+        p = cjson_get_array_item(menu, i);
+
+        if (NULL == p)
+            /* TODO: set error code */
+            return -1;
+
+        if (__load_menu_to_grc(p, grc) < 0)
+            /* TODO: set error code */
+            return -1;
+    }
+
+    return 0;
+}
+
+/*
+ * Load all objects related info from the GRC to an usable format, such as
+ * the objects, keys and menu informations.
+ */
+int parse_objects(struct al_grc *grc)
+{
+    cjson_t *n;
+
+    n = grc_get_object(grc, OBJ_OBJECTS);
+
+    if (NULL == n) {
+        al_set_errno(AL_ERROR_OBJECTS_BLOCK_NOT_FOUND);
+        return -1;
+    }
+
+    /* Parse all objects */
+    if (load_objects_to_grc(grc, n) < 0)
+        return -1;
+
+    /* Parse keys */
+    n = grc_get_object(grc, OBJ_KEYS);
+
+    if (load_keys_to_grc(grc, n) < 0)
+        return -1;
+
+    /* Parse menu */
+    n = grc_get_object(grc, OBJ_MENU);
+
+    if (load_menu_to_grc(grc, n) < 0)
         return -1;
 
     return 0;
@@ -300,7 +697,6 @@ int grc_get_object_value(cjson_t *object, const char *object_name,
     if (type == CJSON_NUMBER) {
         s = cjson_get_object_value(n);
         v = cstring_to_int(s);
-        cstring_unref(s);
 
         return v;
     }
@@ -312,374 +708,16 @@ int grc_get_object_value(cjson_t *object, const char *object_name,
  * Get the object value from within a GRC file, expecting to be a GRC_STRING
  * object.
  */
-char *grc_get_object_str(cjson_t *object, const char *object_name)
+cstring_t *grc_get_object_str(cjson_t *object, const char *object_name)
 {
     cjson_t *n = NULL;
-    cstring_t *s = NULL;
-    char *p = NULL;
 
     n = cjson_get_object_item(object, object_name);
 
     if (NULL == n)
         return NULL;
 
-    s = cjson_get_object_value(n);
-    p = (char *)cstring_valueof(s);
-    cstring_unref(s);
-
-    return p;
-}
-
-/*
- * Destroy a structure 'struct grc_key_data'.
- */
-void destroy_key_data(struct grc_key_data *kdata)
-{
-    if (kdata->name != NULL)
-        free(kdata->name);
-
-    if (kdata->key != NULL)
-        free(kdata->key);
-
-    free(kdata);
-}
-
-/*
- * Create and return a structure 'grc_key_data'. It is created and filled with
- * content from an object from an array 'keys' inside a GRC file.
- */
-struct grc_key_data *new_key_data(cjson_t *key)
-{
-    struct grc_key_data *k = NULL;
-    struct grc_json_key *e;
-    char *tmp;
-
-    k = calloc(1, sizeof(struct grc_key_data));
-
-    if (NULL == k) {
-        al_set_errno(AL_ERROR_MEMORY);
-        return NULL;
-    }
-
-    /* key */
-    e = get_grc_json_key(AL_GRC_JOBJ_KEY);
-
-    if (NULL == e)
-        goto undefined_grc_jkey_block;
-
-    tmp = grc_get_object_str(key, e->name);
-
-    if (NULL == tmp)
-        goto undefined_grc_jkey_block;
-
-    k->key = strdup(tmp);
-
-    /* name */
-    e = get_grc_json_key(AL_GRC_JOBJ_NAME);
-
-    if (NULL == e)
-        goto undefined_grc_jkey_block;
-
-    tmp = grc_get_object_str(key, e->name);
-    k->name = strdup(tmp);
-
-    return k;
-
-undefined_grc_jkey_block:
-    al_set_errno(AL_ERROR_UNDEFINED_GRC_KEY);
-    destroy_key_data(k);
-
-    return NULL;
-}
-
-/*
- * Destroy a structure 'struct grc_obj_properties'.
- */
-void destroy_obj_properties(struct grc_obj_properties *prop)
-{
-    if (prop->parent != NULL)
-        free(prop->parent);
-
-    if (prop->name != NULL)
-        free(prop->name);
-
-    if (prop->fg != NULL)
-        free(prop->fg);
-
-    free(prop);
-}
-
-/*
- * Create and return a structure 'struct grc_obj_properties'. It is created
- * and filled with an object content from 'objects' array inside a GRC file.
- */
-struct grc_obj_properties *new_obj_properties(cjson_t *object)
-{
-    struct grc_obj_properties *p = NULL;
-    struct grc_json_key *e;
-    char *tmp;
-
-    p = calloc(1, sizeof(struct grc_obj_properties));
-
-    if (NULL == p) {
-        al_set_errno(AL_ERROR_MEMORY);
-        return NULL;
-    }
-
-    /* type (obrigatorio) */
-    e = get_grc_json_key(AL_GRC_JOBJ_TYPE);
-
-    if (NULL == e)
-        goto undefined_grc_jkey_block;
-
-    tmp = grc_get_object_str(object, e->name);
-    p->type = tr_str_type_to_grc_type(tmp);
-
-    /* name */
-    e = get_grc_json_key(AL_GRC_JOBJ_NAME);
-
-    if (NULL == e)
-        goto undefined_grc_jkey_block;
-
-    tmp = grc_get_object_str(object, e->name);
-
-    if (tmp != NULL)
-        p->name = strdup(tmp);
-    else
-        p->name = NULL;
-
-    /* parent */
-    e = get_grc_json_key(AL_GRC_JOBJ_PARENT);
-
-    if (NULL == e)
-        goto undefined_grc_jkey_block;
-
-    tmp = grc_get_object_str(object, e->name);
-
-    if (tmp != NULL)
-        p->parent = strdup(tmp);
-    else
-        p->parent = NULL;
-
-    /* text */
-    e = get_grc_json_key(AL_GRC_JOBJ_TEXT);
-
-    if (NULL == e)
-        goto undefined_grc_jkey_block;
-
-    tmp = grc_get_object_str(object, e->name);
-
-    if (tmp != NULL)
-        p->text = tmp;
-    else
-        p->text = NULL;
-
-    /* foreground */
-    e = get_grc_json_key(AL_GRC_JOBJ_FOREGROUND);
-
-    if (NULL == e)
-        goto undefined_grc_jkey_block;
-
-    tmp = grc_get_object_str(object, e->name);
-
-    if (tmp != NULL)
-        p->fg = strdup(tmp);
-
-    /* pos_x */
-    e = get_grc_json_key(AL_GRC_JOBJ_POS_X);
-
-    if (NULL == e)
-        goto undefined_grc_jkey_block;
-
-    p->x = grc_get_object_value(object, e->name, -1);
-
-    /* pos_y */
-    e = get_grc_json_key(AL_GRC_JOBJ_POS_Y);
-
-    if (NULL == e)
-        goto undefined_grc_jkey_block;
-
-    p->y = grc_get_object_value(object, e->name, -1);
-
-    /* width */
-    e = get_grc_json_key(AL_GRC_JOBJ_WIDTH);
-
-    if (NULL == e)
-        goto undefined_grc_jkey_block;
-
-    p->w = grc_get_object_value(object, e->name, -1);
-
-    /* height */
-    e = get_grc_json_key(AL_GRC_JOBJ_HEIGHT);
-
-    if (NULL == e)
-        goto undefined_grc_jkey_block;
-
-    p->h = grc_get_object_value(object, e->name, -1);
-
-    /* hide */
-    e = get_grc_json_key(AL_GRC_JOBJ_HIDE);
-
-    if (NULL == e)
-        goto undefined_grc_jkey_block;
-
-    p->hide = grc_get_object_value(object, e->name, false);
-
-    /* line_break */
-    e = get_grc_json_key(AL_GRC_JOBJ_LINE_BREAK);
-
-    if (NULL == e)
-        goto undefined_grc_jkey_block;
-
-    tmp = grc_get_object_str(object, e->name);
-    p->line_break_mode = tr_line_break(tmp);
-
-    /* input_length */
-    e = get_grc_json_key(AL_GRC_JOBJ_INPUT_LENGTH);
-
-    if (NULL == e)
-        goto undefined_grc_jkey_block;
-
-    p->data_length = grc_get_object_value(object, e->name, 0);
-
-    /* radio_group */
-    e = get_grc_json_key(AL_GRC_JOBJ_RADIO_GROUP);
-
-    if (NULL == e)
-        goto undefined_grc_jkey_block;
-
-    p->radio_group = grc_get_object_value(object, e->name, 0);
-
-    /* radio_type */
-    e = get_grc_json_key(AL_GRC_JOBJ_RADIO_TYPE);
-
-    if (NULL == e)
-        goto undefined_grc_jkey_block;
-
-    tmp = grc_get_object_str(object, e->name);
-    p->radio_type = tr_radio_type(tmp);
-
-    /* password */
-    e = get_grc_json_key(AL_GRC_JOBJ_PASSWORD_MODE);
-
-    if (NULL == e)
-        goto undefined_grc_jkey_block;
-
-    p->password_mode = grc_get_object_value(object, e->name, false);
-
-    /* horizontal position */
-    e = get_grc_json_key(AL_GRC_JOBJ_H_POSITION);
-
-    if (NULL == e)
-        goto undefined_grc_jkey_block;
-
-    tmp = grc_get_object_str(object, e->name);
-    p->horizontal_position = tr_horizontal_position(tmp);
-
-    /* fps */
-    e = get_grc_json_key(AL_GRC_JOBJ_FPS);
-
-    if (NULL == e)
-        goto undefined_grc_jkey_block;
-
-    p->fps = grc_get_object_value(object, e->name, 0);
-
-    /* devices */
-    e = get_grc_json_key(AL_GRC_JOBJ_DEVICES);
-
-    if (NULL == e)
-        goto undefined_grc_jkey_block;
-
-    p->devices = grc_get_object_value(object, e->name, 1);
-
-    return p;
-
-undefined_grc_jkey_block:
-    al_set_errno(AL_ERROR_UNDEFINED_GRC_KEY);
-    destroy_obj_properties(p);
-
-    return NULL;
-}
-
-void destroy_menu(void *a)
-{
-    struct grc_menu *menu = (struct grc_menu *)a;
-
-    if (menu->items != NULL)
-        cdll_free(menu->items, destroy_menu);
-
-    if (menu->parent != NULL)
-        free(menu->parent);
-
-    if (menu->name != NULL)
-        free(menu->name);
-
-    if (menu->text != NULL)
-        free(menu->text);
-
-    free(menu);
-}
-
-struct grc_menu *new_menu(cjson_t *object)
-{
-    struct grc_json_key *e;
-    struct grc_menu *m, *it;
-    char *tmp;
-    cjson_t *o, *n;
-    int i, t;
-
-    m = calloc(1, sizeof(struct grc_menu));
-
-    if (NULL == m)
-        return NULL;
-
-    m->parent = NULL;
-    m->items = NULL;
-
-    /* name */
-    e = get_grc_json_key(AL_GRC_JOBJ_NAME);
-
-    if (e != NULL) {
-        tmp = grc_get_object_str(object, e->name);
-
-        if (tmp != NULL)
-            m->name = strdup(tmp);
-    }
-
-    /* parent */
-    e = get_grc_json_key(AL_GRC_JOBJ_PARENT);
-
-    if (e != NULL) {
-        tmp = grc_get_object_str(object, e->name);
-
-        if (tmp != NULL)
-            m->parent = strdup(tmp);
-    }
-
-    /* text */
-    e = get_grc_json_key(AL_GRC_JOBJ_TEXT);
-
-    if (e != NULL) {
-        tmp = grc_get_object_str(object, e->name);
-
-        if (tmp != NULL)
-            m->text = strdup(tmp);
-    }
-
-    /* options (items) */
-    o = cjson_get_object_item(object, OBJ_OPTIONS);
-
-    if (o != NULL) {
-        t = cjson_get_array_size(o);
-
-        for (i = 0; i < t; i++) {
-            n = cjson_get_array_item(o, i);
-
-            it = new_menu(n);
-            m->items = cdll_unshift(m->items, it);
-        }
-    }
-
-    return m;
+    /* XXX: This returns a new cstring_ref */
+    return cjson_get_object_value(n);
 }
 

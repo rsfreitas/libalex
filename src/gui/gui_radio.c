@@ -28,7 +28,7 @@
 
 int gui_d_radio_proc(int msg, DIALOG *d, int c)
 {
-    struct al_callback_data *acd = d->dp3;
+    struct callback_data *acd = d->dp3;
     int ret;
 
     ret = d_radio_proc(msg, d, c);
@@ -36,11 +36,11 @@ int gui_d_radio_proc(int msg, DIALOG *d, int c)
     if (msg == MSG_CLICK) {
         if (d->dp3 != NULL) {
             if (d->flags & D_SELECTED)
-                acd->value_int = 1;
+                callback_set_int(acd, 1);
             else
-                acd->value_int = 0;
+                callback_set_int(acd, 0);
 
-            ret = run_callback(acd);
+            ret = run_callback(acd, D_O_K);
         }
     }
 
