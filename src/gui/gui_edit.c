@@ -185,7 +185,7 @@ static void set_actual_edit_object(DIALOG *d, struct callback_data *acd)
     if (NULL == grc)
         return;
 
-    if (grc->virtual_keyboard == false)
+    if (info_get_value(grc->info, AL_INFO_VIRTUAL_KEYBOARD) == false)
         return;
 
     /*

@@ -26,6 +26,157 @@
 
 #include "libalex.h"
 
+struct gfx_info {
+    /* Internal info */
+    bool                    use_gfx;
+    bool                    are_we_prepared;
+
+    enum al_grc_line_break  lbreak;                 /** 'messages_log_box' break
+                                                        line type */
+
+    bool                    ignore_esc_key;         /** Flag to ignore the ESC
+                                                        key */
+
+    bool                    virtual_keyboard;       /** Flag to use the virtual
+                                                        keyboard */
+
+    bool                    esc_key_user_defined;   /** Flag showing if the user
+                                                        has declared the ESC
+                                                        key */
+
+    /* Info from the GRC file */
+    int                     width;
+    int                     height;
+    int                     color_depth;
+    bool                    block_keys;
+    bool                    use_mouse;
+};
+
+struct gfx_info *info_start(void)
+{
+    struct gfx_info *i = NULL;
+
+    i = calloc(1, sizeof(struct gfx_info));
+
+    if (NULL == i)
+        return NULL;
+
+    return i;
+}
+
+void info_finish(struct gfx_info *info)
+{
+    if (NULL == info)
+        return;
+
+    free(info);
+}
+
+int info_set_value(struct gfx_info *info, enum al_gfx_info field, ...)
+{
+    va_list ap;
+    int value;
+
+    va_start(ap, NULL);
+    value = va_arg(ap, int);
+    va_end(ap);
+
+    switch (field) {
+        case AL_INFO_USE_GFX:
+            info->use_gfx = value;
+            break;
+
+        case AL_INFO_ARE_WE_PREPARED:
+            info->are_we_prepared = value;
+            break;
+
+        case AL_INFO_LINE_BREAK:
+            info->lbreak = value;
+            break;
+
+        case AL_INFO_IGNORE_ESC_KEY:
+            info->ignore_esc_key = value;
+            break;
+
+        case AL_INFO_VIRTUAL_KEYBOARD:
+            info->virtual_keyboard = value;
+            break;
+
+        case AL_INFO_ESC_KEY_USER_DEFINED:
+            info->esc_key_user_defined = value;
+            break;
+
+        case AL_INFO_WIDTH:
+            info->width = value;
+            break;
+
+        case AL_INFO_HEIGHT:
+            info->height = value;
+            break;
+
+        case AL_INFO_COLOR_DEPTH:
+            info->color_depth = value;
+            break;
+
+        case AL_INFO_BLOCK_KEYS:
+            info->block_keys = value;
+            break;
+
+        case AL_INFO_USE_MOUSE:
+            info->use_mouse = value;
+            break;
+
+        default:
+            return -1;
+    }
+
+    return 0;
+}
+
+int info_get_value(struct gfx_info *info, enum al_gfx_info field)
+{
+    if (NULL == info)
+        return -1;
+
+    switch (field) {
+        case AL_INFO_USE_GFX:
+            return info->use_gfx;
+
+        case AL_INFO_ARE_WE_PREPARED:
+            return info->are_we_prepared;
+
+        case AL_INFO_LINE_BREAK:
+            return info->lbreak;
+
+        case AL_INFO_IGNORE_ESC_KEY:
+            return info->ignore_esc_key;
+
+        case AL_INFO_VIRTUAL_KEYBOARD:
+            return info->virtual_keyboard;
+
+        case AL_INFO_ESC_KEY_USER_DEFINED:
+            return info->esc_key_user_defined;
+
+        case AL_INFO_WIDTH:
+            return info->width;
+
+        case AL_INFO_HEIGHT:
+            return info->height;
+
+        case AL_INFO_COLOR_DEPTH:
+            return info->color_depth;
+
+        case AL_INFO_BLOCK_KEYS:
+            return info->block_keys;
+
+        case AL_INFO_USE_MOUSE:
+            return info->use_mouse;
+    }
+
+    /* default */
+    return -1;
+}
+
 /*
  * Parse main DIALOG informations, such as screen resolution, color depth,
  * etc.
@@ -48,8 +199,9 @@ int info_parse(struct al_grc *grc)
     if (NULL == dt)
         goto unknown_grc_key_block;
 
-    grc->gfx.width = grc_get_object_value(jinfo, property_detail_string(dt),
-                                          AL_DEFAULT_WIDTH);
+    info_set_value(grc->info, AL_INFO_WIDTH,
+                   grc_get_object_value(jinfo, property_detail_string(dt),
+                                        AL_DEFAULT_WIDTH), NULL);
 
     /* height */
     dt = get_property_detail(AL_GRC_JOBJ_HEIGHT);
@@ -57,9 +209,9 @@ int info_parse(struct al_grc *grc)
     if (NULL == dt)
         goto unknown_grc_key_block;
 
-    grc->gfx.height = grc_get_object_value(jinfo,
-                                           property_detail_string(dt),
-                                           AL_DEFAULT_HEIGHT);
+    info_set_value(grc->info, AL_INFO_HEIGHT,
+                   grc_get_object_value(jinfo, property_detail_string(dt),
+                                        AL_DEFAULT_HEIGHT), NULL);
 
     /* color depth */
     dt = get_property_detail(AL_GRC_JOBJ_COLOR_DEPTH);
@@ -67,8 +219,9 @@ int info_parse(struct al_grc *grc)
     if (NULL == dt)
         goto unknown_grc_key_block;
 
-    grc->gfx.color_depth = grc_get_object_value(jinfo, property_detail_string(dt),
-                                                AL_DEFAULT_COLOR_DEPTH);
+    info_set_value(grc->info, AL_INFO_COLOR_DEPTH,
+                   grc_get_object_value(jinfo, property_detail_string(dt),
+                                        AL_DEFAULT_COLOR_DEPTH), NULL);
 
     /* block exit keys */
     dt = get_property_detail(AL_GRC_JOBJ_BLOCK_EXIT_KEYS);
@@ -76,8 +229,9 @@ int info_parse(struct al_grc *grc)
     if (NULL == dt)
         goto unknown_grc_key_block;
 
-    grc->gfx.block_keys = grc_get_object_value(jinfo, property_detail_string(dt),
-                                               true);
+    info_set_value(grc->info, AL_INFO_BLOCK_KEYS,
+                   grc_get_object_value(jinfo, property_detail_string(dt),
+                                        true), NULL);
 
     /* mouse */
     dt = get_property_detail(AL_GRC_JOBJ_MOUSE);
@@ -85,8 +239,9 @@ int info_parse(struct al_grc *grc)
     if (NULL == dt)
         goto unknown_grc_key_block;
 
-    grc->gfx.use_mouse = grc_get_object_value(jinfo, property_detail_string(dt),
-                                              false);
+    info_set_value(grc->info, AL_INFO_USE_MOUSE,
+                   grc_get_object_value(jinfo, property_detail_string(dt),
+                                        false), NULL);
 
     /* ignore_esc_key */
     dt = get_property_detail(AL_GRC_JOBJ_IGNORE_ESC_KEY);
@@ -94,9 +249,9 @@ int info_parse(struct al_grc *grc)
     if (NULL == dt)
         goto unknown_grc_key_block;
 
-    grc->ignore_esc_key = grc_get_object_value(jinfo,
-                                               property_detail_string(dt),
-                                               false);
+    info_set_value(grc->info, AL_INFO_IGNORE_ESC_KEY,
+                   grc_get_object_value(jinfo, property_detail_string(dt),
+                                        false), NULL);
 
     return 0;
 
@@ -110,6 +265,6 @@ int info_color_depth(struct al_grc *grc)
     if (NULL == grc)
         return AL_DEFAULT_COLOR_DEPTH;
 
-    return grc->gfx.color_depth;
+    return info_get_value(grc->info, AL_INFO_COLOR_DEPTH);
 }
 

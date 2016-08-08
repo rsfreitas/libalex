@@ -133,6 +133,7 @@ enum grc_entry_type_value {
     GRC_BOOL
 };
 
+/* Internal known objects */
 enum grc_object_type {
     GRC_OBJ_STANDARD,
     GRC_OBJ_MENU,
@@ -151,24 +152,11 @@ struct property_detail;
 /** Structure to be used in the callback functions */
 struct callback_data;
 
-/*
- * Structure to identify possible objects of type { "string": value }
- * in a GRC file.
- */
-struct grc_json_key {
-    char                        name[128];
-    enum al_grc_object_property prop;
-    enum grc_entry_type_value   type;
-};
+/** Main UI informations */
+struct gfx_info;
 
-/* Graphic mode informations */
-struct al_gfx_info {
-    int     width;
-    int     height;
-    int     color_depth;
-    bool    block_keys;
-    bool    use_mouse;
-};
+/** DIALOG colors */
+struct gfx_color;
 
 struct grc_generic_data {
     clist_t     *prev;
@@ -212,25 +200,11 @@ struct al_grc {
     struct grc_object       *ui_menu;
 
     /* Graphic mode info */
-    bool                    use_gfx;
-    struct al_gfx_info      gfx;
-    bool                    are_we_prepared;
+    struct gfx_info         *info;
 
     /* Main colors of the DIALOG */
     int                     fg;
     int                     bg;
-
-    /* 'messages_log_box' break line type */
-    enum al_grc_line_break  lbreak;
-
-    /* Flag to ignore the ESC key */
-    bool                    ignore_esc_key;
-
-    /* Flag showing if the user has declared the ESC key */
-    bool                    esc_key_user_defined;
-
-    /* Flag to use the virtual keyboard */
-    bool                    virtual_keyboard;
 
     /*
      * Pointer to the 'edit' object that was selected when a virtual
@@ -262,7 +236,6 @@ struct grc_menu *get_grc_menu_from_grc(struct al_grc *grc,
 MENU *get_MENU_from_grc(struct al_grc *grc, const char *object_name);
 
 /* parser.c */
-struct grc_json_key *get_grc_json_key(enum al_grc_object_property prop);
 int grc_get_object_value(cjson_t *object, const char *object_name,
                          int default_value);
 
@@ -298,6 +271,7 @@ struct al_grc *new_grc(void);
 void destroy_grc(struct al_grc *grc);
 void grc_creates_reference(struct al_grc *grc, struct grc_object *object);
 DIALOG *grc_get_DIALOG_from_tag(struct al_grc *grc, const char *tag);
+MENU *grc_get_MENU_from_tag(struct al_grc *grc, const char *tag);
 
 /* grc_generic.c */
 struct grc_generic_data *new_grc_generic_data(void);
@@ -379,6 +353,10 @@ int color_get_global_bg(struct al_grc *grc);
 /* info.c */
 int info_parse(struct al_grc *grc);
 int info_color_depth(struct al_grc *grc);
+struct gfx_info *info_start(void);
+void info_finish(struct gfx_info *info);
+int info_set_value(struct gfx_info *info, enum al_gfx_info field, ...);
+int info_get_value(struct gfx_info *info, enum al_gfx_info field);
 
 #endif
 

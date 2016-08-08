@@ -29,61 +29,6 @@
 #include "gui/objects.h"
 
 /*
- * ------- Common functions -------
- */
-
-/*static MENU *search_menu(MENU *menu, int t_items, const char *object_name)
-{
-    int i;
-
-    for (i = 0; i < t_items; i++) {
-        if (menu[i].dp == NULL)
-            continue;
-
-        if (!strcmp(menu[i].dp, object_name))
-            return &menu[i];
-    }
-
-    return NULL;
-}
-
-MENU *get_MENU_from_grc(struct al_grc *grc, const char *object_name)
-{
-    struct al_menu *p = NULL;
-    MENU *it = NULL;
-
-    if (NULL == object_name) {
-        al_set_errno(AL_ERROR_NULL_ARG);
-        return NULL;
-    }
-*/
-    /* Search in the main menu */
-/*    it = search_menu(grc->dlg_menu, grc->dlg_menu_t_items, object_name);
-
-    if (it != NULL)
-        return it;
-*/
-    /* Search in the others */
-/*    for (p = grc->menu; p; p = p->next) {
-        it = search_menu(p->menu, p->t_items, object_name);
-
-        if (it != NULL)
-            return it;
-    }
-
-    if (NULL == it) {
-        al_set_errno(AL_ERROR_OBJECT_NOT_FOUND);
-        return NULL;
-    }
-
-    return NULL;
-}*/
-
-/*
- * ------- Graphical Interface handling functions -------
- */
-
-/*
  * Turn back to text mode.
  */
 void gui_reset_resolution(void)
@@ -166,11 +111,11 @@ static void DIALOG_add_default_esc_key(DIALOG *dlg, unsigned int index,
     struct grc_object *gobj = NULL;
 
     /* Was the key defined by the user? */
-    if (grc->esc_key_user_defined == true)
+    if (info_get_value(grc->info, AL_INFO_ESC_KEY_USER_DEFINED) == true)
         return;
 
     /* Did the user ask to ignore the ESC key? */
-    if (grc->ignore_esc_key == false)
+    if (info_get_value(grc->info, AL_INFO_IGNORE_ESC_KEY) == false)
         return;
 
     gobj = new_grc_object(GRC_OBJ_STANDARD);
@@ -311,14 +256,14 @@ int DIALOG_create(struct al_grc *grc)
     dlg_items += 1;
 
     /* d_clear_proc */
-    if (grc->use_gfx == true)
+    if (info_get_value(grc->info, AL_INFO_USE_GFX) == true)
         dlg_items += 1;
 
     /*
      * Even that the user has defined the ESC key, we allocate an extra space.
      * It will not be used...
      */
-    if (grc->ignore_esc_key)
+    if (info_get_value(grc->info, AL_INFO_IGNORE_ESC_KEY) == true)
         dlg_items += 1;
 
     dlg_items += cdll_size(grc->ui_objects);
@@ -340,7 +285,7 @@ int DIALOG_create(struct al_grc *grc)
     }
 
     /* Initializes the DIALOG */
-    if (grc->use_gfx == true)
+    if (info_get_value(grc->info, AL_INFO_USE_GFX) == true)
         DIALOG_creation_start(d, grc);
 
     /* Add user defined objects */
@@ -373,6 +318,8 @@ int DIALOG_create(struct al_grc *grc)
 
 int gui_init(struct al_grc *grc)
 {
+    int w, h;
+
     if (install_allegro(SYSTEM_AUTODETECT, NULL, NULL)) {
         al_set_errno(AL_ERROR_LIB_INIT);
         return -1;
@@ -385,27 +332,25 @@ int gui_init(struct al_grc *grc)
 
     install_timer();
     set_color_depth(info_color_depth(grc));
+    w = info_get_value(grc->info, AL_INFO_WIDTH);
+    h = info_get_value(grc->info, AL_INFO_HEIGHT);
 
-    if (set_gfx_mode(GFX_XWINDOWS, grc->gfx.width, grc->gfx.height,
-                     0, 0) != 0)
-    {
-        if (set_gfx_mode(GFX_FBCON, grc->gfx.width, grc->gfx.height,
-                         0, 0) != 0)
-        {
+    if (set_gfx_mode(GFX_XWINDOWS, w, h, 0, 0) != 0) {
+        if (set_gfx_mode(GFX_FBCON, w, h, 0, 0) != 0) {
             remove_keyboard();
             allegro_exit();
             al_set_errno(AL_ERROR_SET_GFX_MODE);
             return -1;
         }
     } else {
-        if (grc->gfx.use_mouse == true) {
+        if (info_get_value(grc->info, AL_INFO_USE_MOUSE) == true) {
             install_mouse();
             gui_mouse_focus = FALSE;
         }
     }
 
     /* Disable ctrl+alt+end */
-    if (grc->gfx.block_keys == true)
+    if (info_get_value(grc->info, AL_INFO_BLOCK_KEYS) == false)
         three_finger_flag = FALSE;
 
     return 0;
@@ -413,7 +358,7 @@ int gui_init(struct al_grc *grc)
 
 void run_DIALOG(struct al_grc *grc)
 {
-    if (grc->use_gfx == false)
+    if (info_get_value(grc->info, AL_INFO_USE_GFX) == false)
         centre_dialog(grc->al_dlg);
 
     do_dialog(grc->al_dlg, -1);

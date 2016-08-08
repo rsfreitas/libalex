@@ -175,6 +175,21 @@ enum al_key {
     KEY_INTERROGATION
 };
 
+/** Global DIALOG info */
+enum al_gfx_info {
+    AL_INFO_USE_GFX,
+    AL_INFO_ARE_WE_PREPARED,
+    AL_INFO_LINE_BREAK,
+    AL_INFO_IGNORE_ESC_KEY,
+    AL_INFO_VIRTUAL_KEYBOARD,
+    AL_INFO_ESC_KEY_USER_DEFINED,
+    AL_INFO_WIDTH,
+    AL_INFO_HEIGHT,
+    AL_INFO_COLOR_DEPTH,
+    AL_INFO_BLOCK_KEYS,
+    AL_INFO_USE_MOUSE
+};
+
 /* Supported colors */
 #define AL_BLACK                        "black"
 #define AL_WHITE                        "white"

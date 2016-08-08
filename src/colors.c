@@ -26,6 +26,13 @@
 
 #include "libalex.h"
 
+struct gfx_color {
+    cstring_t   *s_fg;
+    cstring_t   *s_bg;
+    int         fg;
+    int         bg;
+};
+
 struct rgb {
     int r;
     int g;

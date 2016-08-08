@@ -30,58 +30,6 @@
 #include "libalex.h"
 #include "gui/objects.h"
 
-static struct grc_json_key __entries[] = {
-    { OBJ_WIDTH,                AL_GRC_JOBJ_WIDTH,              GRC_NUMBER  },
-    { OBJ_HEIGHT,               AL_GRC_JOBJ_HEIGHT,             GRC_NUMBER  },
-    { OBJ_COLOR_DEPTH,          AL_GRC_JOBJ_COLOR_DEPTH,        GRC_NUMBER  },
-    { OBJ_FOREGROUND,           AL_GRC_JOBJ_FOREGROUND,         GRC_STRING  },
-    { OBJ_BACKGROUND,           AL_GRC_JOBJ_BACKGROUND,         GRC_STRING  },
-    { OBJ_BLOCK_EXIT_KEYS,      AL_GRC_JOBJ_BLOCK_EXIT_KEYS,    GRC_BOOL    },
-    { OBJ_MOUSE,                AL_GRC_JOBJ_MOUSE,              GRC_BOOL    },
-    { OBJ_TYPE,                 AL_GRC_JOBJ_TYPE,               GRC_STRING  },
-    { OBJ_POS_X,                AL_GRC_JOBJ_POS_X,              GRC_NUMBER  },
-    { OBJ_POS_Y,                AL_GRC_JOBJ_POS_Y,              GRC_NUMBER  },
-    { OBJ_TAG,                  AL_GRC_JOBJ_TAG,                GRC_STRING  },
-    { OBJ_PARENT,               AL_GRC_JOBJ_PARENT,             GRC_STRING  },
-    { OBJ_KEY,                  AL_GRC_JOBJ_KEY,                GRC_STRING  },
-    { OBJ_TEXT,                 AL_GRC_JOBJ_TEXT,               GRC_STRING  },
-    { OBJ_HIDE,                 AL_GRC_JOBJ_HIDE,               GRC_BOOL    },
-    { OBJ_LINE_BREAK,           AL_GRC_JOBJ_LINE_BREAK,         GRC_STRING  },
-    { OBJ_IGNORE_ESC_KEY,       AL_GRC_JOBJ_IGNORE_ESC_KEY,     GRC_BOOL    },
-    { OBJ_INPUT_LENGTH,         AL_GRC_JOBJ_INPUT_LENGTH,       GRC_NUMBER  },
-    { OBJ_RADIO_GROUP,          AL_GRC_JOBJ_RADIO_GROUP,        GRC_NUMBER  },
-    { OBJ_RADIO_TYPE,           AL_GRC_JOBJ_RADIO_TYPE,         GRC_STRING  },
-    { OBJ_PASSWORD,             AL_GRC_JOBJ_PASSWORD_MODE,      GRC_BOOL    },
-    { OBJ_HORIZONTAL_POSITION,  AL_GRC_JOBJ_H_POSITION,         GRC_STRING  },
-    { OBJ_FPS,                  AL_GRC_JOBJ_FPS,                GRC_NUMBER  },
-    { OBJ_DEVICES,              AL_GRC_JOBJ_DEVICES,            GRC_NUMBER  }
-};
-
-#define MAX_GRC_ENTRIES             \
-    (sizeof(__entries) / sizeof(__entries[0]))
-
-/*
- * ------- GRC object handling -------
- */
-
-/*
- * Search for an information structure from a JSON object in the supported
- * objects list.
- */
-struct grc_json_key *get_grc_json_key(enum al_grc_object_property prop)
-{
-    unsigned int i;
-    struct grc_json_key *e = NULL;
-
-    for (i = 0; i < MAX_GRC_ENTRIES; i++)
-        if (__entries[i].prop == prop) {
-            e = &__entries[i];
-            break;
-        }
-
-    return e;
-}
-
 /*
  * THE parse ;-) (from a file). Just keep the DIALOG information as a JSON
  * internally.
@@ -318,7 +266,7 @@ static int grc_to_DIALOG(struct grc_object *gobject, struct al_grc *grc)
              * Set that the virtual keyboard is enabled to this DIALOG
              * so that every object may known this.
              */
-            grc->virtual_keyboard = true;
+            info_set_value(grc->info, AL_INFO_VIRTUAL_KEYBOARD, true, NULL);
             break;
 
         case AL_GRC_OBJ_ICON:
@@ -454,7 +402,7 @@ static int grc_to_key_DIALOG(struct grc_object *gobject, struct al_grc *grc)
      * override it.
      */
     if (d->d1 == KEY_ESC)
-        grc->esc_key_user_defined = true;
+        info_set_value(grc->info, AL_INFO_ESC_KEY_USER_DEFINED, true, NULL);
 
     return 0;
 }
@@ -517,7 +465,7 @@ static int load_keys_to_grc(struct al_grc *grc, cjson_t *keys)
         return -1;
     }
 
-    grc->esc_key_user_defined = false;
+    info_set_value(grc->info, AL_INFO_ESC_KEY_USER_DEFINED, false, NULL);
 
     for (i = 0; i < t_keys; i++) {
         p = cjson_get_array_item(keys, i);

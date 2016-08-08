@@ -48,6 +48,9 @@ void destroy_grc(struct al_grc *grc)
     if (grc->jgrc != NULL)
         cjson_delete(grc->jgrc);
 
+    if (grc->info != NULL)
+        info_finish(grc->info);
+
     free(grc);
 }
 
@@ -72,17 +75,24 @@ struct al_grc *new_grc(void)
     g->ui_keys = NULL;
     g->ui_menu = NULL;
 
+    g->info = info_start();
+
+    if (NULL == g->info) {
+        free(g);
+        return NULL;
+    }
+
     /*
      * Let the virtual keyboard disabled by now. If there is such an object
      * this flag will be enabled later.
      */
-    g->virtual_keyboard = false;
+    info_set_value(g->info, AL_INFO_VIRTUAL_KEYBOARD, false, NULL);
 
     /*
      * We're not prepared to run de DIALOG yet cause we need to load all
      * objects from the file and translate them to Allegro.
      */
-    g->are_we_prepared = false;
+    info_set_value(g->info, AL_INFO_ARE_WE_PREPARED, false, NULL);
 
     return g;
 }
@@ -118,7 +128,28 @@ DIALOG *grc_get_DIALOG_from_tag(struct al_grc *grc, const char *tag)
 
 MENU *grc_get_MENU_from_tag(struct al_grc *grc, const char *tag)
 {
-    // TODO
+    struct tmp_list {
+        struct grc_object *ui;
+    };
+
+    MENU *m = NULL;
+    unsigned int i, t;
+    struct grc_object *p;
+    struct tmp_list ui_list[] = {
+        { grc->ui_menu },
+        { grc->tmp_objects }
+    };
+
+    t = sizeof(ui_list) / sizeof(ui_list[0]);
+
+    for (i = 0; i < t; i++) {
+        p = ui_list[i].ui;
+        m = grc_object_get_MENU_from_tag(p, tag);
+
+        if (m != NULL)
+            return m;
+    }
+
     return NULL;
 }
 

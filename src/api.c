@@ -77,7 +77,7 @@ static struct al_grc *al_grc_init(const char *grc_data, int load_mode,
         goto end_block;
     }
 
-    grc->use_gfx = gfx;
+    info_set_value(grc->info, AL_INFO_USE_GFX, gfx, NULL);
 
     if (info_parse(grc) < 0)
         goto end_block;
@@ -146,7 +146,7 @@ int LIBEXPORT al_grc_uninit(struct al_grc *grc)
     }
 
     /* Return the gfx to text mode */
-    if (grc->use_gfx == true)
+    if (info_get_value(grc->info, AL_INFO_USE_GFX) == true)
         gui_reset_resolution();
 
     /* Free the object */
@@ -171,7 +171,7 @@ int LIBEXPORT al_grc_prepare_dialog(struct al_grc *grc)
 
     if (ret == 0)
         /* And now we're prepared to run the DIALOG */
-        grc->are_we_prepared = true;
+        info_set_value(grc->info, AL_INFO_ARE_WE_PREPARED, true, NULL);
 
     return ret;
 }
@@ -186,7 +186,7 @@ int LIBEXPORT al_grc_do_dialog(struct al_grc *grc)
     }
 
     /* We're not prepared to run the DIALOG yet */
-    if (grc->are_we_prepared == false) {
+    if (info_get_value(grc->info, AL_INFO_ARE_WE_PREPARED) == false) {
         al_set_errno(AL_ERROR_NOT_PREPARED_YET);
         return -1;
     }
