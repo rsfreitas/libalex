@@ -4,7 +4,7 @@
  *
  * Author: Rodrigo Freitas
  * Created at: Thu Dec 18 15:59:14 2014
- * Project: libalex
+ * Project: libgrc
  *
  * Copyright (c) 2014 Rodrigo Freitas
  *
@@ -24,17 +24,17 @@
  * USA
  */
 
-#ifndef _LIBALEX_WRITE_H
-#define _LIBALEX_WRITE_H			1
+#ifndef _LIBGRC_WRITE_H
+#define _LIBGRC_WRITE_H			1
 
-#ifndef LIBALEX_COMPILE
-# ifndef _LIBALEX_H
-#  error "Never use <write.h> directly; include <libalex.h> instead."
+#ifndef LIBGRC_COMPILE
+# ifndef _LIBGRC_H
+#  error "Never use <write.h> directly; include <libgrc.h> instead."
 # endif
 #endif
 
 /**
- * @name al_grc_GRC_create_colors
+ * @name grc_GRC_create_colors
  * @brief Create the color block information.
  *
  * Add information about the DIALOG main colors to a GRC file.
@@ -45,17 +45,17 @@
  *
  * @return On success returns 0 or -1 otherwise.
  */
-int al_grc_GRC_create_colors(struct al_grc *grc, const char *foreground,
-                             const char *background);
+int grc_GRC_create_colors(grc_t *grc, const char *foreground,
+                          const char *background);
 
 /**
- * @name al_grc_GRC_create_info
+ * @name grc_GRC_create_info
  * @brief Create the main DIALOG block information.
  *
  * @param [in,out] grc: Previously created GRC structure.
  * @param [in] width: Window width.
  * @param [in] height: Window height.
- * @param [in] color: DIALOG colors.
+ * @param [in] color_depth: DIALOG colors.
  * @param [in] block_exit_keys: Flag to block Allegro's ctrl+alt+end
  *                              shortcut.
  * @param [in] mouse: Flag to enable mouse.
@@ -63,24 +63,23 @@ int al_grc_GRC_create_colors(struct al_grc *grc, const char *foreground,
  *
  * @return On success returns 0 or -1 otherwise.
  */
-int al_grc_GRC_create_info(struct al_grc *grc, unsigned int width,
-                           unsigned int height, enum al_grc_color_depth color,
-                           bool block_exit_keys, bool mouse,
-                           bool ignore_esc_key);
+int grc_GRC_create_info(grc_t *grc, unsigned int width, unsigned int height,
+                        enum grc_color_depth color_depth, bool block_exit_keys,
+                        bool mouse, bool ignore_esc_key);
 
 /**
- * @name al_grc_GRC_keys_start
+ * @name grc_GRC_keys_start
  * @brief Create the supported keys block.
  *
  * @param [in,out] grc: Previously created GRC structure.
  *
  * @return On success returns 0 or -1 otherwise.
  */
-int al_grc_GRC_keys_start(struct al_grc *grc);
+int grc_GRC_keys_start(grc_t *grc);
 
 /* TODO: Change this name to tag... */
 /**
- * @name al_grc_GRC_add_key
+ * @name grc_GRC_add_key
  * @brief Add a supported key from a DIALOG.
  *
  * @param [in,out] grc: Previously created GRC structure.
@@ -90,50 +89,50 @@ int al_grc_GRC_keys_start(struct al_grc *grc);
  *
  * @return On success returns 0 or -1 otherwise.
  */
-int al_grc_GRC_add_key(struct al_grc *grc, const char *key, const char *name);
+int grc_GRC_add_key(grc_t *grc, const char *key, const char *name);
 
 /**
- * @name al_grc_GRC_keys_finish
+ * @name grc_GRC_keys_finish
  * @brief Ends the supported keys block.
  *
  * @param [in,out] grc: Previously created GRC structure.
  *
  * @return On success returns 0 or -1 otherwise.
  */
-int al_grc_GRC_keys_finish(struct al_grc *grc);
+int grc_GRC_keys_finish(grc_t *grc);
 
 /**
- * @name al_grc_GRC_objects_start
+ * @name grc_GRC_objects_start
  * @brief Creates the block which will contain all DIALOG objects.
  *
  * @param [in,out] grc: Previously created GRC structure.
  *
  * @return On success returns 0 or -1 otherwise.
  */
-int al_grc_GRC_objects_start(struct al_grc *grc);
+int grc_GRC_objects_start(grc_t *grc);
 
 /**
- * @name al_grc_GRC_create_object
+ * @name grc_GRC_create_object
  * @brief Creates an object which will be added to the DIALOG.
  *
  * @param [in,out] grc: Previously created GRC structure.
  *
  * @return On success returns 0 or -1 otherwise.
  */
-int al_grc_GRC_create_object(struct al_grc *grc);
+int grc_GRC_create_object(grc_t *grc);
 
 /**
- * @name al_grc_GRC_finish_object
+ * @name grc_GRC_finish_object
  * @brief Ends the object added to the DIALOG.
  *
  * @param [in,out] grc: Previously created GRC structure.
  *
  * @return On success returns 0 or -1 otherwise.
  */
-int al_grc_GRC_finish_object(struct al_grc *grc);
+int grc_GRC_finish_object(grc_t *grc);
 
 /**
- * @name al_grc_GRC_set_object_property
+ * @name grc_GRC_set_object_property
  * @brief Add a property to a newly created object.
  *
  * @param [in,out] grc: Previously created GRC structure.
@@ -142,18 +141,17 @@ int al_grc_GRC_finish_object(struct al_grc *grc);
  *
  * @return On success returns 0 or -1 otherwise.
  */
-int al_grc_GRC_set_object_property(struct al_grc *grc,
-                                   enum al_grc_object_property prop, ...);
+int grc_GRC_set_object_property(grc_t *grc, enum grc_object_property prop, ...);
 
 /**
- * @name al_grc_GRC_objects_finish
+ * @name grc_GRC_objects_finish
  * @brief Ends the objects block.
  *
  * @param [in,out] grc: Previously created GRC structure.
  *
  * @return On success returns 0 or -1 otherwise.
  */
-int al_grc_GRC_objects_finish(struct al_grc *grc);
+int grc_GRC_objects_finish(grc_t *grc);
 
 #endif
 

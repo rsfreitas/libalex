@@ -4,7 +4,7 @@
  *
  * Author: Rodrigo Freitas
  * Created at: Mon Dec 22 11:43:11 2014
- * Project: libalex
+ * Project: libgrc
  *
  * Copyright (c) 2014 Rodrigo Freitas
  *
@@ -24,7 +24,7 @@
  * USA
  */
 
-#include "libalex.h"
+#include "libgrc.h"
 
 /*
  * Layout (1):
@@ -108,12 +108,12 @@ struct screen_line {
     struct screen_key   keys[MAX_SCREEN_KEYS];
 };
 
-struct keyboard_layout {
+struct keyboard_layout_s {
     int                 format;
     struct screen_line  line[TOTAL_LINES];
 };
 
-static struct keyboard_layout __klayout[] = {
+static struct keyboard_layout_s __klayout[] = {
     /* format 1 */
     {
         .format = 1,
@@ -355,7 +355,7 @@ static const char *translate_special_key(const char *btn_text)
 static void calc_buttons_area(DIALOG *d, int keyb_layout)
 {
     int i, j, x, y, w, btn_height;
-    struct keyboard_layout *k = &__klayout[keyb_layout];
+    struct keyboard_layout_s *k = &__klayout[keyb_layout];
     struct screen_key *sk;
     struct special_key *spk = NULL;
 
@@ -514,7 +514,7 @@ static void draw_special_key(struct screen_key *key, struct special_key *spk,
 static void draw_keyboard(DIALOG *d, int keyb_layout)
 {
     int i, btn_height, j, half_letter = text_height(font) / 2, fg, bg;
-    struct keyboard_layout *k = &__klayout[keyb_layout];
+    struct keyboard_layout_s *k = &__klayout[keyb_layout];
     struct screen_key *sk, *dotted_key = NULL;
     struct special_key *spk;
     char *btn_text;
@@ -583,7 +583,7 @@ static void draw_keyboard(DIALOG *d, int keyb_layout)
 static struct screen_key *find_clicked_button(int x, int y, int keyb_layout)
 {
     struct screen_key *key = NULL, *sk;
-    struct keyboard_layout *k = &__klayout[keyb_layout];
+    struct keyboard_layout_s *k = &__klayout[keyb_layout];
     int i, j;
 
     for (i = 0; i < TOTAL_LINES; i++) {
@@ -643,7 +643,7 @@ static void run_edit_callback(DIALOG *edit)
     run_callback(acd, D_O_K);
 }
 
-static int update_last_edit_object_value(DIALOG *d, struct al_grc *grc,
+static int update_last_edit_object_value(DIALOG *d, struct grc_s *grc,
     struct screen_key *key)
 {
     struct special_key *spk = NULL;
@@ -663,10 +663,10 @@ static int update_last_edit_object_value(DIALOG *d, struct al_grc *grc,
     if (spk != NULL) {
         switch (spk->value) {
             case SPK_CHANGE_FMT:
-                if (d->d1 == GRC_KLAYOUT_LETTERS)
-                    d->d1 = GRC_KLAYOUT_NUMBERS;
-                else if (d->d1 == GRC_KLAYOUT_NUMBERS)
-                    d->d1 = GRC_KLAYOUT_LETTERS;
+                if (d->d1 == KEYBOARD_LAYOUT_LETTERS)
+                    d->d1 = KEYBOARD_LAYOUT_NUMBERS;
+                else if (d->d1 == KEYBOARD_LAYOUT_NUMBERS)
+                    d->d1 = KEYBOARD_LAYOUT_LETTERS;
 
                 return D_REDRAWME;
 
@@ -753,8 +753,8 @@ int gui_d_vt_keyboard_proc(int msg, DIALOG *d, int c __attribute__((unused)))
 {
     struct screen_key *key;
     struct callback_data *acd = d->dp3;
-    struct al_grc *grc;
-    enum grc_keyboard_layout klayout = d->d1;
+    struct grc_s *grc;
+    enum keyboard_layout klayout = d->d1;
     int mx, my, ret, draw = false;
 
     grc = get_callback_grc(acd);
@@ -765,8 +765,8 @@ int gui_d_vt_keyboard_proc(int msg, DIALOG *d, int c __attribute__((unused)))
              * Estimate each button area make the mouse click validation
              * easier.
              */
-            calc_buttons_area(d, GRC_KLAYOUT_LETTERS);
-            calc_buttons_area(d, GRC_KLAYOUT_NUMBERS);
+            calc_buttons_area(d, KEYBOARD_LAYOUT_LETTERS);
+            calc_buttons_area(d, KEYBOARD_LAYOUT_NUMBERS);
             break;
 
         case MSG_DRAW:

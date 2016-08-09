@@ -5,7 +5,7 @@
  *
  * Author: Rodrigo Freitas
  * Created at: Thu Jul 28 09:45:08 2016
- * Project: libalex
+ * Project: libgrc
  *
  * Copyright (c) 2014 Rodrigo Freitas
  *
@@ -27,18 +27,18 @@
 
 #include <stdlib.h>
 
-#include "libalex.h"
+#include "libgrc.h"
 
 /* Structure to hold a property detail, such as its name, type, etc */
 struct property_detail {
     char                        string[128];
-    enum al_grc_object_property prop;
+    enum grc_object_property    prop;
     enum grc_entry_type_value   type;
 };
 
 /* Structure to store an object "object" of a GRC file */
 struct grc_obj_properties {
-    enum al_grc_object  type;
+    enum grc_object     type;
     cstring_t           *name;
     cstring_t           *parent;
     cstring_t           *text;
@@ -61,30 +61,30 @@ struct grc_obj_properties {
 
 /* Supported properties from an object of a GRC file */
 static struct property_detail __properties[] = {
-    { OBJ_WIDTH,                AL_GRC_JOBJ_WIDTH,              GRC_NUMBER  },
-    { OBJ_HEIGHT,               AL_GRC_JOBJ_HEIGHT,             GRC_NUMBER  },
-    { OBJ_COLOR_DEPTH,          AL_GRC_JOBJ_COLOR_DEPTH,        GRC_NUMBER  },
-    { OBJ_FOREGROUND,           AL_GRC_JOBJ_FOREGROUND,         GRC_STRING  },
-    { OBJ_BACKGROUND,           AL_GRC_JOBJ_BACKGROUND,         GRC_STRING  },
-    { OBJ_BLOCK_EXIT_KEYS,      AL_GRC_JOBJ_BLOCK_EXIT_KEYS,    GRC_BOOL    },
-    { OBJ_MOUSE,                AL_GRC_JOBJ_MOUSE,              GRC_BOOL    },
-    { OBJ_TYPE,                 AL_GRC_JOBJ_TYPE,               GRC_STRING  },
-    { OBJ_POS_X,                AL_GRC_JOBJ_POS_X,              GRC_NUMBER  },
-    { OBJ_POS_Y,                AL_GRC_JOBJ_POS_Y,              GRC_NUMBER  },
-    { OBJ_TAG,                  AL_GRC_JOBJ_TAG,                GRC_STRING  },
-    { OBJ_PARENT,               AL_GRC_JOBJ_PARENT,             GRC_STRING  },
-    { OBJ_KEY,                  AL_GRC_JOBJ_KEY,                GRC_STRING  },
-    { OBJ_TEXT,                 AL_GRC_JOBJ_TEXT,               GRC_STRING  },
-    { OBJ_HIDE,                 AL_GRC_JOBJ_HIDE,               GRC_BOOL    },
-    { OBJ_LINE_BREAK,           AL_GRC_JOBJ_LINE_BREAK,         GRC_STRING  },
-    { OBJ_IGNORE_ESC_KEY,       AL_GRC_JOBJ_IGNORE_ESC_KEY,     GRC_BOOL    },
-    { OBJ_INPUT_LENGTH,         AL_GRC_JOBJ_INPUT_LENGTH,       GRC_NUMBER  },
-    { OBJ_RADIO_GROUP,          AL_GRC_JOBJ_RADIO_GROUP,        GRC_NUMBER  },
-    { OBJ_RADIO_TYPE,           AL_GRC_JOBJ_RADIO_TYPE,         GRC_STRING  },
-    { OBJ_PASSWORD,             AL_GRC_JOBJ_PASSWORD_MODE,      GRC_BOOL    },
-    { OBJ_HORIZONTAL_POSITION,  AL_GRC_JOBJ_H_POSITION,         GRC_STRING  },
-    { OBJ_FPS,                  AL_GRC_JOBJ_FPS,                GRC_NUMBER  },
-    { OBJ_DEVICES,              AL_GRC_JOBJ_DEVICES,            GRC_NUMBER  }
+    { OBJ_WIDTH,                GRC_PROPERTY_WIDTH,              GRC_NUMBER  },
+    { OBJ_HEIGHT,               GRC_PROPERTY_HEIGHT,             GRC_NUMBER  },
+    { OBJ_COLOR_DEPTH,          GRC_PROPERTY_COLOR_DEPTH,        GRC_NUMBER  },
+    { OBJ_FOREGROUND,           GRC_PROPERTY_FOREGROUND,         GRC_STRING  },
+    { OBJ_BACKGROUND,           GRC_PROPERTY_BACKGROUND,         GRC_STRING  },
+    { OBJ_BLOCK_EXIT_KEYS,      GRC_PROPERTY_BLOCK_EXIT_KEYS,    GRC_BOOL    },
+    { OBJ_MOUSE,                GRC_PROPERTY_MOUSE,              GRC_BOOL    },
+    { OBJ_TYPE,                 GRC_PROPERTY_TYPE,               GRC_STRING  },
+    { OBJ_POS_X,                GRC_PROPERTY_POS_X,              GRC_NUMBER  },
+    { OBJ_POS_Y,                GRC_PROPERTY_POS_Y,              GRC_NUMBER  },
+    { OBJ_TAG,                  GRC_PROPERTY_TAG,                GRC_STRING  },
+    { OBJ_PARENT,               GRC_PROPERTY_PARENT,             GRC_STRING  },
+    { OBJ_KEY,                  GRC_PROPERTY_KEY,                GRC_STRING  },
+    { OBJ_TEXT,                 GRC_PROPERTY_TEXT,               GRC_STRING  },
+    { OBJ_HIDE,                 GRC_PROPERTY_HIDE,               GRC_BOOL    },
+    { OBJ_LINE_BREAK,           GRC_PROPERTY_LINE_BREAK,         GRC_STRING  },
+    { OBJ_IGNORE_ESC_KEY,       GRC_PROPERTY_IGNORE_ESC_KEY,     GRC_BOOL    },
+    { OBJ_INPUT_LENGTH,         GRC_PROPERTY_INPUT_LENGTH,       GRC_NUMBER  },
+    { OBJ_RADIO_GROUP,          GRC_PROPERTY_RADIO_GROUP,        GRC_NUMBER  },
+    { OBJ_RADIO_TYPE,           GRC_PROPERTY_RADIO_TYPE,         GRC_STRING  },
+    { OBJ_PASSWORD,             GRC_PROPERTY_PASSWORD_MODE,      GRC_BOOL    },
+    { OBJ_HORIZONTAL_POSITION,  GRC_PROPERTY_H_POSITION,         GRC_STRING  },
+    { OBJ_FPS,                  GRC_PROPERTY_FPS,                GRC_NUMBER  },
+    { OBJ_DEVICES,              GRC_PROPERTY_DEVICES,            GRC_NUMBER  }
 };
 
 #define MAX_PROPERTIES              \
@@ -94,7 +94,7 @@ static struct property_detail __properties[] = {
  * Search for an information structure from a JSON object in the supported
  * objects list.
  */
-struct property_detail *get_property_detail(enum al_grc_object_property prop)
+struct property_detail *get_property_detail(enum grc_object_property prop)
 {
     unsigned int i;
     struct property_detail *e = NULL;
@@ -116,7 +116,7 @@ const char *property_detail_string(struct property_detail *d)
     return d->string;
 }
 
-enum al_grc_object_property property_detail(struct property_detail *d)
+enum grc_object_property property_detail(struct property_detail *d)
 {
     if (NULL == d)
         return -1;
@@ -162,7 +162,7 @@ static struct grc_obj_properties *new_empty_obj_properties(void)
     p = calloc(1, sizeof(struct grc_obj_properties));
 
     if (NULL == p) {
-        al_set_errno(AL_ERROR_MEMORY);
+        grc_set_errno(GRC_ERROR_MEMORY);
         return NULL;
     }
 
@@ -182,7 +182,7 @@ struct grc_obj_properties *new_obj_properties(cjson_t *object)
     p = new_empty_obj_properties();
 
     /* type */
-    dt = get_property_detail(AL_GRC_JOBJ_TYPE);
+    dt = get_property_detail(GRC_PROPERTY_TYPE);
 
     if (NULL == dt)
         goto undefined_grc_jkey_block;
@@ -192,7 +192,7 @@ struct grc_obj_properties *new_obj_properties(cjson_t *object)
     free(tmp);
 
     /* tag */
-    dt = get_property_detail(AL_GRC_JOBJ_TAG);
+    dt = get_property_detail(GRC_PROPERTY_TAG);
 
     if (NULL == dt)
         goto undefined_grc_jkey_block;
@@ -205,7 +205,7 @@ struct grc_obj_properties *new_obj_properties(cjson_t *object)
         p->name = NULL;
 
     /* parent */
-    dt = get_property_detail(AL_GRC_JOBJ_PARENT);
+    dt = get_property_detail(GRC_PROPERTY_PARENT);
 
     if (NULL == dt)
         goto undefined_grc_jkey_block;
@@ -218,7 +218,7 @@ struct grc_obj_properties *new_obj_properties(cjson_t *object)
         p->parent = NULL;
 
     /* text */
-    dt = get_property_detail(AL_GRC_JOBJ_TEXT);
+    dt = get_property_detail(GRC_PROPERTY_TEXT);
 
     if (NULL == dt)
         goto undefined_grc_jkey_block;
@@ -231,7 +231,7 @@ struct grc_obj_properties *new_obj_properties(cjson_t *object)
         p->text = NULL;
 
     /* key */
-    dt = get_property_detail(AL_GRC_JOBJ_KEY);
+    dt = get_property_detail(GRC_PROPERTY_KEY);
 
     if (NULL == dt)
         goto undefined_grc_jkey_block;
@@ -244,7 +244,7 @@ struct grc_obj_properties *new_obj_properties(cjson_t *object)
         p->key = NULL;
 
     /* foreground */
-    dt = get_property_detail(AL_GRC_JOBJ_FOREGROUND);
+    dt = get_property_detail(GRC_PROPERTY_FOREGROUND);
 
     if (NULL == dt)
         goto undefined_grc_jkey_block;
@@ -255,7 +255,7 @@ struct grc_obj_properties *new_obj_properties(cjson_t *object)
         p->fg = tmp;
 
     /* pos_x */
-    dt = get_property_detail(AL_GRC_JOBJ_POS_X);
+    dt = get_property_detail(GRC_PROPERTY_POS_X);
 
     if (NULL == dt)
         goto undefined_grc_jkey_block;
@@ -263,7 +263,7 @@ struct grc_obj_properties *new_obj_properties(cjson_t *object)
     p->x = grc_get_object_value(object, property_detail_string(dt), -1);
 
     /* pos_y */
-    dt = get_property_detail(AL_GRC_JOBJ_POS_Y);
+    dt = get_property_detail(GRC_PROPERTY_POS_Y);
 
     if (NULL == dt)
         goto undefined_grc_jkey_block;
@@ -271,7 +271,7 @@ struct grc_obj_properties *new_obj_properties(cjson_t *object)
     p->y = grc_get_object_value(object, property_detail_string(dt), -1);
 
     /* width */
-    dt = get_property_detail(AL_GRC_JOBJ_WIDTH);
+    dt = get_property_detail(GRC_PROPERTY_WIDTH);
 
     if (NULL == dt)
         goto undefined_grc_jkey_block;
@@ -279,7 +279,7 @@ struct grc_obj_properties *new_obj_properties(cjson_t *object)
     p->w = grc_get_object_value(object, property_detail_string(dt), -1);
 
     /* height */
-    dt = get_property_detail(AL_GRC_JOBJ_HEIGHT);
+    dt = get_property_detail(GRC_PROPERTY_HEIGHT);
 
     if (NULL == dt)
         goto undefined_grc_jkey_block;
@@ -287,7 +287,7 @@ struct grc_obj_properties *new_obj_properties(cjson_t *object)
     p->h = grc_get_object_value(object, property_detail_string(dt), -1);
 
     /* hide */
-    dt = get_property_detail(AL_GRC_JOBJ_HIDE);
+    dt = get_property_detail(GRC_PROPERTY_HIDE);
 
     if (NULL == dt)
         goto undefined_grc_jkey_block;
@@ -295,7 +295,7 @@ struct grc_obj_properties *new_obj_properties(cjson_t *object)
     p->hide = grc_get_object_value(object, property_detail_string(dt), false);
 
     /* line_break */
-    dt = get_property_detail(AL_GRC_JOBJ_LINE_BREAK);
+    dt = get_property_detail(GRC_PROPERTY_LINE_BREAK);
 
     if (NULL == dt)
         goto undefined_grc_jkey_block;
@@ -305,7 +305,7 @@ struct grc_obj_properties *new_obj_properties(cjson_t *object)
     free(tmp);
 
     /* input_length */
-    dt = get_property_detail(AL_GRC_JOBJ_INPUT_LENGTH);
+    dt = get_property_detail(GRC_PROPERTY_INPUT_LENGTH);
 
     if (NULL == dt)
         goto undefined_grc_jkey_block;
@@ -314,7 +314,7 @@ struct grc_obj_properties *new_obj_properties(cjson_t *object)
                                           0);
 
     /* radio_group */
-    dt = get_property_detail(AL_GRC_JOBJ_RADIO_GROUP);
+    dt = get_property_detail(GRC_PROPERTY_RADIO_GROUP);
 
     if (NULL == dt)
         goto undefined_grc_jkey_block;
@@ -323,7 +323,7 @@ struct grc_obj_properties *new_obj_properties(cjson_t *object)
                                           0);
 
     /* radio_type */
-    dt = get_property_detail(AL_GRC_JOBJ_RADIO_TYPE);
+    dt = get_property_detail(GRC_PROPERTY_RADIO_TYPE);
 
     if (NULL == dt)
         goto undefined_grc_jkey_block;
@@ -333,7 +333,7 @@ struct grc_obj_properties *new_obj_properties(cjson_t *object)
     free(tmp);
 
     /* password */
-    dt = get_property_detail(AL_GRC_JOBJ_PASSWORD_MODE);
+    dt = get_property_detail(GRC_PROPERTY_PASSWORD_MODE);
 
     if (NULL == dt)
         goto undefined_grc_jkey_block;
@@ -342,7 +342,7 @@ struct grc_obj_properties *new_obj_properties(cjson_t *object)
                                             false);
 
     /* horizontal position */
-    dt = get_property_detail(AL_GRC_JOBJ_H_POSITION);
+    dt = get_property_detail(GRC_PROPERTY_H_POSITION);
 
     if (NULL == dt)
         goto undefined_grc_jkey_block;
@@ -352,7 +352,7 @@ struct grc_obj_properties *new_obj_properties(cjson_t *object)
     free(tmp);
 
     /* fps */
-    dt = get_property_detail(AL_GRC_JOBJ_FPS);
+    dt = get_property_detail(GRC_PROPERTY_FPS);
 
     if (NULL == dt)
         goto undefined_grc_jkey_block;
@@ -360,7 +360,7 @@ struct grc_obj_properties *new_obj_properties(cjson_t *object)
     p->fps = grc_get_object_value(object, property_detail_string(dt), 0);
 
     /* devices */
-    dt = get_property_detail(AL_GRC_JOBJ_DEVICES);
+    dt = get_property_detail(GRC_PROPERTY_DEVICES);
 
     if (NULL == dt)
         goto undefined_grc_jkey_block;
@@ -370,7 +370,7 @@ struct grc_obj_properties *new_obj_properties(cjson_t *object)
     return p;
 
 undefined_grc_jkey_block:
-    al_set_errno(AL_ERROR_UNDEFINED_GRC_KEY);
+    grc_set_errno(GRC_ERROR_UNDEFINED_GRC_KEY);
     destroy_obj_properties(p);
 
     return NULL;
@@ -449,7 +449,7 @@ const char *grc_obj_get_property_fg(struct grc_obj_properties *prop)
     return cstring_valueof(prop->fg);
 }
 
-enum al_grc_object grc_obj_get_property_type(struct grc_obj_properties *prop)
+enum grc_object grc_obj_get_property_type(struct grc_obj_properties *prop)
 {
     if (NULL == prop)
         return -1;
@@ -546,7 +546,7 @@ int grc_obj_get_property_horizontal_position(struct grc_obj_properties *prop)
 }
 
 int grc_obj_set_property_type(struct grc_obj_properties *prop,
-    enum al_grc_object type)
+    enum grc_object type)
 {
     if (NULL == prop)
         return -1;

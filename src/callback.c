@@ -4,7 +4,7 @@
  *
  * Author: Rodrigo Freitas
  * Created at: Thu Jul 28 09:21:58 2016
- * Project: libalex
+ * Project: libgrc
  *
  * Copyright (c) 2014 Rodrigo Freitas
  *
@@ -27,7 +27,7 @@
 #include <stdlib.h>
 #include <stdarg.h>
 
-#include "libalex.h"
+#include "libgrc.h"
 
 /* Structure to be used in the callback functions */
 struct callback_data {
@@ -37,7 +37,7 @@ struct callback_data {
     void            *grc; /* Pointer to the main structure */
 
     /* internal */
-    int             (*callback)(struct callback_data *);
+    int             (*callback)(grc_callback_data_t *);
 };
 
 /*
@@ -68,8 +68,8 @@ void destroy_callback_data(void *a)
 /*
  * Sets an object callback data to point to the main library structure.
  */
-void set_object_callback_data(struct grc_object *gobject,
-    struct al_grc *grc)
+void set_object_callback_data(struct grc_object_s *gobject,
+    struct grc_s *grc)
 {
     struct callback_data *acd;
     DIALOG *d;
@@ -77,7 +77,7 @@ void set_object_callback_data(struct grc_object *gobject,
     acd = new_callback_data();
 
     if (NULL == acd) {
-        al_set_errno(AL_ERROR_MEMORY);
+        grc_set_errno(GRC_ERROR_MEMORY);
         return;
     }
 
@@ -88,7 +88,7 @@ void set_object_callback_data(struct grc_object *gobject,
     gobject->cb_data = acd;
 }
 
-int get_callback_data(struct callback_data *acd, enum al_data_type data,
+int get_callback_data(struct callback_data *acd, enum grc_object_member member,
     va_list ap)
 {
     const char *ifmt = "%d\0", *sfmt = "%[^|]";
@@ -97,23 +97,23 @@ int get_callback_data(struct callback_data *acd, enum al_data_type data,
     if (NULL == acd)
         return -1;
 
-    switch (data) {
-        case AL_DT_KEY_SCANCODE:
-        case AL_DT_SLIDER_POSITION:
-        case AL_DT_CHECKBOX_STATE:
-        case AL_DT_RADIO_STATE:
-        case AL_DT_LIST_POSITION:
+    switch (member) {
+        case GRC_MEMBER_KEY_SCANCODE:
+        case GRC_MEMBER_SLIDER_POSITION:
+        case GRC_MEMBER_CHECKBOX_STATE:
+        case GRC_MEMBER_RADIO_STATE:
+        case GRC_MEMBER_LIST_POSITION:
             snprintf(tmp, sizeof(tmp) - 1, ifmt, acd->value_int);
             vsscanf(tmp, ifmt, ap);
             break;
 
-        case AL_DT_EDIT_VALUE:
+        case GRC_MEMBER_EDIT_VALUE:
             snprintf(tmp, sizeof(tmp) - 1, "%s", acd->value_string);
             vsscanf(tmp, sfmt, ap);
             break;
 
         default:
-            al_set_errno(AL_ERROR_UNSUPPORTED_DATA_TYPE);
+            grc_set_errno(GRC_ERROR_UNSUPPORTED_DATA_TYPE);
             return -1;
     }
 
@@ -128,7 +128,7 @@ void *get_callback_user_arg(struct callback_data *acd)
     return acd->user_arg;
 }
 
-struct al_grc *get_callback_grc(struct callback_data *acd)
+struct grc_s *get_callback_grc(struct callback_data *acd)
 {
     if (NULL == acd)
         return NULL;
@@ -136,7 +136,7 @@ struct al_grc *get_callback_grc(struct callback_data *acd)
     return acd->grc;
 }
 
-static bool object_has_callback_data(struct al_grc *grc, DIALOG *d)
+static bool object_has_callback_data(struct grc_s *grc, DIALOG *d)
 {
     struct callback_data *acd = NULL;
 
@@ -149,8 +149,8 @@ static bool object_has_callback_data(struct al_grc *grc, DIALOG *d)
     return (acd->grc == grc) ? true : false;
 }
 
-int set_callback(struct al_grc *grc, DIALOG *dlg,
-    int (*callback)(struct callback_data *), void *arg)
+int set_callback(struct grc_s *grc, DIALOG *dlg,
+    int (*callback)(grc_callback_data_t *), void *arg)
 {
     struct callback_data *acd = NULL;
 

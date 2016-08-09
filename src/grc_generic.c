@@ -4,7 +4,7 @@
  *
  * Author: Rodrigo Freitas
  * Created at: Thu Jul 28 09:22:12 2016
- * Project: libalex
+ * Project: libgrc
  *
  * Copyright (c) 2014 Rodrigo Freitas
  *
@@ -26,7 +26,7 @@
 
 #include <stdlib.h>
 
-#include "libalex.h"
+#include "libgrc.h"
 
 struct grc_generic_data *new_grc_generic_data(void)
 {

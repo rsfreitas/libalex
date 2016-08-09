@@ -1,10 +1,10 @@
-# libalex
+# libgrc
 
-ALlegro EXtensions Library
+An Allegro Extensions Library.
 
-Libalex is a library to manipulate Allegro DIALOGs trough UI resource files,
+Libgrc is a library to manipulate Allegro DIALOGs trough UI resource files,
 in JSON format. The user may define all objects and behavior from a dialog
-without write a single line of code.
+without write a single line of code. GRC stands for GUI Resource file.
 
 The library allows that outside functions may be assigned to an object and
 called within an event.
@@ -49,8 +49,6 @@ LGPLv2
   may also have this object. Or update the clock inside a thread, so it may
   continue work outside your DIALOG.
 
-* Load the 'info' block even when the gfx mode is not been loaded again.
-
 * Try to make the virtual keyboard available only when accessing objects of
   edit type.
 
@@ -66,7 +64,7 @@ LGPLv2
 * Add support for changing font using this library.
 
 * Maybe remove the *al_grc_prepare_dialog* and pass all Allegro initialization
-  to the *al_grc_prepare_dialog*.
+  to the *al_grc_do_dialog*.
 
 * Change menu JSON format to handle submenus.
 

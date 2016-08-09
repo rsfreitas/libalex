@@ -4,7 +4,7 @@
  *
  * Author: Rodrigo Freitas
  * Created at: Sun Dec 14 00:29:57 2014
- * Project: libalex
+ * Project: libgrc
  *
  * Copyright (c) 2014 Rodrigo Freitas
  *
@@ -24,7 +24,7 @@
  * USA
  */
 
-#include "libalex.h"
+#include "libgrc.h"
 
 /*
  * The user must pass a function of following type to use this object:

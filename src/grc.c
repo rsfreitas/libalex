@@ -1,10 +1,10 @@
 
 /*
- * Description: Functions to manipulate a 'struct al_grc' structure.
+ * Description: Functions to manipulate a 'struct grc_s' structure.
  *
  * Author: Rodrigo Freitas
  * Created at: Thu Jul 28 09:01:37 2016
- * Project: libalex
+ * Project: libgrc
  *
  * Copyright (c) 2014 Rodrigo Freitas
  *
@@ -26,12 +26,12 @@
 
 #include <stdlib.h>
 
-#include "libalex.h"
+#include "libgrc.h"
 
 /*
- * Destroy a structure of type 'struct al_grc'.
+ * Destroy a structure of type 'struct grc_s'.
  */
-void destroy_grc(struct al_grc *grc)
+void destroy_grc(struct grc_s *grc)
 {
     if (grc->ui_objects != NULL)
         cdll_free(grc->ui_objects, destroy_grc_object);
@@ -42,60 +42,82 @@ void destroy_grc(struct al_grc *grc)
     if (grc->ui_keys != NULL)
         cdll_free(grc->ui_keys, destroy_grc_object);
 
-    if (grc->al_dlg != NULL)
-        free(grc->al_dlg);
+    if (grc->dlg != NULL)
+        free(grc->dlg);
 
     if (grc->jgrc != NULL)
         cjson_delete(grc->jgrc);
 
+    if (grc->info != NULL)
+        info_finish(grc->info);
+
+    if (grc->color != NULL)
+        color_finish(grc->color);
+
+    grc_release_internal_data(grc);
     free(grc);
 }
 
 /*
- * Create and return a structure of type 'struct al_grc'.
+ * Create and return a structure of type 'struct grc_s'.
  */
-struct al_grc *new_grc(void)
+struct grc_s *new_grc(void)
 {
-    struct al_grc *g;
+    struct grc_s *g;
 
-    g = calloc(1, sizeof(struct al_grc));
+    g = calloc(1, sizeof(struct grc_s));
 
     if (NULL == g) {
-        al_set_errno(AL_ERROR_MEMORY);
+        grc_set_errno(GRC_ERROR_MEMORY);
         return NULL;
     }
 
     g->jgrc = NULL;
-    g->al_dlg = NULL;
+    g->dlg = NULL;
     g->ui_objects = NULL;
     g->tmp_objects = NULL;
     g->ui_keys = NULL;
     g->ui_menu = NULL;
 
+    g->info = info_start();
+
+    if (NULL == g->info) {
+        free(g);
+        return NULL;
+    }
+
+    g->color = color_start();
+
+    if (NULL == g->color) {
+        info_finish(g->info);
+        free(g);
+        return NULL;
+    }
+
     /*
      * Let the virtual keyboard disabled by now. If there is such an object
      * this flag will be enabled later.
      */
-    g->virtual_keyboard = false;
+    info_set_value(g->info, INFO_VIRTUAL_KEYBOARD, false, NULL);
 
     /*
      * We're not prepared to run de DIALOG yet cause we need to load all
      * objects from the file and translate them to Allegro.
      */
-    g->are_we_prepared = false;
+    info_set_value(g->info, INFO_ARE_WE_PREPARED, false, NULL);
 
     return g;
 }
 
-DIALOG *grc_get_DIALOG_from_tag(struct al_grc *grc, const char *tag)
+DIALOG *grc_get_DIALOG_from_tag(struct grc_s *grc, const char *tag)
 {
     struct tmp_list {
-        struct grc_object *ui;
+        struct grc_object_s *ui;
     };
 
     DIALOG *d = NULL;
     unsigned int i, t;
-    struct grc_object *p;
+    struct grc_object_s *p;
     struct tmp_list ui_list[] = {
         { grc->ui_objects },
         { grc->ui_keys },
@@ -116,9 +138,86 @@ DIALOG *grc_get_DIALOG_from_tag(struct al_grc *grc, const char *tag)
     return NULL;
 }
 
-MENU *grc_get_MENU_from_tag(struct al_grc *grc, const char *tag)
+MENU *grc_get_MENU_from_tag(struct grc_s *grc, const char *tag)
 {
-    // TODO
+    struct tmp_list {
+        struct grc_object_s *ui;
+    };
+
+    MENU *m = NULL;
+    unsigned int i, t;
+    struct grc_object_s *p;
+    struct tmp_list ui_list[] = {
+        { grc->ui_menu },
+        { grc->tmp_objects }
+    };
+
+    t = sizeof(ui_list) / sizeof(ui_list[0]);
+
+    for (i = 0; i < t; i++) {
+        p = ui_list[i].ui;
+        m = grc_object_get_MENU_from_tag(p, tag);
+
+        if (m != NULL)
+            return m;
+    }
+
     return NULL;
+}
+
+struct gfx_info_s *grc_get_info(struct grc_s *grc)
+{
+    if (NULL == grc)
+        return NULL;
+
+    return grc->info;
+}
+
+cjson_t *grc_get_JSON(struct grc_s *grc)
+{
+    if (NULL == grc)
+        return NULL;
+
+    return grc->jgrc;
+}
+
+int grc_set_JSON(struct grc_s *grc, cjson_t *json)
+{
+    if (NULL == grc)
+        return -1;
+
+    grc->jgrc = json;
+
+    return 0;
+}
+
+void *grc_get_internal_data(struct grc_s *grc)
+{
+    if (NULL == grc)
+        return NULL;
+
+    return grc->internal;
+}
+
+int grc_set_internal_data(struct grc_s *grc, void *ptr,
+    void (*free_internal)(void *))
+{
+    if (NULL == grc)
+        return -1;
+
+    grc->internal = ptr;
+    grc->free_internal = free_internal;
+
+    return 0;
+}
+
+void grc_release_internal_data(struct grc_s *grc)
+{
+    if (NULL == grc)
+        return;
+
+    if (grc->internal != NULL)
+        if (grc->free_internal != NULL)
+            (grc->free_internal)(grc->internal);
 }
 

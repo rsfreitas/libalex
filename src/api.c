@@ -4,7 +4,7 @@
  *
  * Author: Rodrigo Freitas
  * Created at: Sat Dec 13 22:21:54 2014
- * Project: libalex
+ * Project: libgrc
  *
  * Copyright (c) 2014 Rodrigo Freitas
  *
@@ -24,14 +24,14 @@
  * USA
  */
 
-#include "libalex.h"
+#include "libgrc.h"
 #include "gui/objects.h"
 
 #define LOAD_FROM_MEM       0
 #define LOAD_FROM_FILE      1
 #define LOAD_BARE_DATA      2
 
-static int start_grc(struct al_grc *grc __attribute__((unused)))
+static int start_grc(grc_t *grc __attribute__((unused)))
 {
 /*    if (grc->use_gfx == true) {
         if (gui_change_resolution(grc) < 0)
@@ -44,13 +44,14 @@ static int start_grc(struct al_grc *grc __attribute__((unused)))
     return 0;
 }
 
-static struct al_grc *al_grc_init(const char *grc_data, int load_mode,
+static grc_t *grc_init(const char *grc_data, int load_mode,
     bool gfx)
 {
-    struct al_grc *grc;
+    grc_t *grc;
     int ret = 0;
+    struct gfx_info_s *info;
 
-    al_errno_clear();
+    grc_errno_clear();
     grc = new_grc();
 
     if (NULL == grc)
@@ -68,16 +69,17 @@ static struct al_grc *al_grc_init(const char *grc_data, int load_mode,
          */
         return grc;
     } else {
-        al_set_errno(AL_ERROR_INVALID_LOAD_MODE);
+        grc_set_errno(GRC_ERROR_INVALID_LOAD_MODE);
         goto end_block;
     }
 
     if (ret < 0) {
-        al_set_errno(AL_ERROR_PARSE_GRC);
+        grc_set_errno(GRC_ERROR_PARSE_GRC);
         goto end_block;
     }
 
-    grc->use_gfx = gfx;
+    info = grc_get_info(grc);
+    info_set_value(info, INFO_USE_GFX, gfx, NULL);
 
     if (info_parse(grc) < 0)
         goto end_block;
@@ -104,30 +106,30 @@ end_block:
     return NULL;
 }
 
-struct al_grc LIBEXPORT *al_grc_init_from_file(const char *grc_file,
+grc_t LIBEXPORT *grc_init_from_file(const char *grc_file,
     bool gfx)
 {
-    return al_grc_init(grc_file, LOAD_FROM_FILE, gfx);
+    return grc_init(grc_file, LOAD_FROM_FILE, gfx);
 }
 
-struct al_grc LIBEXPORT *al_grc_init_from_mem(const char *data,
+grc_t LIBEXPORT *grc_init_from_mem(const char *data,
     bool gfx)
 {
-    return al_grc_init(data, LOAD_FROM_MEM, gfx);
+    return grc_init(data, LOAD_FROM_MEM, gfx);
 }
 
-struct al_grc LIBEXPORT *al_grc_create(void)
+grc_t LIBEXPORT *grc_create(void)
 {
-    return al_grc_init(NULL, LOAD_BARE_DATA, 0);
+    return grc_init(NULL, LOAD_BARE_DATA, 0);
 }
 
 /* TODO: Why do we need this function? */
-int LIBEXPORT al_grc_init_from_bare_data(struct al_grc *grc)
+int LIBEXPORT grc_init_from_bare_data(grc_t *grc)
 {
-    al_errno_clear();
+    grc_errno_clear();
 
     if (NULL == grc) {
-        al_set_errno(AL_ERROR_NULL_ARG);
+        grc_set_errno(GRC_ERROR_NULL_ARG);
         return -1;
     }
 
@@ -136,17 +138,21 @@ int LIBEXPORT al_grc_init_from_bare_data(struct al_grc *grc)
     return start_grc(grc);
 }
 
-int LIBEXPORT al_grc_uninit(struct al_grc *grc)
+int LIBEXPORT grc_uninit(grc_t *grc)
 {
-    al_errno_clear();
+    struct gfx_info_s *info;
+
+    grc_errno_clear();
 
     if (NULL == grc) {
-        al_set_errno(AL_ERROR_NULL_ARG);
+        grc_set_errno(GRC_ERROR_NULL_ARG);
         return -1;
     }
 
+    info = grc_get_info(grc);
+
     /* Return the gfx to text mode */
-    if (grc->use_gfx == true)
+    if (info_get_value(info, INFO_USE_GFX) == true)
         gui_reset_resolution();
 
     /* Free the object */
@@ -156,38 +162,45 @@ int LIBEXPORT al_grc_uninit(struct al_grc *grc)
     return 0;
 }
 
-int LIBEXPORT al_grc_prepare_dialog(struct al_grc *grc)
+int LIBEXPORT grc_prepare_dialog(grc_t *grc)
 {
     int ret;
+    struct gfx_info_s *info;
 
-    al_errno_clear();
+    grc_errno_clear();
 
     if (NULL == grc) {
-        al_set_errno(AL_ERROR_NULL_ARG);
+        grc_set_errno(GRC_ERROR_NULL_ARG);
         return -1;
     }
 
     ret = DIALOG_create(grc);
 
-    if (ret == 0)
+    if (ret == 0) {
         /* And now we're prepared to run the DIALOG */
-        grc->are_we_prepared = true;
+        info = grc_get_info(grc);
+        info_set_value(info, INFO_ARE_WE_PREPARED, true, NULL);
+    }
 
     return ret;
 }
 
-int LIBEXPORT al_grc_do_dialog(struct al_grc *grc)
+int LIBEXPORT grc_do_dialog(grc_t *grc)
 {
-    al_errno_clear();
+    struct gfx_info_s *info;
+
+    grc_errno_clear();
 
     if (NULL == grc) {
-        al_set_errno(AL_ERROR_NULL_ARG);
+        grc_set_errno(GRC_ERROR_NULL_ARG);
         return -1;
     }
 
+    info = grc_get_info(grc);
+
     /* We're not prepared to run the DIALOG yet */
-    if (grc->are_we_prepared == false) {
-        al_set_errno(AL_ERROR_NOT_PREPARED_YET);
+    if (info_get_value(info, INFO_ARE_WE_PREPARED) == false) {
+        grc_set_errno(GRC_ERROR_NOT_PREPARED_YET);
         return -1;
     }
 
@@ -196,16 +209,16 @@ int LIBEXPORT al_grc_do_dialog(struct al_grc *grc)
     return 0;
 }
 
-int LIBEXPORT al_grc_set_callback(struct al_grc *grc, const char *object_name,
-    int (*callback)(struct callback_data *), void *arg)
+int LIBEXPORT grc_set_callback(grc_t *grc, const char *object_name,
+    int (*callback)(grc_callback_data_t *), void *arg)
 {
     DIALOG *d;
     MENU *m;
 
-    al_errno_clear();
+    grc_errno_clear();
 
     if (NULL == grc) {
-        al_set_errno(AL_ERROR_NULL_ARG);
+        grc_set_errno(GRC_ERROR_NULL_ARG);
         return -1;
     }
 
@@ -234,60 +247,60 @@ int LIBEXPORT al_grc_set_callback(struct al_grc *grc, const char *object_name,
 /*
  * TODO: Change this to use a cvalue_t.
  */
-int LIBEXPORT al_grc_get_callback_data(struct callback_data *acd,
-    enum al_data_type data, ...)
+int LIBEXPORT grc_get_callback_data(grc_callback_data_t *acd,
+    enum grc_object_member member, ...)
 {
     va_list ap;
     int ret;
 
-    al_errno_clear();
+    grc_errno_clear();
 
     if (NULL == acd) {
-        al_set_errno(AL_ERROR_NULL_ARG);
+        grc_set_errno(GRC_ERROR_NULL_ARG);
         return -1;
     }
 
     va_start(ap, NULL);
-    ret = get_callback_data(acd, data, ap);
+    ret = get_callback_data(acd, member, ap);
     va_end(ap);
 
     return ret;
 }
 
-void LIBEXPORT *al_grc_get_callback_user_arg(struct callback_data *acd)
+void LIBEXPORT *grc_get_callback_user_arg(grc_callback_data_t *acd)
 {
-    al_errno_clear();
+    grc_errno_clear();
 
     if (NULL == acd) {
-        al_set_errno(AL_ERROR_NULL_ARG);
+        grc_set_errno(GRC_ERROR_NULL_ARG);
         return NULL;
     }
 
     return get_callback_user_arg(acd);
 }
 
-struct al_grc LIBEXPORT *al_grc_get_callback_grc(struct callback_data *acd)
+grc_t LIBEXPORT *grc_get_callback_grc(grc_callback_data_t *acd)
 {
-    al_errno_clear();
+    grc_errno_clear();
 
     if (NULL == acd) {
-        al_set_errno(AL_ERROR_NULL_ARG);
+        grc_set_errno(GRC_ERROR_NULL_ARG);
         return NULL;
     }
 
     return get_callback_grc(acd);
 }
 
-int LIBEXPORT al_grc_object_set_data(struct al_grc *grc, const char *object_name,
-    enum al_data_type type, void *data)
+int LIBEXPORT grc_object_set_data(grc_t *grc, const char *object_name,
+    enum grc_object_member member, void *data)
 {
     DIALOG *d;
     int s;
 
-    al_errno_clear();
+    grc_errno_clear();
 
     if (NULL == grc) {
-        al_set_errno(AL_ERROR_NULL_ARG);
+        grc_set_errno(GRC_ERROR_NULL_ARG);
         return -1;
     }
 
@@ -296,9 +309,9 @@ int LIBEXPORT al_grc_object_set_data(struct al_grc *grc, const char *object_name
     if (NULL == d)
         return -1;
 
-    switch (type) {
-        case AL_DT_RADIO_STATE:
-        case AL_DT_CHECKBOX_STATE:
+    switch (member) {
+        case GRC_MEMBER_RADIO_STATE:
+        case GRC_MEMBER_CHECKBOX_STATE:
             s = *((int *)&data);
 
             if (s == true)
@@ -308,29 +321,29 @@ int LIBEXPORT al_grc_object_set_data(struct al_grc *grc, const char *object_name
 
             break;
 
-        case AL_DT_D1:
-        case AL_DT_SLIDER_LIMIT:
+        case GRC_MEMBER_D1:
+        case GRC_MEMBER_SLIDER_LIMIT:
             d->d1 = *((int *)&data);
             break;
 
-        case AL_DT_D2:
-        case AL_DT_SLIDER_POSITION:
+        case GRC_MEMBER_D2:
+        case GRC_MEMBER_SLIDER_POSITION:
             d->d2 = *((int *)&data);
             break;
 
-        case AL_DT_DP:
-        case AL_DT_EDIT_VALUE:
-        case AL_DT_TEXT:
-        case AL_DT_LIST_CONTENT_BUILD:
-        case AL_DT_ICON:
+        case GRC_MEMBER_DP:
+        case GRC_MEMBER_EDIT_VALUE:
+        case GRC_MEMBER_TEXT:
+        case GRC_MEMBER_LIST_CONTENT_BUILD:
+        case GRC_MEMBER_ICON:
             d->dp = data;
             break;
 
-        case AL_DT_DP2:
+        case GRC_MEMBER_DP2:
             d->dp2 = data;
             break;
 
-        case AL_DT_DP3:
+        case GRC_MEMBER_DP3:
             /*
              * To keep a standard in all object implemented internally we
              * manipulate the callback structure from the object.
@@ -339,22 +352,22 @@ int LIBEXPORT al_grc_object_set_data(struct al_grc *grc, const char *object_name
             break;
 
         default:
-            al_set_errno(AL_ERROR_UNSUPPORTED_DATA_TYPE);
+            grc_set_errno(GRC_ERROR_UNSUPPORTED_DATA_TYPE);
             return -1;
     }
 
     return 0;
 }
 
-int LIBEXPORT al_grc_object_set_proc(struct al_grc *grc,
+int LIBEXPORT grc_object_set_proc(grc_t *grc,
     const char *object_name, int (*function)(int, DIALOG *, int))
 {
     DIALOG *d;
 
-    al_errno_clear();
+    grc_errno_clear();
 
     if (NULL == grc) {
-        al_set_errno(AL_ERROR_NULL_ARG);
+        grc_set_errno(GRC_ERROR_NULL_ARG);
         return -1;
     }
 
@@ -368,15 +381,15 @@ int LIBEXPORT al_grc_object_set_proc(struct al_grc *grc,
     return 0;
 }
 
-int LIBEXPORT al_grc_object_send_message(struct al_grc *grc,
+int LIBEXPORT grc_object_send_message(grc_t *grc,
     const char *object_name, int msg, int c)
 {
     DIALOG *d;
 
-    al_errno_clear();
+    grc_errno_clear();
 
     if (NULL == grc) {
-        al_set_errno(AL_ERROR_NULL_ARG);
+        grc_set_errno(GRC_ERROR_NULL_ARG);
         return -1;
     }
 
@@ -390,8 +403,8 @@ int LIBEXPORT al_grc_object_send_message(struct al_grc *grc,
     return 0;
 }
 
-void LIBEXPORT *al_grc_object_get_data(struct al_grc *grc,
-    const char *object_name, enum al_data_type type, ...)
+void LIBEXPORT *grc_object_get_data(grc_t *grc,
+    const char *object_name, enum grc_object_member member, ...)
 {
     const char *ifmt = "%d\0";
     va_list ap;
@@ -400,10 +413,10 @@ void LIBEXPORT *al_grc_object_get_data(struct al_grc *grc,
     int value = -1;
     DIALOG *d;
 
-    al_errno_clear();
+    grc_errno_clear();
 
     if (NULL == grc) {
-        al_set_errno(AL_ERROR_NULL_ARG);
+        grc_set_errno(GRC_ERROR_NULL_ARG);
         return NULL;
     }
 
@@ -414,9 +427,9 @@ void LIBEXPORT *al_grc_object_get_data(struct al_grc *grc,
 
     va_start(ap, NULL);
 
-    switch (type) {
-        case AL_DT_RADIO_STATE:
-        case AL_DT_CHECKBOX_STATE:
+    switch (member) {
+        case GRC_MEMBER_RADIO_STATE:
+        case GRC_MEMBER_CHECKBOX_STATE:
             if (d->flags & D_SELECTED)
                 value = 1;
             else
@@ -424,33 +437,33 @@ void LIBEXPORT *al_grc_object_get_data(struct al_grc *grc,
 
             break;
 
-        case AL_DT_D1:
-        case AL_DT_SLIDER_LIMIT:
-        case AL_DT_LIST_POSITION:
+        case GRC_MEMBER_D1:
+        case GRC_MEMBER_SLIDER_LIMIT:
+        case GRC_MEMBER_LIST_POSITION:
             value = d->d1;
             break;
 
-        case AL_DT_D2:
-        case AL_DT_SLIDER_POSITION:
+        case GRC_MEMBER_D2:
+        case GRC_MEMBER_SLIDER_POSITION:
             value = d->d2;
             break;
 
-        case AL_DT_DP:
-        case AL_DT_EDIT_VALUE:
-        case AL_DT_TEXT:
+        case GRC_MEMBER_DP:
+        case GRC_MEMBER_EDIT_VALUE:
+        case GRC_MEMBER_TEXT:
             data = d->dp;
             break;
 
-        case AL_DT_DP2:
+        case GRC_MEMBER_DP2:
             data = d->dp2;
             break;
 
-        case AL_DT_DP3:
+        case GRC_MEMBER_DP3:
             data = d->dp3;
             break;
 
         default:
-            al_set_errno(AL_ERROR_UNSUPPORTED_DATA_TYPE);
+            grc_set_errno(GRC_ERROR_UNSUPPORTED_DATA_TYPE);
             return NULL;
     }
 
@@ -470,14 +483,14 @@ void LIBEXPORT *al_grc_object_get_data(struct al_grc *grc,
     return data;
 }
 
-int LIBEXPORT al_grc_object_hide(struct al_grc *grc, const char *object_name)
+int LIBEXPORT grc_object_hide(grc_t *grc, const char *object_name)
 {
     DIALOG *d;
 
-    al_errno_clear();
+    grc_errno_clear();
 
     if (NULL == grc) {
-        al_set_errno(AL_ERROR_NULL_ARG);
+        grc_set_errno(GRC_ERROR_NULL_ARG);
         return -1;
     }
 
@@ -491,14 +504,14 @@ int LIBEXPORT al_grc_object_hide(struct al_grc *grc, const char *object_name)
     return 0;
 }
 
-int LIBEXPORT al_grc_object_show(struct al_grc *grc, const char *object_name)
+int LIBEXPORT grc_object_show(grc_t *grc, const char *object_name)
 {
     DIALOG *d;
 
-    al_errno_clear();
+    grc_errno_clear();
 
     if (NULL == grc) {
-        al_set_errno(AL_ERROR_NULL_ARG);
+        grc_set_errno(GRC_ERROR_NULL_ARG);
         return -1;
     }
 
@@ -512,15 +525,15 @@ int LIBEXPORT al_grc_object_show(struct al_grc *grc, const char *object_name)
     return 0;
 }
 
-int LIBEXPORT al_grc_log(struct al_grc *grc, const char *object_name,
+int LIBEXPORT grc_log(grc_t *grc, const char *object_name,
     const char *msg, const char *color)
 {
     DIALOG *d;
 
-    al_errno_clear();
+    grc_errno_clear();
 
     if (NULL == grc) {
-        al_set_errno(AL_ERROR_NULL_ARG);
+        grc_set_errno(GRC_ERROR_NULL_ARG);
         return -1;
     }
 
@@ -538,14 +551,14 @@ int LIBEXPORT al_grc_log(struct al_grc *grc, const char *object_name,
     return 0;
 }
 
-int LIBEXPORT al_grc_list_get_selected_index(struct al_grc *grc,
+int LIBEXPORT grc_list_get_selected_index(grc_t *grc,
     const char *object_name)
 {
     int p = -1;
 
-    if ((al_grc_object_get_data(grc, object_name, AL_DT_LIST_POSITION,
-                                &p) == NULL) &&
-        (al_get_last_error() != AL_NO_ERROR))
+    if ((grc_object_get_data(grc, object_name, GRC_MEMBER_LIST_POSITION,
+                             &p) == NULL) &&
+        (grc_get_last_error() != GRC_NO_ERROR))
     {
         return -1;
     }
@@ -553,14 +566,14 @@ int LIBEXPORT al_grc_list_get_selected_index(struct al_grc *grc,
     return p;
 }
 
-int LIBEXPORT al_grc_checkbox_get_status(struct al_grc *grc,
+int LIBEXPORT grc_checkbox_get_status(grc_t *grc,
     const char *object_name)
 {
     int st = -1;
 
-    if ((al_grc_object_get_data(grc, object_name, AL_DT_CHECKBOX_STATE,
-                                &st) == NULL) &&
-        (al_get_last_error() != AL_NO_ERROR))
+    if ((grc_object_get_data(grc, object_name, GRC_MEMBER_CHECKBOX_STATE,
+                             &st) == NULL) &&
+        (grc_get_last_error() != GRC_NO_ERROR))
     {
         return -1;
     }
@@ -568,14 +581,14 @@ int LIBEXPORT al_grc_checkbox_get_status(struct al_grc *grc,
     return st;
 }
 
-int LIBEXPORT al_grc_radio_get_status(struct al_grc *grc,
+int LIBEXPORT grc_radio_get_status(grc_t *grc,
     const char *object_name)
 {
     int st = -1;
 
-    if ((al_grc_object_get_data(grc, object_name, AL_DT_RADIO_STATE,
-                                &st) == NULL) &&
-        (al_get_last_error() != AL_NO_ERROR))
+    if ((grc_object_get_data(grc, object_name, GRC_MEMBER_RADIO_STATE,
+                             &st) == NULL) &&
+        (grc_get_last_error() != GRC_NO_ERROR))
     {
         return -1;
     }
@@ -583,25 +596,25 @@ int LIBEXPORT al_grc_radio_get_status(struct al_grc *grc,
     return st;
 }
 
-char LIBEXPORT *al_grc_edit_get_data(struct al_grc *grc,
+char LIBEXPORT *grc_edit_get_data(grc_t *grc,
     const char *object_name)
 {
     char *v = NULL;
 
-    v = (char *)al_grc_object_get_data(grc, object_name, AL_DT_EDIT_VALUE,
-                                       NULL);
+    v = (char *)grc_object_get_data(grc, object_name, GRC_MEMBER_EDIT_VALUE,
+                                    NULL);
 
     return v;
 }
 
-/*int al_grc_set_bitmap_mem(struct al_grc *grc, const char *object_name,
+/*int grc_set_bitmap_mem(grc_t *grc, const char *object_name,
     unsigned char *bimg, unsigned int bsize, int image_fmt)
 {
 //    object_message(d, MSG_LOAD_IMAGE, c);
     return -1;
 }
 
-int al_grc_set_bitmap(struct al_grc *grc, const char *object_name,
+int grc_set_bitmap(grc_t *grc, const char *object_name,
     const char *filename, int image_fmt)
 {
     return -1;

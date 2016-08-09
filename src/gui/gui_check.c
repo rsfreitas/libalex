@@ -4,7 +4,7 @@
  *
  * Author: Rodrigo Freitas
  * Created at: Sun Dec 14 21:00:35 2014
- * Project: libalex
+ * Project: libgrc
  *
  * Copyright (c) 2014 Rodrigo Freitas
  *
@@ -24,7 +24,7 @@
  * USA
  */
 
-#include "libalex.h"
+#include "libgrc.h"
 
 int gui_d_check_proc(int msg, DIALOG *d, int c)
 {

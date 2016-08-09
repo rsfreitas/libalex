@@ -4,7 +4,7 @@
  *
  * Author: Rodrigo Freitas
  * Created at: Mon Dec 29 11:41:01 2014
- * Project: libalex
+ * Project: libgrc
  *
  * Copyright (c) 2014 Rodrigo Freitas
  *
@@ -24,7 +24,7 @@
  * USA
  */
 
-#include "libalex.h"
+#include "libgrc.h"
 
 int gui_d_textbox_proc(int msg, DIALOG *d, int c)
 {

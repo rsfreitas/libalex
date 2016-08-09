@@ -4,7 +4,7 @@
  *
  * Author: Rodrigo Freitas
  * Created at: Mon Dec 29 10:11:13 2014
- * Project: libalex
+ * Project: libgrc
  *
  * Copyright (c) 2014 Rodrigo Freitas
  *
@@ -24,7 +24,7 @@
  * USA
  */
 
-#include "libalex.h"
+#include "libgrc.h"
 
 /*
  * This is a copy from Allegro's 'd_icon_proc' without the capability of use

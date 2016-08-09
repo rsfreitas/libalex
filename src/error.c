@@ -4,7 +4,7 @@
  *
  * Author: Rodrigo Freitas
  * Created at: Wed Dec 10 17:18:41 2014
- * Project: libalex
+ * Project: libgrc
  *
  * Copyright (c) 2014 Rodrigo Freitas
  *
@@ -24,7 +24,7 @@
  * USA
  */
 
-#include "libalex.h"
+#include "libgrc.h"
 
 static const char *__error_descriptions[] = {
     "Ok",
@@ -52,27 +52,27 @@ static const char *__error_descriptions[] = {
     "The DIALOG is not prepared to run"
 };
 
-static int __al_errno;
+static int __grc_errno;
 static const char *__unknown_error = "Unknown error";
 
-void al_errno_clear(void)
+void grc_errno_clear(void)
 {
-    __al_errno = AL_NO_ERROR;
+    __grc_errno = GRC_NO_ERROR;
 }
 
-void al_set_errno(enum al_error_code code)
+void grc_set_errno(enum grc_error_code code)
 {
-    __al_errno = code;
+    __grc_errno = code;
 }
 
-enum al_error_code LIBEXPORT al_get_last_error(void)
+enum grc_error_code LIBEXPORT grc_get_last_error(void)
 {
-    return __al_errno;
+    return __grc_errno;
 }
 
-const char LIBEXPORT *al_strerror(enum al_error_code code)
+const char LIBEXPORT *grc_strerror(enum grc_error_code code)
 {
-    if (code >= AL_MAX_ERROR_CODE)
+    if (code >= GRC_MAX_ERROR_CODE)
         return __unknown_error;
 
     return __error_descriptions[code];

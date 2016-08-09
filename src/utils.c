@@ -4,7 +4,7 @@
  *
  * Author: Rodrigo Freitas
  * Created at: Thu Jul 28 09:01:31 2016
- * Project: libalex
+ * Project: libgrc
  *
  * Copyright (c) 2014 Rodrigo Freitas
  *
@@ -26,35 +26,35 @@
 
 #include <ctype.h>
 
-#include "libalex.h"
+#include "libgrc.h"
 
 /* Used to map possible objects from a DIALOG */
 struct grc_dlg_object {
     char                name[256];
-    enum al_grc_object  type;
+    enum grc_object     type;
 };
 
 /* Supported objects from a DIALOG */
 static struct grc_dlg_object __dlg_objects [] = {
-    { DLG_OBJ_KEY,              AL_GRC_OBJ_KEY                  },
-    { DLG_OBJ_BOX,              AL_GRC_OBJ_BOX                  },
-    { DLG_OBJ_DIGITAL_CLOCK,    AL_GRC_OBJ_DIGITAL_CLOCK        },
-    { DLG_OBJ_IMAGE,            AL_GRC_OBJ_IMAGE                },
-    { DLG_OBJ_MESSAGES_LOG_BOX, AL_GRC_OBJ_MESSAGES_LOG_BOX     },
-    { DLG_OBJ_VAR_TEXT,         AL_GRC_OBJ_VAR_TEXT             },
-    { DLG_OBJ_FIXED_TEXT,       AL_GRC_OBJ_FIXED_TEXT           },
-    { DLG_OBJ_CUSTOM,           AL_GRC_OBJ_CUSTOM               },
-    { DLG_OBJ_BUTTON,           AL_GRC_OBJ_BUTTON               },
-    { DLG_OBJ_EDIT,             AL_GRC_OBJ_EDIT                 },
-    { DLG_OBJ_LIST,             AL_GRC_OBJ_LIST                 },
-    { DLG_OBJ_CHECKBOX,         AL_GRC_OBJ_CHECK                },
-    { DLG_OBJ_RADIO,            AL_GRC_OBJ_RADIO                },
-    { DLG_OBJ_SLIDER,           AL_GRC_OBJ_SLIDER               },
-    { DLG_OBJ_LIVE_IMAGE,       AL_GRC_OBJ_LIVE_IMAGE           },
-    { DLG_OBJ_MULTLIVE_IMAGE,   AL_GRC_OBJ_MULTLIVE_IMAGE       },
-    { DLG_OBJ_VT_KEYBOARD,      AL_GRC_OBJ_VT_KEYBOARD          },
-    { DLG_OBJ_ICON,             AL_GRC_OBJ_ICON                 },
-    { DLG_OBJ_TEXTBOX,          AL_GRC_OBJ_TEXTBOX              }
+    { DLG_OBJ_KEY,              GRC_OBJECT_KEY                  },
+    { DLG_OBJ_BOX,              GRC_OBJECT_BOX                  },
+    { DLG_OBJ_DIGITAL_CLOCK,    GRC_OBJECT_DIGITAL_CLOCK        },
+    { DLG_OBJ_IMAGE,            GRC_OBJECT_IMAGE                },
+    { DLG_OBJ_MESSAGES_LOG_BOX, GRC_OBJECT_MESSAGES_LOG_BOX     },
+    { DLG_OBJ_VAR_TEXT,         GRC_OBJECT_VAR_TEXT             },
+    { DLG_OBJ_FIXED_TEXT,       GRC_OBJECT_FIXED_TEXT           },
+    { DLG_OBJ_CUSTOM,           GRC_OBJECT_CUSTOM               },
+    { DLG_OBJ_BUTTON,           GRC_OBJECT_BUTTON               },
+    { DLG_OBJ_EDIT,             GRC_OBJECT_EDIT                 },
+    { DLG_OBJ_LIST,             GRC_OBJECT_LIST                 },
+    { DLG_OBJ_CHECKBOX,         GRC_OBJECT_CHECK                },
+    { DLG_OBJ_RADIO,            GRC_OBJECT_RADIO                },
+    { DLG_OBJ_SLIDER,           GRC_OBJECT_SLIDER               },
+    { DLG_OBJ_LIVE_IMAGE,       GRC_OBJECT_LIVE_IMAGE           },
+    { DLG_OBJ_MULTLIVE_IMAGE,   GRC_OBJECT_MULTLIVE_IMAGE       },
+    { DLG_OBJ_VT_KEYBOARD,      GRC_OBJECT_VT_KEYBOARD          },
+    { DLG_OBJ_ICON,             GRC_OBJECT_ICON                 },
+    { DLG_OBJ_TEXTBOX,          GRC_OBJECT_TEXTBOX              }
 };
 
 #define MAX_DLG_SUPPORTED_OBJECTS   \
@@ -127,10 +127,10 @@ int tr_line_break(const char *mode)
 {
     /* default option in case there is no key */
     if ((NULL == mode) || !strcmp(mode, LBREAK_SMART_STR))
-        return AL_GRC_LBREAK_SMART;
+        return GRC_LINE_BREAK_SMART;
 
     if (!strcmp(mode, LBREAK_RAW_STR))
-        return AL_GRC_LBREAK_RAW;
+        return GRC_LINE_BREAK_RAW;
 
     return -1;
 }
@@ -142,10 +142,10 @@ int tr_radio_type(const char *type)
 {
     /* default option in case there is no key */
     if ((NULL == type) || !strcmp(type, RADIO_CIRCLE))
-        return AL_GRC_RADIO_CIRCLE;
+        return GRC_RADIO_CIRCLE;
 
     if (!strcmp(type, RADIO_SQUARE))
-        return AL_GRC_RADIO_SQUARE;
+        return GRC_RADIO_SQUARE;
 
     return -1;
 }
@@ -157,54 +157,54 @@ int tr_horizontal_position(const char *pos)
 {
     /* default option in case there is no key */
     if ((NULL == pos) || !strcmp(pos, POS_H_RIGHT))
-        return AL_GRC_H_POS_RIGHT;
+        return GRC_H_POS_RIGHT;
 
     if (!strcmp(pos, POS_H_LEFT))
-        return AL_GRC_H_POS_LEFT;
+        return GRC_H_POS_LEFT;
 
     return -1;
 }
 
-const char *str_line_break(enum al_grc_line_break lbreak)
+const char *str_line_break(enum grc_line_break lbreak)
 {
     switch (lbreak) {
-        case AL_GRC_LBREAK_SMART:
+        case GRC_LINE_BREAK_SMART:
             return LBREAK_SMART_STR;
 
-        case AL_GRC_LBREAK_RAW:
+        case GRC_LINE_BREAK_RAW:
             return LBREAK_RAW_STR;
     }
 
     return NULL;
 }
 
-const char *str_radio_type(enum al_grc_radio_button_fmt radio)
+const char *str_radio_type(enum grc_radio_button_fmt radio)
 {
     switch (radio) {
-        case AL_GRC_RADIO_CIRCLE:
+        case GRC_RADIO_CIRCLE:
             return RADIO_CIRCLE;
 
-        case AL_GRC_RADIO_SQUARE:
+        case GRC_RADIO_SQUARE:
             return RADIO_SQUARE;
     }
 
     return NULL;
 }
 
-const char *str_horizontal_position(enum al_grc_hpos hpos)
+const char *str_horizontal_position(enum grc_horizontal_position hpos)
 {
     switch (hpos) {
-        case AL_GRC_H_POS_RIGHT:
+        case GRC_H_POS_RIGHT:
             return POS_H_RIGHT;
 
-        case AL_GRC_H_POS_LEFT:
+        case GRC_H_POS_LEFT:
             return POS_H_LEFT;
     }
 
     return NULL;
 }
 
-const char *str_grc_obj_type(enum al_grc_object obj)
+const char *str_grc_obj_type(enum grc_object obj)
 {
     unsigned int i;
     char *n = NULL;
@@ -218,7 +218,7 @@ const char *str_grc_obj_type(enum al_grc_object obj)
     return n;
 }
 
-cjson_t *grc_get_object(struct al_grc *grc, const char *object)
+cjson_t *grc_get_object(struct grc_s *grc, const char *object)
 {
     return cjson_get_object_item(grc->jgrc, object);
 }

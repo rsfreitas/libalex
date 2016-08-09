@@ -1,6 +1,6 @@
 
 /*
- * Description: An example of libalex API do handle simple DIALOGs, without
+ * Description: An example of libgrc API do handle simple DIALOGs, without
  *              function callbacks and other complicated stuff.
  *
  * Author: Rodrigo Freitas
@@ -11,7 +11,7 @@
 #include <stdlib.h>
 #include <unistd.h>
 
-#include "libalex.h"
+#include "libgrc.h"
 
 int main(int argc, char **argv)
 {
@@ -33,21 +33,21 @@ int main(int argc, char **argv)
         }
     } while (option != -1);
 
-    grc = al_grc_init_from_file(filename, true);
+    grc = grc_init_from_file(filename, true);
 
     if (NULL == grc) {
-        fprintf(stderr, "Error: %s\n", al_strerror(al_get_last_error()));
+        fprintf(stderr, "Error: %s\n", grc_strerror(grc_get_last_error()));
         goto end_block;
     }
 
-    al_grc_prepare_dialog(grc);
+    grc_prepare_dialog(grc);
 
-    if (al_grc_do_dialog(grc) < 0)
-        fprintf(stderr, "Error: %s\n", al_strerror(al_get_last_error()));
+    if (grc_do_dialog(grc) < 0)
+        fprintf(stderr, "Error: %s\n", grc_strerror(grc_get_last_error()));
 
 end_block:
     if (grc != NULL)
-        al_grc_uninit(grc);
+        grc_uninit(grc);
 
     if (filename != NULL)
         free(filename);
