@@ -4,7 +4,7 @@
  *
  * Author: Rodrigo Freitas
  * Created at: Tue Dec  9 22:44:20 2014
- * Project: libalex
+ * Project: libgrc
  *
  * Copyright (c) 2014 Rodrigo Freitas
  *
@@ -24,8 +24,8 @@
  * USA
  */
 
-#ifndef _LIBALEX_INTERNAL_H
-#define _LIBALEX_INTERNAL_H         1
+#ifndef _LIBGRC_INTERNAL_H
+#define _LIBGRC_INTERNAL_H         1
 
 /** Defines */
 
@@ -33,9 +33,9 @@
 #define MAX_EDIT_SIZE               1024
 
 /* Default main window resolution and color */
-#define AL_DEFAULT_WIDTH            800
-#define AL_DEFAULT_HEIGHT           600
-#define AL_DEFAULT_COLOR_DEPTH      32
+#define DEFAULT_WIDTH               800
+#define DEFAULT_HEIGHT              600
+#define DEFAULT_COLOR_DEPTH         32
 
 /* Main objects of a GRC file */
 #define OBJ_INFO                    "info"
@@ -121,9 +121,9 @@
 /** Enumerators */
 
 /* Keyboard layout */
-enum grc_keyboard_layout {
-    GRC_KLAYOUT_LETTERS,
-    GRC_KLAYOUT_NUMBERS
+enum keyboard_layout {
+    KEYBOARD_LAYOUT_LETTERS,
+    KEYBOARD_LAYOUT_NUMBERS
 };
 
 /* Values supported inside a GRC file */
@@ -135,10 +135,31 @@ enum grc_entry_type_value {
 
 /* Internal known objects */
 enum grc_object_type {
-    GRC_OBJ_STANDARD,
-    GRC_OBJ_MENU,
-    GRC_OBJ_KEY,
-    GRC_OBJ_MENU_ITEM
+    STANDARD_OBJECT,
+    MENU_OBJECT,
+    KEY_OBJECT,
+    MENU_ITEM_OBJECT
+};
+
+/* Global DIALOG info */
+enum gfx_info {
+    INFO_USE_GFX,
+    INFO_ARE_WE_PREPARED,
+    INFO_LINE_BREAK,
+    INFO_IGNORE_ESC_KEY,
+    INFO_VIRTUAL_KEYBOARD,
+    INFO_ESC_KEY_USER_DEFINED,
+    INFO_WIDTH,
+    INFO_HEIGHT,
+    INFO_COLOR_DEPTH,
+    INFO_BLOCK_KEYS,
+    INFO_USE_MOUSE
+};
+
+/* DIALOG colors */
+enum gfx_color {
+    COLOR_FG,
+    COLOR_BG
 };
 
 /** Structures */
@@ -153,10 +174,10 @@ struct property_detail;
 struct callback_data;
 
 /** Main UI informations */
-struct gfx_info;
+struct gfx_info_s;
 
 /** DIALOG colors */
-struct gfx_color;
+struct gfx_color_s;
 
 struct grc_generic_data {
     clist_t     *prev;
@@ -164,7 +185,7 @@ struct grc_generic_data {
     char        data[MAX_EDIT_SIZE];
 };
 
-struct grc_object {
+struct grc_object_s {
     clist_t                     *prev;
     clist_t                     *next;
 
@@ -181,11 +202,11 @@ struct grc_object {
 
     /* Is this a menu? */
     MENU                        *menu;
-    struct grc_object           *items;
+    struct grc_object_s         *items;
 };
 
 /* Main structure to handle an Allegro DIALOG */
-struct al_grc {
+struct grc_s {
     /* GRC is a JSON object inside */
     cjson_t                 *jgrc;
 
@@ -193,18 +214,15 @@ struct al_grc {
      * Even having a DIALOG structure inside every grc_object we keep this
      * to be the real DIALOG, the one used by Allegro.
      */
-    DIALOG                  *al_dlg;
-    struct grc_object       *ui_objects;
-    struct grc_object       *tmp_objects;
-    struct grc_object       *ui_keys;
-    struct grc_object       *ui_menu;
+    DIALOG                  *dlg;
+    struct grc_object_s     *ui_objects;
+    struct grc_object_s     *tmp_objects;
+    struct grc_object_s     *ui_keys;
+    struct grc_object_s     *ui_menu;
 
-    /* Graphic mode info */
-    struct gfx_info         *info;
-
-    /* Main colors of the DIALOG */
-    int                     fg;
-    int                     bg;
+    /* Graphic mode info and colors */
+    struct gfx_info_s       *info;
+    struct gfx_color_s      *color;
 
     /*
      * Pointer to the 'edit' object that was selected when a virtual
@@ -217,61 +235,69 @@ struct al_grc {
     struct tm               dlg_tm;
 
     /* Temporary values while creating a GRC file. */
-    cjson_t                 *jtmp;
-    cjson_t                 *jtmp_obj;
+    void                    *internal;
+    void                    (*free_internal)(void *);
 };
 
 /** Prototypes */
 
 /* gui.c */
-int gui_init(struct al_grc *grc);
+int gui_init(struct grc_s *grc);
 void gui_reset_resolution(void);
-int DIALOG_create(struct al_grc *grc);
-void run_DIALOG(struct al_grc *grc);
+int DIALOG_create(struct grc_s *grc);
+void run_DIALOG(struct grc_s *grc);
 int grc_tr_color_to_al_color(int color_depth, const char *color);
-DIALOG *get_DIALOG_from_grc(struct al_grc *grc, const char *object_name);
-struct grc_menu *get_grc_menu_from_grc(struct al_grc *grc,
+DIALOG *get_DIALOG_from_grc(struct grc_s *grc, const char *object_name);
+struct grc_menu *get_grc_menu_from_grc(struct grc_s *grc,
                                        const char *object_name);
 
-MENU *get_MENU_from_grc(struct al_grc *grc, const char *object_name);
+MENU *get_MENU_from_grc(struct grc_s *grc, const char *object_name);
 
 /* parser.c */
 int grc_get_object_value(cjson_t *object, const char *object_name,
                          int default_value);
 
 cstring_t *grc_get_object_str(cjson_t *object, const char *object_name);
-int parse_file(struct al_grc *grc, const char *grc_filename);
-int parse_mem(struct al_grc *grc, const char *data);
-int parse_colors(struct al_grc *grc);
-int parse_objects(struct al_grc *grc);
+int parse_file(struct grc_s *grc, const char *grc_filename);
+int parse_mem(struct grc_s *grc, const char *data);
+int parse_colors(struct grc_s *grc);
+int parse_objects(struct grc_s *grc);
 
 /* error.c */
-void al_errno_clear(void);
-void al_set_errno(enum al_error_code code);
+void grc_errno_clear(void);
+void grc_set_errno(enum grc_error_code code);
 
 /* callback.c */
 struct callback_data *new_callback_data(void);
 void destroy_callback_data(void *a);
-void set_object_callback_data(struct grc_object *gobject,
-                              struct al_grc *grc);
+void set_object_callback_data(struct grc_object_s *gobject,
+                              struct grc_s *grc);
 
-int get_callback_data(struct callback_data *acd, enum al_data_type data,
+int get_callback_data(struct callback_data *acd, enum grc_object_member member,
                       va_list ap);
+
 void *get_callback_user_arg(struct callback_data *acd);
-struct al_grc *get_callback_grc(struct callback_data *acd);
-int set_callback(struct al_grc *grc, DIALOG *dlg,
-                 int (*callback)(struct callback_data *), void *arg);
+struct grc_s *get_callback_grc(struct callback_data *acd);
+int set_callback(struct grc_s *grc, DIALOG *dlg,
+                 int (*callback)(grc_callback_data_t *), void *arg);
 
 int run_callback(struct callback_data *acd, unsigned int default_return);
 void callback_set_int(struct callback_data *acd, int value);
 void callback_set_string(struct callback_data *acd, char *value);
 
 /* grc.c */
-struct al_grc *new_grc(void);
-void destroy_grc(struct al_grc *grc);
-void grc_creates_reference(struct al_grc *grc, struct grc_object *object);
-DIALOG *grc_get_DIALOG_from_tag(struct al_grc *grc, const char *tag);
-MENU *grc_get_MENU_from_tag(struct al_grc *grc, const char *tag);
+struct grc_s *new_grc(void);
+void destroy_grc(struct grc_s *grc);
+void grc_creates_reference(struct grc_s *grc, struct grc_object_s *object);
+DIALOG *grc_get_DIALOG_from_tag(struct grc_s *grc, const char *tag);
+MENU *grc_get_MENU_from_tag(struct grc_s *grc, const char *tag);
+struct gfx_info_s *grc_get_info(struct grc_s *grc);
+cjson_t *grc_get_JSON(struct grc_s *grc);
+int grc_set_JSON(struct grc_s *grc, cjson_t *json);
+void *grc_get_internal_data(struct grc_s *grc);
+void grc_release_internal_data(struct grc_s *grc);
+int grc_set_internal_data(struct grc_s *grc, void *ptr,
+                          void (*free_internal)(void *));
 
 /* grc_generic.c */
 struct grc_generic_data *new_grc_generic_data(void);
@@ -279,16 +305,16 @@ void destroy_grc_generic_data(void *a);
 
 /* grc_object.c */
 void destroy_grc_object(void *a);
-struct grc_object *new_grc_object(enum grc_object_type type);
-struct grc_obj_properties *grc_object_get_properties(struct grc_object *object);
-DIALOG *grc_object_get_DIALOG(struct grc_object *object);
-MENU *grc_object_get_MENU(struct grc_object *object);
-void grc_object_set_MENU(struct grc_object *object, MENU *menu);
-void grc_object_set_tag(struct grc_object *object, const char *tag);
-DIALOG *grc_object_get_DIALOG_from_tag(struct grc_object *object,
+struct grc_object_s *new_grc_object(enum grc_object_type type);
+struct grc_obj_properties *grc_object_get_properties(struct grc_object_s *object);
+DIALOG *grc_object_get_DIALOG(struct grc_object_s *object);
+MENU *grc_object_get_MENU(struct grc_object_s *object);
+void grc_object_set_MENU(struct grc_object_s *object, MENU *menu);
+void grc_object_set_tag(struct grc_object_s *object, const char *tag);
+DIALOG *grc_object_get_DIALOG_from_tag(struct grc_object_s *object,
                                        const char *tag);
 
-MENU *grc_object_get_MENU_from_tag(struct grc_object *object, const char *tag);
+MENU *grc_object_get_MENU_from_tag(struct grc_object_s *object, const char *tag);
 
 /* object_properties.c */
 void destroy_obj_properties(struct grc_obj_properties *odata);
@@ -301,7 +327,7 @@ const char *grc_obj_get_property_parent(struct grc_obj_properties *prop);
 const char *grc_obj_get_property_text(struct grc_obj_properties *prop);
 const char *grc_obj_get_property_fg(struct grc_obj_properties *prop);
 const char *grc_obj_get_property_key(struct grc_obj_properties *prop);
-enum al_grc_object grc_obj_get_property_type(struct grc_obj_properties *prop);
+enum grc_object grc_obj_get_property_type(struct grc_obj_properties *prop);
 int grc_obj_get_property_x(struct grc_obj_properties *prop);
 int grc_obj_get_property_y(struct grc_obj_properties *prop);
 int grc_obj_get_property_w(struct grc_obj_properties *prop);
@@ -315,7 +341,7 @@ int grc_obj_get_property_horizontal_position(struct grc_obj_properties *prop);
 bool grc_obj_get_property_hide(struct grc_obj_properties *prop);
 
 int grc_obj_set_property_type(struct grc_obj_properties *prop,
-                              enum al_grc_object type);
+                              enum grc_object type);
 
 #define PROP_get(prop, name)    \
     grc_obj_get_property_##name(prop)
@@ -326,9 +352,9 @@ int grc_obj_set_property_type(struct grc_obj_properties *prop,
 #define PROP_set(prop, name, value) \
     grc_obj_set_property_##name(prop, value)
 
-struct property_detail *get_property_detail(enum al_grc_object_property prop);
+struct property_detail *get_property_detail(enum grc_object_property prop);
 const char *property_detail_string(struct property_detail *d);
-enum al_grc_object_property property_detail(struct property_detail *d);
+enum grc_object_property property_detail(struct property_detail *d);
 enum grc_entry_type_value propery_detail_type(struct property_detail *d);
 
 /* utils.c */
@@ -338,25 +364,28 @@ int tr_line_break(const char *mode);
 int tr_radio_type(const char *type);
 int tr_horizontal_position(const char *pos);
 int tr_str_key_to_al_key(const char *skey);
-const char *str_radio_type(enum al_grc_radio_button_fmt radio);
-const char *str_horizontal_position(enum al_grc_hpos hpos);
-const char *str_line_break(enum al_grc_line_break lbreak);
-const char *str_grc_obj_type(enum al_grc_object obj);
-cjson_t *grc_get_object(struct al_grc *grc, const char *object);
+const char *str_radio_type(enum grc_radio_button_fmt radio);
+const char *str_horizontal_position(enum grc_horizontal_position hpos);
+const char *str_line_break(enum grc_line_break lbreak);
+const char *str_grc_obj_type(enum grc_object obj);
+cjson_t *grc_get_object(struct grc_s *grc, const char *object);
 
 /* colors.c */
-int color_parse(struct al_grc *grc);
+int color_parse(struct grc_s *grc);
 int color_grc_to_al(int color_depth, const char *color_name);
-int color_get_global_fg(struct al_grc *grc);
-int color_get_global_bg(struct al_grc *grc);
+int color_get_global_fg(struct grc_s *grc);
+int color_get_global_bg(struct grc_s *grc);
+struct gfx_color_s *color_start(void);
+void color_finish(struct gfx_color_s *color);
+int color_get(struct gfx_color_s *color, enum gfx_color type);
 
 /* info.c */
-int info_parse(struct al_grc *grc);
-int info_color_depth(struct al_grc *grc);
-struct gfx_info *info_start(void);
-void info_finish(struct gfx_info *info);
-int info_set_value(struct gfx_info *info, enum al_gfx_info field, ...);
-int info_get_value(struct gfx_info *info, enum al_gfx_info field);
+int info_parse(struct grc_s *grc);
+int info_color_depth(struct grc_s *grc);
+struct gfx_info_s *info_start(void);
+void info_finish(struct gfx_info_s *info);
+int info_set_value(struct gfx_info_s *info, enum gfx_info field, ...);
+int info_get_value(struct gfx_info_s *info, enum gfx_info field);
 
 #endif
 

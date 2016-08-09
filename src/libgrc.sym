@@ -1,0 +1,41 @@
+LIBCOLLECTIONS_0.1 {
+    global:
+        grc_init_from_file;
+        grc_init_from_mem;
+        grc_create;
+        grc_init_from_bare_data;
+        grc_uninit;
+        grc_prepare_dialog;
+        grc_do_dialog;
+        grc_set_callback;
+        grc_get_callback_data;
+        grc_get_callback_user_arg;
+        grc_get_callback_grc;
+        grc_object_set_data;
+        grc_object_set_proc;
+        grc_object_send_message;
+        grc_object_get_data;
+        grc_object_hide;
+        grc_object_show;
+        grc_log;
+        grc_list_get_selected_index;
+        grc_checkbox_get_status;
+        grc_radio_get_status;
+        grc_edit_get_data;
+        grc_get_last_error;
+        grc_strerror;
+        grc_GRC_create_colors;
+        grc_GRC_create_info;
+        grc_GRC_keys_start;
+        grc_GRC_add_key;
+        grc_GRC_keys_finish;
+        grc_GRC_objects_start;
+        grc_GRC_create_object;
+        grc_GRC_finish_object;
+        grc_GRC_set_object_property;
+        grc_GRC_objects_finish;
+    local:
+        *;
+};
+
+

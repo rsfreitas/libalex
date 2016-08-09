@@ -4,7 +4,7 @@
  *
  * Author: Rodrigo Freitas
  * Created at: Sun Aug 24 21:05:01 2014
- * Project: libalex
+ * Project: libgrc
  *
  * Copyright (c) 2014 Rodrigo Freitas
  *
@@ -24,17 +24,17 @@
  * USA
  */
 
-#ifndef _LIBALEX_API_H
-#define _LIBALEX_API_H                            1
+#ifndef _LIBGRC_API_H
+#define _LIBGRC_API_H                            1
 
-#ifndef LIBALEX_COMPILE
-# ifndef _LIBALEX_H
-#  error "Never use <api.h> directly; include <libalex.h> instead."
+#ifndef LIBGRC_COMPILE
+# ifndef _LIBGRC_H
+#  error "Never use <api.h> directly; include <libgrc.h> instead."
 # endif
 #endif
 
 /**
- * @name al_grc_init_from_file
+ * @name grc_init_from_file
  * @brief Initialize library environment and Allegro.
  *
  * All UI informations are loaded from a file of GRC type, passed in
@@ -46,13 +46,13 @@
  * @param [in] grc_file: Complete path of the GRC file which will be loaded.
  * @param [in] gfx: Flag to initialize internal Allegro gfx routines.
  *
- * @return Returns a 'struct al_grc' to handle UI calls on success or NULL
+ * @return Returns a 'grc_t' to handle UI calls on success or NULL
  *         otherwise.
  */
-struct al_grc *al_grc_init_from_file(const char *grc_file, bool gfx);
+grc_t *grc_init_from_file(const char *grc_file, bool gfx);
 
 /**
- * @name al_grc_init_from_mem
+ * @name grc_init_from_mem
  * @brief Initialize library environment and Allegro.
  *
  * All UI informations are loaded from a memory buffer containing a previously
@@ -65,36 +65,36 @@ struct al_grc *al_grc_init_from_file(const char *grc_file, bool gfx);
  * @param [in] data: The buffer containing a previously loaded GRC file.
  * @param [in] gfx: Flag to initialize internal Allegro gfx routines.
  *
- * @return Returns a 'struct al_grc' to handle UI calls on success or NULL
+ * @return Returns a 'grc_t' to handle UI calls on success or NULL
  *         otherwise.
  */
-struct al_grc *al_grc_init_from_mem(const char *data, bool gfx);
+grc_t *grc_init_from_mem(const char *data, bool gfx);
 
 /**
- * @name al_grc_create
+ * @name grc_create
  * @brief Initialize library environment to create UI in runtime.
  *
  * This functions provides the user a way to define and initialize an UI
  * in runtime. The creation of this UI is done by functions with prefix
- * 'al_grc_GRC_'.
+ * 'grc_GRC_'.
  *
- * @return Returns a 'struct al_grc' to handle UI calls on success or NULL
+ * @return Returns a 'grc_t' to handle UI calls on success or NULL
  *         otherwise.
  */
-struct al_grc *al_grc_create(void);
+grc_t *grc_create(void);
 
 /**
- * @name al_grc_init_from_bare_data
+ * @name grc_init_from_bare_data
  * @brief Initialize UI from runtime informations.
  *
  * @param [in] grc: Previously created UI structure.
  *
  * @return On success returns 0 or -1 otherwise.
  */
-int al_grc_init_from_bare_data(struct al_grc *grc);
+int grc_init_from_bare_data(grc_t *grc);
 
 /**
- * @name al_grc_uninit
+ * @name grc_uninit
  * @brief Shutdown library environment.
  *
  * This functions returns GFX to text mode.
@@ -103,10 +103,10 @@ int al_grc_init_from_bare_data(struct al_grc *grc);
  *
  * @return On success returns 0 or -1 otherwise.
  */
-int al_grc_uninit(struct al_grc *grc);
+int grc_uninit(grc_t *grc);
 
 /**
- * @name al_grc_prepare_dialog
+ * @name grc_prepare_dialog
  * @brief Starts the next DIALOG to be on the screen.
  *
  * This functions is responsible to make all initialization Allegro needs to
@@ -117,10 +117,10 @@ int al_grc_uninit(struct al_grc *grc);
  *
  * @return On success returns 0 or -1 otherwise.
  */
-int al_grc_prepare_dialog(struct al_grc *grc);
+int grc_prepare_dialog(grc_t *grc);
 
 /**
- * @name al_grc_do_dialog
+ * @name grc_do_dialog
  * @brief Puts a DIALOG to run.
  *
  * All custom adjust in objects from the DIALOG must be made before a call to
@@ -130,10 +130,10 @@ int al_grc_prepare_dialog(struct al_grc *grc);
  *
  * @return On success returns 0 or -1 otherwise.
  */
-int al_grc_do_dialog(struct al_grc *grc);
+int grc_do_dialog(grc_t *grc);
 
 /**
- * @name al_grc_set_callback
+ * @name grc_set_callback
  * @brief Assigns a callback function to an object.
  *
  * The callback function must receive two arguments. The first may vary
@@ -157,24 +157,24 @@ int al_grc_do_dialog(struct al_grc *grc);
  *
  * @return On success returns 0 or -1 otherwise.
  */
-int al_grc_set_callback(struct al_grc *grc, const char *object_name,
-                        int (*callback)(struct callback_data *), void *arg);
+int grc_set_callback(grc_t *grc, const char *object_name,
+                     int (*callback)(grc_callback_data_t *), void *arg);
 
 /**
- * @name al_grc_get_callback_data
+ * @name grc_get_callback_data
  * @brief Gets the return value from a callback function call.
  *
  * @param [in] acd: Callback function argument.
- * @param [in] data: Type of the data.
+ * @param [in] member: Type of the data.
  * @param [out] ...: Custom data.
  *
  * @return On success returns 0 or -1 otherwise.
  */
-int al_grc_get_callback_data(struct callback_data *acd,
-                             enum al_data_type data, ...);
+int grc_get_callback_data(grc_callback_data_t *acd,
+                          enum grc_object_member member, ...);
 
 /**
- * @name al_grc_get_callback_user_arg
+ * @name grc_get_callback_user_arg
  * @brief Gets the custom data passed to a callback function.
  *
  * @param [in] acd: Callback function argument.
@@ -182,10 +182,10 @@ int al_grc_get_callback_data(struct callback_data *acd,
  * @return On success returns a pointer the the data passed as argument
  *         to a callback function or NULL otherwise.
  */
-void *al_grc_get_callback_user_arg(struct callback_data *acd);
+void *grc_get_callback_user_arg(grc_callback_data_t *acd);
 
 /**
- * @name al_grc_get_callback_grc
+ * @name grc_get_callback_grc
  * @brief Gets a pointer the the main library object.
  *
  * This function allows a callback function get a pointer to the main library
@@ -196,25 +196,25 @@ void *al_grc_get_callback_user_arg(struct callback_data *acd);
  * @return On success returns a pointer to the main library object or NULL
  *         otherwise.
  */
-struct al_grc *al_grc_get_callback_grc(struct callback_data *acd);
+grc_t *grc_get_callback_grc(grc_callback_data_t *acd);
 
 /* TODO: change data to const */
 /**
- * @name al_grc_object_set_data
+ * @name grc_object_set_data
  * @brief Initialized object members that can receive variable data.
  *
  * @param [in] grc: Previously created UI structure.
  * @param [in] object_name: The object name.
- * @param [in] type: Object data type which will be initialized.
+ * @param [in] member: Object data type which will be initialized.
  * @param [in] data: Value which will be assigned to the object member.
  *
  * @return On success returns 0 or -1 otherwise.
  */
-int al_grc_object_set_data(struct al_grc *grc, const char *object_name,
-                           enum al_data_type type, void *data);
+int grc_object_set_data(grc_t *grc, const char *object_name,
+                        enum grc_object_member member, void *data);
 
 /**
- * @name al_grc_object_set_proc
+ * @name grc_object_set_proc
  * @brief Set an object main function.
  *
  * This function assigns the main function of a custom object.
@@ -225,11 +225,11 @@ int al_grc_object_set_data(struct al_grc *grc, const char *object_name,
  *
  * @return On success returns 0 or -1 otherwise.
  */
-int al_grc_object_set_proc(struct al_grc *grc, const char *object_name,
-                           int (*function)(int, DIALOG *, int));
+int grc_object_set_proc(grc_t *grc, const char *object_name,
+                        int (*function)(int, DIALOG *, int));
 
 /**
- * @name al_grc_object_send_message
+ * @name grc_object_send_message
  * @brief Send a message to an object.
  *
  * @param [in] grc: Previously created UI structure.
@@ -239,28 +239,28 @@ int al_grc_object_set_proc(struct al_grc *grc, const char *object_name,
  *
  * @return On success returns 0 or -1 otherwise.
  */
-int al_grc_object_send_message(struct al_grc *grc, const char *object_name,
-                               int msg, int c);
+int grc_object_send_message(grc_t *grc, const char *object_name,
+                            int msg, int c);
 
 /* TODO: Change this to use a cvalue_t */
 /**
- * @name al_grc_object_get_data
+ * @name grc_object_get_data
  * @brief Get current value from specific objects.
  *
  * @param [in] grc: Previously created UI structure.
  * @param [in] object_name: The object name.
- * @param [in] type: Object data type which will be initialized.
+ * @param [in] member: Object data type which will be initialized.
  * @param [out] ...: Data to store the extracted value.
  *
  * @return If the object return value is not a int, on success returns the value
  *         or NULL otherwise. If the object returns a int value, on success
  *         returns a valid pointer or NULL otherwise.
  */
-void *al_grc_object_get_data(struct al_grc *grc, const char *object_name,
-                             enum al_data_type type, ...);
+void *grc_object_get_data(grc_t *grc, const char *object_name,
+                          enum grc_object_member member, ...);
 
 /**
- * @name al_grc_object_hide
+ * @name grc_object_hide
  * @brief Hide an object on the screen.
  *
  * @param [in] grc: Previously created UI structure.
@@ -268,10 +268,10 @@ void *al_grc_object_get_data(struct al_grc *grc, const char *object_name,
  *
  * @return On success returns 0 or -1 otherwise.
  */
-int al_grc_object_hide(struct al_grc *grc, const char *object_name);
+int grc_object_hide(grc_t *grc, const char *object_name);
 
 /**
- * @name al_grc_object_show
+ * @name grc_object_show
  * @brief Show a previously hidden object on the screen.
  *
  * @param [in] grc: Previously created UI structure.
@@ -279,10 +279,10 @@ int al_grc_object_hide(struct al_grc *grc, const char *object_name);
  *
  * @return On success returns 0 or -1 otherwise.
  */
-int al_grc_object_show(struct al_grc *grc, const char *object_name);
+int grc_object_show(grc_t *grc, const char *object_name);
 
 /**
- * @name al_grc_log
+ * @name grc_log
  * @brief Add a message in a 'message_log_box' object.
  *
  * @param [in] grc: Previously created UI structure.
@@ -293,11 +293,11 @@ int al_grc_object_show(struct al_grc *grc, const char *object_name);
  *
  * @return On success returns 0 or -1 otherwise.
  */
-int al_grc_log(struct al_grc *grc, const char *object_name, const char *msg,
-               const char *color);
+int grc_log(grc_t *grc, const char *object_name, const char *msg,
+            const char *color);
 
 /**
- * @name al_grc_list_get_selected_index
+ * @name grc_list_get_selected_index
  * @brief Gets the selected item index from a 'list' object.
  *
  * @param [in] grc: Previously created UI structure.
@@ -305,10 +305,10 @@ int al_grc_log(struct al_grc *grc, const char *object_name, const char *msg,
  *
  * @return On success returns the item index or -1 otherwise.
  */
-int al_grc_list_get_selected_index(struct al_grc *grc, const char *object_name);
+int grc_list_get_selected_index(grc_t *grc, const char *object_name);
 
 /**
- * @name al_grc_checkbox_get_status
+ * @name grc_checkbox_get_status
  * @brief Gets the current state of a 'checkbox' object.
  *
  * @param [in] grc: Previously created UI structure.
@@ -317,10 +317,10 @@ int al_grc_list_get_selected_index(struct al_grc *grc, const char *object_name);
  * @return On success return the object current state (1 - selected, 0 -
  *         unselected) or -1 otherwise.
  */
-int al_grc_checkbox_get_status(struct al_grc *grc, const char *object_name);
+int grc_checkbox_get_status(grc_t *grc, const char *object_name);
 
 /**
- * @name al_grc_radio_get_status
+ * @name grc_radio_get_status
  * @brief Gets the current state of a 'radio' object.
  *
  * @param [in] grc: Previously created UI structure.
@@ -329,10 +329,10 @@ int al_grc_checkbox_get_status(struct al_grc *grc, const char *object_name);
  * @return On success return the object current state (1 - selected, 0 -
  *         unselected) or -1 otherwise.
  */
-int al_grc_radio_get_status(struct al_grc *grc, const char *object_name);
+int grc_radio_get_status(grc_t *grc, const char *object_name);
 
 /**
- * @name al_grc_edit_get_data
+ * @name grc_edit_get_data
  * @brief Gets the current value of an 'edit' object.
  *
  * @param [in] grc: Previously created UI structure.
@@ -340,7 +340,7 @@ int al_grc_radio_get_status(struct al_grc *grc, const char *object_name);
  *
  * @return On success returns the object value or NULL othewise.
  */
-char *al_grc_edit_get_data(struct al_grc *grc, const char *object_name);
+char *grc_edit_get_data(grc_t *grc, const char *object_name);
 
 #endif
 

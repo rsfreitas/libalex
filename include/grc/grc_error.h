@@ -4,7 +4,7 @@
  *
  * Author: Rodrigo Freitas
  * Created at: Wed Dec 10 17:21:26 BRST 2014
- * Project: libalex
+ * Project: libgrc
  *
  * Copyright (c) 2014 Rodrigo Freitas
  *
@@ -24,61 +24,61 @@
  * USA
  */
 
-#ifndef _LIBALEX_ERROR_H
-#define _LIBALEX_ERROR_H                            1
+#ifndef _LIBGRC_ERROR_H
+#define _LIBGRC_ERROR_H                            1
 
-#ifndef LIBALEX_COMPILE
-# ifndef _LIBALEX_H
-#  error "Never use <error.h> directly; include <libalex.h> instead."
+#ifndef LIBGRC_COMPILE
+# ifndef _LIBGRC_H
+#  error "Never use <error.h> directly; include <libgrc.h> instead."
 # endif
 #endif
 
-enum al_error_code {
-    AL_NO_ERROR = 0,
+enum grc_error_code {
+    GRC_NO_ERROR = 0,
 
-    AL_ERROR_NULL_ARG,
-    AL_ERROR_MEMORY,
-    AL_ERROR_PARSE_GRC,
-    AL_ERROR_UNDEFINED_GRC_KEY,
-    AL_ERROR_INFO_BLOCK_NOT_FOUND,
-    AL_ERROR_COLORS_BLOCK_NOT_FOUND,
-    AL_ERROR_SET_GFX_MODE,
-    AL_ERROR_LIB_INIT,
-    AL_ERROR_KEYBOARD_INIT,
-    AL_ERROR_OBJECTS_BLOCK_NOT_FOUND,
-    AL_ERROR_NO_OBJECTS,
-    AL_ERROR_NEW_REF,
-    AL_ERROR_NO_KEYS,
-    AL_ERROR_OBJECT_NOT_FOUND,
-    AL_ERROR_UNKNOWN_OBJECT_TYPE,
-    AL_ERROR_INVALID_LOAD_MODE,
-    AL_ERROR_UNSUPPORTED_EDIT_INPUT_LENGTH,
-    AL_ERROR_UNSUPPORTED_COLORS,
-    AL_ERROR_UNSUPPORTED_COLOR_DEPTH,
-    AL_ERROR_UNKNOWN_PROPERTY,
-    AL_ERROR_UNSUPPORTED_DATA_TYPE,
-    AL_ERROR_NOT_PREPARED_YET,
+    GRC_ERROR_NULL_ARG,
+    GRC_ERROR_MEMORY,
+    GRC_ERROR_PARSE_GRC,
+    GRC_ERROR_UNDEFINED_GRC_KEY,
+    GRC_ERROR_INFO_BLOCK_NOT_FOUND,
+    GRC_ERROR_COLORS_BLOCK_NOT_FOUND,
+    GRC_ERROR_SET_GFX_MODE,
+    GRC_ERROR_LIB_INIT,
+    GRC_ERROR_KEYBOARD_INIT,
+    GRC_ERROR_OBJECTS_BLOCK_NOT_FOUND,
+    GRC_ERROR_NO_OBJECTS,
+    GRC_ERROR_NEW_REF,
+    GRC_ERROR_NO_KEYS,
+    GRC_ERROR_OBJECT_NOT_FOUND,
+    GRC_ERROR_UNKNOWN_OBJECT_TYPE,
+    GRC_ERROR_INVALID_LOAD_MODE,
+    GRC_ERROR_UNSUPPORTED_EDIT_INPUT_LENGTH,
+    GRC_ERROR_UNSUPPORTED_COLORS,
+    GRC_ERROR_UNSUPPORTED_COLOR_DEPTH,
+    GRC_ERROR_UNKNOWN_PROPERTY,
+    GRC_ERROR_UNSUPPORTED_DATA_TYPE,
+    GRC_ERROR_NOT_PREPARED_YET,
 
-    AL_MAX_ERROR_CODE
+    GRC_MAX_ERROR_CODE
 };
 
 /**
- * @name al_get_last_error
+ * @name grc_get_last_error
  * @brief Gets the last error code internally occurred.
  *
  * @return Returns the last error code.
  */
-enum al_error_code al_get_last_error(void);
+enum grc_error_code grc_get_last_error(void);
 
 /**
- * @name al_strerror
+ * @name grc_strerror
  * @brief Converts a numeric error code in a text message.
  *
  * @param [in] error_code: Numeric error code.
  *
  * @return Returns the text corresponding the error code.
  */
-const char *al_strerror(enum al_error_code code);
+const char *grc_strerror(enum grc_error_code code);
 
 #endif
 

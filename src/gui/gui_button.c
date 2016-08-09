@@ -4,7 +4,7 @@
  *
  * Author: Rodrigo Freitas
  * Created at: Wed Dec 10 16:06:37 2014
- * Project: libalex
+ * Project: libgrc
  *
  * Copyright (c) 2014 Rodrigo Freitas
  *
@@ -24,7 +24,7 @@
  * USA
  */
 
-#include "libalex.h"
+#include "libgrc.h"
 
 /*
  * This object allows that a function be called when activated (when

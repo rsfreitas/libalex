@@ -4,7 +4,7 @@
  *
  * Author: Rodrigo Freitas
  * Created at: Wed Dec 10 15:58:59 2014
- * Project: libalex
+ * Project: libgrc
  *
  * Copyright (c) 2014 Rodrigo Freitas
  *
@@ -28,7 +28,7 @@
 
 #include <pthread.h>
 
-#include "libalex.h"
+#include "libgrc.h"
 
 #define MAX_LINE_CHARS      256
 #define WIDEST_CHAR         "W"
@@ -128,7 +128,7 @@ static void clear_messages(DIALOG *d)
     pthread_mutex_unlock(&__m_lines);
 }
 
-static int split_line(enum al_grc_line_break lbreak, const char *msg)
+static int split_line(enum grc_line_break lbreak, const char *msg)
 {
     size_t l;
     int i, exact_l = 0, splitted = 0, p = 0, r;
@@ -148,7 +148,7 @@ static int split_line(enum al_grc_line_break lbreak, const char *msg)
          * cannot have words bigger than the maximum supported columns,
          * because in this case we will not be able to break it.
          */
-        if (lbreak == AL_GRC_LBREAK_SMART) {
+        if (lbreak == GRC_LINE_BREAK_SMART) {
             int n, x;
             char *s;
 
@@ -176,7 +176,7 @@ static int split_line(enum al_grc_line_break lbreak, const char *msg)
     return splitted;
 }
 
-void gui_messages_set(enum al_grc_line_break lbreak, int fg_color,
+void gui_messages_set(enum grc_line_break lbreak, int fg_color,
     const char *msg, const char *color)
 {
     size_t l;

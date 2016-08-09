@@ -4,7 +4,7 @@
  *
  * Author: Rodrigo Freitas
  * Created at: Sat Dec 13 21:05:43 2014
- * Project: libalex
+ * Project: libgrc
  *
  * Copyright (c) 2014 Rodrigo Freitas
  *
@@ -24,7 +24,7 @@
  * USA
  */
 
-#include "libalex.h"
+#include "libgrc.h"
 
 /*
  * Function like a d_edit_proc from Allegro, @dp2 is the value displayed
@@ -175,7 +175,7 @@ static int d_password_proc(int msg, DIALOG *d, int c)
 
 static void set_actual_edit_object(DIALOG *d, struct callback_data *acd)
 {
-    struct al_grc *grc;
+    struct grc_s *grc;
 
     if (NULL == acd)
         return;
@@ -185,7 +185,7 @@ static void set_actual_edit_object(DIALOG *d, struct callback_data *acd)
     if (NULL == grc)
         return;
 
-    if (info_get_value(grc->info, AL_INFO_VIRTUAL_KEYBOARD) == false)
+    if (info_get_value(grc->info, INFO_VIRTUAL_KEYBOARD) == false)
         return;
 
     /*

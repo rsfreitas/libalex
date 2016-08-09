@@ -4,7 +4,7 @@
  *
  * Author: Rodrigo Freitas
  * Created at: Sun Dec 14 00:24:40 2014
- * Project: libalex
+ * Project: libgrc
  *
  * Copyright (c) 2014 Rodrigo Freitas
  *
@@ -24,7 +24,7 @@
  * USA
  */
 
-#include "libalex.h"
+#include "libgrc.h"
 
 static int internal_callback(void *arg, int pos)
 {

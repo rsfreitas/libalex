@@ -4,7 +4,7 @@
  *
  * Author: Rodrigo Freitas
  * Created at: Thu Jul 21 15:57:15 2016
- * Project: libalex
+ * Project: libgrc
  *
  * Copyright (c) 2014 Rodrigo Freitas
  *
@@ -55,7 +55,7 @@ int gui_d_list_proc(int msg, DIALOG *d, int c);
 
 /* gui_messages_log_box.c */
 int gui_messages_log_proc(int msg, DIALOG *d, int c);
-void gui_messages_set(enum al_grc_line_break lbreak, int fg_color,
+void gui_messages_set(enum grc_line_break lbreak, int fg_color,
                       const char *msg, const char *color);
 
 /* gui_radio.c */

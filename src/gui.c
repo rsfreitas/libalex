@@ -5,7 +5,7 @@
  *
  * Author: Rodrigo Freitas
  * Created at: Mon Dec 15 11:25:28 2014
- * Project: libalex
+ * Project: libgrc
  *
  * Copyright (c) 2014 Rodrigo Freitas
  *
@@ -25,7 +25,7 @@
  * USA
  */
 
-#include "libalex.h"
+#include "libgrc.h"
 #include "gui/objects.h"
 
 /*
@@ -43,12 +43,12 @@ void gui_reset_resolution(void)
  * ------- DIALOG handling functions -------
  */
 
-static void DIALOG_creation_start(DIALOG *dlg, struct al_grc *grc)
+static void DIALOG_creation_start(DIALOG *dlg, struct grc_s *grc)
 {
     DIALOG *p;
-    struct grc_object *gobj = NULL;
+    struct grc_object_s *gobj = NULL;
 
-    gobj = new_grc_object(GRC_OBJ_STANDARD);
+    gobj = new_grc_object(STANDARD_OBJECT);
 
     if (NULL == gobj)
         return;
@@ -63,12 +63,12 @@ static void DIALOG_creation_start(DIALOG *dlg, struct al_grc *grc)
 }
 
 static void DIALOG_creation_finish(DIALOG *dlg, unsigned int index,
-    struct al_grc *grc)
+    struct grc_s *grc)
 {
     DIALOG *p;
-    struct grc_object *gobj = NULL;
+    struct grc_object_s *gobj = NULL;
 
-    gobj = new_grc_object(GRC_OBJ_STANDARD);
+    gobj = new_grc_object(STANDARD_OBJECT);
 
     if (NULL == gobj)
         return;
@@ -82,7 +82,7 @@ static void DIALOG_creation_finish(DIALOG *dlg, unsigned int index,
     grc->tmp_objects = cdll_unshift(grc->tmp_objects, gobj);
 
     /* Create the real end of the DIALOG */
-    gobj = new_grc_object(GRC_OBJ_STANDARD);
+    gobj = new_grc_object(STANDARD_OBJECT);
 
     if (NULL == gobj)
         return;
@@ -105,20 +105,20 @@ static int __disable_key(void *arg __attribute__((unused)))
 }
 
 static void DIALOG_add_default_esc_key(DIALOG *dlg, unsigned int index,
-    struct al_grc *grc)
+    struct grc_s *grc)
 {
     DIALOG *p;
-    struct grc_object *gobj = NULL;
+    struct grc_object_s *gobj = NULL;
 
     /* Was the key defined by the user? */
-    if (info_get_value(grc->info, AL_INFO_ESC_KEY_USER_DEFINED) == true)
+    if (info_get_value(grc->info, INFO_ESC_KEY_USER_DEFINED) == true)
         return;
 
     /* Did the user ask to ignore the ESC key? */
-    if (info_get_value(grc->info, AL_INFO_IGNORE_ESC_KEY) == false)
+    if (info_get_value(grc->info, INFO_IGNORE_ESC_KEY) == false)
         return;
 
-    gobj = new_grc_object(GRC_OBJ_STANDARD);
+    gobj = new_grc_object(STANDARD_OBJECT);
 
     if (NULL == gobj)
         return;
@@ -139,7 +139,7 @@ static void DIALOG_add_default_esc_key(DIALOG *dlg, unsigned int index,
 
 static int create_menu_item(unsigned int index, void *a, void *b)
 {
-    struct grc_object *it = (struct grc_object *)a;
+    struct grc_object_s *it = (struct grc_object_s *)a;
     MENU *menu = (MENU *)b;
     MENU *m = NULL;
     struct grc_obj_properties *prop = NULL;
@@ -165,7 +165,7 @@ static int create_menu_item(unsigned int index, void *a, void *b)
 
 static int create_menu(unsigned int index, void *a, void *b)
 {
-    struct grc_object *o = (struct grc_object *)a;
+    struct grc_object_s *o = (struct grc_object_s *)a;
     MENU *menu = (MENU *)b;
     MENU *m = NULL;
     struct grc_obj_properties *prop = NULL;
@@ -193,13 +193,13 @@ static int create_menu(unsigned int index, void *a, void *b)
     return 0;
 }
 
-static void DIALOG_add_menu(DIALOG *dlg, unsigned int index, struct al_grc *grc)
+static void DIALOG_add_menu(DIALOG *dlg, unsigned int index, struct grc_s *grc)
 {
     MENU *m = NULL;
     DIALOG *p;
-    struct grc_object *gobj = NULL;
+    struct grc_object_s *gobj = NULL;
 
-    gobj = new_grc_object(GRC_OBJ_STANDARD);
+    gobj = new_grc_object(STANDARD_OBJECT);
 
     if (NULL == gobj)
         return;
@@ -224,8 +224,8 @@ static void DIALOG_add_menu(DIALOG *dlg, unsigned int index, struct al_grc *grc)
      * Changes the main color so that the menu uses the same that the user
      * defined.
      */
-    gui_fg_color = grc->fg;
-    gui_bg_color = grc->bg;
+    gui_fg_color = color_get(grc->color, COLOR_FG);
+    gui_bg_color = color_get(grc->color, COLOR_BG);
 
     /* Create the DIALOG menu entry */
     p->proc = d_menu_proc;
@@ -246,24 +246,24 @@ error_block:
  * Here we create the Allegro DIALOG array pointing to every previously loaded
  * object.
  */
-int DIALOG_create(struct al_grc *grc)
+int DIALOG_create(struct grc_s *grc)
 {
     int dlg_items = 0, index = 0;
     DIALOG *d, *q;
-    struct grc_object *p = NULL;
+    struct grc_object_s *p = NULL;
 
     /* d_yield_proc */
     dlg_items += 1;
 
     /* d_clear_proc */
-    if (info_get_value(grc->info, AL_INFO_USE_GFX) == true)
+    if (info_get_value(grc->info, INFO_USE_GFX) == true)
         dlg_items += 1;
 
     /*
      * Even that the user has defined the ESC key, we allocate an extra space.
      * It will not be used...
      */
-    if (info_get_value(grc->info, AL_INFO_IGNORE_ESC_KEY) == true)
+    if (info_get_value(grc->info, INFO_IGNORE_ESC_KEY) == true)
         dlg_items += 1;
 
     dlg_items += cdll_size(grc->ui_objects);
@@ -280,12 +280,12 @@ int DIALOG_create(struct al_grc *grc)
     d = calloc(dlg_items + 1, sizeof(DIALOG));
 
     if (NULL == d) {
-        al_set_errno(AL_ERROR_MEMORY);
+        grc_set_errno(GRC_ERROR_MEMORY);
         return -1;
     }
 
     /* Initializes the DIALOG */
-    if (info_get_value(grc->info, AL_INFO_USE_GFX) == true)
+    if (info_get_value(grc->info, INFO_USE_GFX) == true)
         DIALOG_creation_start(d, grc);
 
     /* Add user defined objects */
@@ -311,56 +311,56 @@ int DIALOG_create(struct al_grc *grc)
     DIALOG_creation_finish(d, dlg_items - 1, grc);
 
     /* Points to the new DIALOG */
-    grc->al_dlg = d;
+    grc->dlg = d;
 
     return 0;
 }
 
-int gui_init(struct al_grc *grc)
+int gui_init(struct grc_s *grc)
 {
     int w, h;
 
     if (install_allegro(SYSTEM_AUTODETECT, NULL, NULL)) {
-        al_set_errno(AL_ERROR_LIB_INIT);
+        grc_set_errno(GRC_ERROR_LIB_INIT);
         return -1;
     }
 
     if (install_keyboard()) {
-        al_set_errno(AL_ERROR_KEYBOARD_INIT);
+        grc_set_errno(GRC_ERROR_KEYBOARD_INIT);
         return -1;
     }
 
     install_timer();
     set_color_depth(info_color_depth(grc));
-    w = info_get_value(grc->info, AL_INFO_WIDTH);
-    h = info_get_value(grc->info, AL_INFO_HEIGHT);
+    w = info_get_value(grc->info, INFO_WIDTH);
+    h = info_get_value(grc->info, INFO_HEIGHT);
 
     if (set_gfx_mode(GFX_XWINDOWS, w, h, 0, 0) != 0) {
         if (set_gfx_mode(GFX_FBCON, w, h, 0, 0) != 0) {
             remove_keyboard();
             allegro_exit();
-            al_set_errno(AL_ERROR_SET_GFX_MODE);
+            grc_set_errno(GRC_ERROR_SET_GFX_MODE);
             return -1;
         }
     } else {
-        if (info_get_value(grc->info, AL_INFO_USE_MOUSE) == true) {
+        if (info_get_value(grc->info, INFO_USE_MOUSE) == true) {
             install_mouse();
             gui_mouse_focus = FALSE;
         }
     }
 
     /* Disable ctrl+alt+end */
-    if (info_get_value(grc->info, AL_INFO_BLOCK_KEYS) == false)
+    if (info_get_value(grc->info, INFO_BLOCK_KEYS) == false)
         three_finger_flag = FALSE;
 
     return 0;
 }
 
-void run_DIALOG(struct al_grc *grc)
+void run_DIALOG(struct grc_s *grc)
 {
-    if (info_get_value(grc->info, AL_INFO_USE_GFX) == false)
-        centre_dialog(grc->al_dlg);
+    if (info_get_value(grc->info, INFO_USE_GFX) == false)
+        centre_dialog(grc->dlg);
 
-    do_dialog(grc->al_dlg, -1);
+    do_dialog(grc->dlg, -1);
 }
 

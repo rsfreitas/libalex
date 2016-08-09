@@ -4,7 +4,7 @@
  *
  * Author: Rodrigo Freitas
  * Created at: Tue Dec  9 22:42:19 2014
- * Project: libalex
+ * Project: libgrc
  *
  * Copyright (c) 2014 Rodrigo Freitas
  *
@@ -26,7 +26,7 @@
 
 #include <time.h>
 
-#include "libalex.h"
+#include "libgrc.h"
 
 /*
  * Function to build an object to put a digital clock into the screen. The clock
@@ -37,7 +37,7 @@
 int gui_clock_proc(int msg, DIALOG *d, int c)
 {
     struct callback_data *acd = d->dp3;
-    struct al_grc *grc = NULL;
+    struct grc_s *grc = NULL;
     int ret;
     struct tm *t;
     time_t tp;

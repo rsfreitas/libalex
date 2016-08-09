@@ -4,7 +4,7 @@
  *
  * Author: Rodrigo Freitas
  * Created at: Tue Dec  9 22:42:05 2014
- * Project: libalex
+ * Project: libgrc
  *
  * Copyright (c) 2014 Rodrigo Freitas
  *
@@ -27,14 +27,14 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "libalex.h"
+#include "libgrc.h"
 #include "gui/objects.h"
 
 /*
  * THE parse ;-) (from a file). Just keep the DIALOG information as a JSON
  * internally.
  */
-int parse_file(struct al_grc *grc, const char *grc_filename)
+int parse_file(struct grc_s *grc, const char *grc_filename)
 {
     grc->jgrc = cjson_read_file(grc_filename);
 
@@ -48,7 +48,7 @@ int parse_file(struct al_grc *grc, const char *grc_filename)
  * THE parse ;-) (from a buffer). Just keep the DIALOG information as a JSON
  * internally.
  */
-int parse_mem(struct al_grc *grc, const char *data)
+int parse_mem(struct grc_s *grc, const char *data)
 {
     grc->jgrc = cjson_parse(data);
 
@@ -59,17 +59,17 @@ int parse_mem(struct al_grc *grc, const char *data)
 }
 
 /*
- * Creates an internal DIALOG (standard object) from a 'struct grc_object'
+ * Creates an internal DIALOG (standard object) from a 'struct grc_object_s'
  * object from its own properties.
  */
-static int grc_to_DIALOG(struct grc_object *gobject, struct al_grc *grc)
+static int grc_to_DIALOG(struct grc_object_s *gobject, struct grc_s *grc)
 {
     DIALOG *d, *p = NULL;
     struct grc_obj_properties *prop;
     struct grc_generic_data *gdata;
     int w = -1, h = -1;
     char tmp[MAX_EDIT_SIZE] = {0};
-    enum al_grc_object type;
+    enum grc_object type;
 
     prop = grc_object_get_properties(gobject);
     type = PROP_get(prop, type);
@@ -88,18 +88,18 @@ static int grc_to_DIALOG(struct grc_object *gobject, struct al_grc *grc)
      * first objects defined, so that no text be superimposed.
      */
     switch (type) {
-        case AL_GRC_OBJ_BOX:
+        case GRC_OBJECT_BOX:
             d->proc = d_box_proc;
             break;
 
-        case AL_GRC_OBJ_DIGITAL_CLOCK:
+        case GRC_OBJECT_DIGITAL_CLOCK:
             d->proc = gui_clock_proc;
             d->dp = gobject->dlg_clock_str;
             break;
 
-        case AL_GRC_OBJ_IMAGE:
-        case AL_GRC_OBJ_MESSAGES_LOG_BOX:
-            if (type == AL_GRC_OBJ_MESSAGES_LOG_BOX) {
+        case GRC_OBJECT_IMAGE:
+        case GRC_OBJECT_MESSAGES_LOG_BOX:
+            if (type == GRC_OBJECT_MESSAGES_LOG_BOX) {
                 d->proc = gui_messages_log_proc;
                 d->d1 = PROP_get(prop, line_break_mode);
             } else {
@@ -130,7 +130,7 @@ static int grc_to_DIALOG(struct grc_object *gobject, struct al_grc *grc)
 
             break;
 
-        case AL_GRC_OBJ_CUSTOM:
+        case GRC_OBJECT_CUSTOM:
             /*
              * In this object, both the object and the callback functions must
              * be defined in runtime, before the DIALOG executes.
@@ -140,16 +140,16 @@ static int grc_to_DIALOG(struct grc_object *gobject, struct al_grc *grc)
              */
             break;
 
-        case AL_GRC_OBJ_VAR_TEXT:
-        case AL_GRC_OBJ_FIXED_TEXT:
+        case GRC_OBJECT_VAR_TEXT:
+        case GRC_OBJECT_FIXED_TEXT:
             d->proc = d_text_proc;
 
-            if (type == AL_GRC_OBJ_FIXED_TEXT)
+            if (type == GRC_OBJECT_FIXED_TEXT)
                 d->dp = (char *)PROP_get(prop, text);
 
             break;
 
-        case AL_GRC_OBJ_BUTTON:
+        case GRC_OBJECT_BUTTON:
             d->proc = gui_d_button_proc;
             d->flags = D_EXIT;
             d->dp = (char *)PROP_get(prop, text);
@@ -163,9 +163,9 @@ static int grc_to_DIALOG(struct grc_object *gobject, struct al_grc *grc)
 
             break;
 
-        case AL_GRC_OBJ_EDIT:
+        case GRC_OBJECT_EDIT:
             if (PROP_get(prop, data_length) >= MAX_EDIT_SIZE) {
-                al_set_errno(AL_ERROR_UNSUPPORTED_EDIT_INPUT_LENGTH);
+                grc_set_errno(GRC_ERROR_UNSUPPORTED_EDIT_INPUT_LENGTH);
                 return -1;
             }
 
@@ -214,16 +214,16 @@ static int grc_to_DIALOG(struct grc_object *gobject, struct al_grc *grc)
 
             break;
 
-        case AL_GRC_OBJ_LIST:
+        case GRC_OBJECT_LIST:
             d->proc = gui_d_list_proc;
             d->flags = D_EXIT;
             break;
 
-        case AL_GRC_OBJ_CHECK:
+        case GRC_OBJECT_CHECK:
             d->proc = gui_d_check_proc;
             d->dp = (char *)PROP_get(prop, text);
 
-            if (PROP_get(prop, horizontal_position) == AL_GRC_H_POS_RIGHT)
+            if (PROP_get(prop, horizontal_position) == GRC_H_POS_RIGHT)
                 d->d1 = 1;
             else
                 d->d1 = 0;
@@ -237,7 +237,7 @@ static int grc_to_DIALOG(struct grc_object *gobject, struct al_grc *grc)
 
             break;
 
-        case AL_GRC_OBJ_RADIO:
+        case GRC_OBJECT_RADIO:
             d->proc = gui_d_radio_proc;
             d->dp = (char *)PROP_get(prop, text);
             d->d1 = PROP_get(prop, radio_group);
@@ -252,34 +252,34 @@ static int grc_to_DIALOG(struct grc_object *gobject, struct al_grc *grc)
 
             break;
 
-        case AL_GRC_OBJ_SLIDER:
+        case GRC_OBJECT_SLIDER:
             d->proc = gui_d_slider_proc;
             d->d1 = PROP_get(prop, data_length);
             break;
 
-        case AL_GRC_OBJ_VT_KEYBOARD:
+        case GRC_OBJECT_VT_KEYBOARD:
             d->proc = gui_d_vt_keyboard_proc;
-            d->d1 = GRC_KLAYOUT_LETTERS;
+            d->d1 = KEYBOARD_LAYOUT_LETTERS;
             d->dp = grc;
 
             /*
              * Set that the virtual keyboard is enabled to this DIALOG
              * so that every object may known this.
              */
-            info_set_value(grc->info, AL_INFO_VIRTUAL_KEYBOARD, true, NULL);
+            info_set_value(grc->info, INFO_VIRTUAL_KEYBOARD, true, NULL);
             break;
 
-        case AL_GRC_OBJ_ICON:
+        case GRC_OBJECT_ICON:
             d->proc = gui_d_icon_proc;
             d->flags = D_EXIT;
             break;
 
-        case AL_GRC_OBJ_TEXTBOX:
+        case GRC_OBJECT_TEXTBOX:
             d->proc = d_textbox_proc;
             break;
 
         default:
-            al_set_errno(AL_ERROR_UNKNOWN_OBJECT_TYPE);
+            grc_set_errno(GRC_ERROR_UNKNOWN_OBJECT_TYPE);
             return -1;
     }
 
@@ -309,13 +309,13 @@ static int grc_to_DIALOG(struct grc_object *gobject, struct al_grc *grc)
 }
 
 /*
- * Load a standard object to the internal 'struct grc_object' list.
+ * Load a standard object to the internal 'struct grc_object_s' list.
  */
-static int __load_object_to_grc(cjson_t *object, struct al_grc *grc)
+static int __load_object_to_grc(cjson_t *object, struct grc_s *grc)
 {
-    struct grc_object *gobj = NULL;
+    struct grc_object_s *gobj = NULL;
 
-    gobj = new_grc_object(GRC_OBJ_STANDARD);
+    gobj = new_grc_object(STANDARD_OBJECT);
 
     if (NULL == gobj)
         return -1;
@@ -354,7 +354,7 @@ error_block:
 /*
  * Load all standard objects to the memory.
  */
-static int load_objects_to_grc(struct al_grc *grc, cjson_t *objects)
+static int load_objects_to_grc(struct grc_s *grc, cjson_t *objects)
 {
     int t_objects, i;
     cjson_t *p;
@@ -362,7 +362,7 @@ static int load_objects_to_grc(struct al_grc *grc, cjson_t *objects)
     t_objects = cjson_get_array_size(objects);
 
     if (t_objects <= 0) {
-        al_set_errno(AL_ERROR_NO_OBJECTS);
+        grc_set_errno(GRC_ERROR_NO_OBJECTS);
         return -1;
     }
 
@@ -382,10 +382,10 @@ static int load_objects_to_grc(struct al_grc *grc, cjson_t *objects)
 }
 
 /*
- * Creates an internal DIALOG (a key) from a 'struct grc_object' object from
+ * Creates an internal DIALOG (a key) from a 'struct grc_object_s' object from
  * its own properties.
  */
-static int grc_to_key_DIALOG(struct grc_object *gobject, struct al_grc *grc)
+static int grc_to_key_DIALOG(struct grc_object_s *gobject, struct grc_s *grc)
 {
     DIALOG *d;
     struct grc_obj_properties *prop;
@@ -402,19 +402,19 @@ static int grc_to_key_DIALOG(struct grc_object *gobject, struct al_grc *grc)
      * override it.
      */
     if (d->d1 == KEY_ESC)
-        info_set_value(grc->info, AL_INFO_ESC_KEY_USER_DEFINED, true, NULL);
+        info_set_value(grc->info, INFO_ESC_KEY_USER_DEFINED, true, NULL);
 
     return 0;
 }
 
 /*
- * Load a key object to the internal 'struct grc_object' list.
+ * Load a key object to the internal 'struct grc_object_s' list.
  */
-static int __load_key_to_grc(cjson_t *key, struct al_grc *grc)
+static int __load_key_to_grc(cjson_t *key, struct grc_s *grc)
 {
-    struct grc_object *gobj = NULL;
+    struct grc_object_s *gobj = NULL;
 
-    gobj = new_grc_object(GRC_OBJ_KEY);
+    gobj = new_grc_object(KEY_OBJECT);
 
     if (NULL == gobj)
         return -1;
@@ -425,7 +425,7 @@ static int __load_key_to_grc(cjson_t *key, struct al_grc *grc)
         goto error_block;
 
     /* We set the object property to a key */
-    PROP_set(gobj->prop, type, AL_GRC_OBJ_KEY);
+    PROP_set(gobj->prop, type, GRC_OBJECT_KEY);
 
     /* Translate this to Allegro's DIALOG format */
     if (grc_to_key_DIALOG(gobj, grc) < 0)
@@ -449,7 +449,7 @@ error_block:
 /*
  * Load all key objects to the memory.
  */
-static int load_keys_to_grc(struct al_grc *grc, cjson_t *keys)
+static int load_keys_to_grc(struct grc_s *grc, cjson_t *keys)
 {
     int t_keys, i;
     cjson_t *p;
@@ -461,11 +461,11 @@ static int load_keys_to_grc(struct al_grc *grc, cjson_t *keys)
     t_keys = cjson_get_array_size(keys);
 
     if (t_keys <= 0) {
-        al_set_errno(AL_ERROR_NO_KEYS);
+        grc_set_errno(GRC_ERROR_NO_KEYS);
         return -1;
     }
 
-    info_set_value(grc->info, AL_INFO_ESC_KEY_USER_DEFINED, false, NULL);
+    info_set_value(grc->info, INFO_ESC_KEY_USER_DEFINED, false, NULL);
 
     for (i = 0; i < t_keys; i++) {
         p = cjson_get_array_item(keys, i);
@@ -482,11 +482,11 @@ static int load_keys_to_grc(struct al_grc *grc, cjson_t *keys)
     return 0;
 }
 
-static int load_menu_items(cjson_t *menu, struct grc_object *gobject)
+static int load_menu_items(cjson_t *menu, struct grc_object_s *gobject)
 {
     cjson_t *items, *p;
     int i, t;
-    struct grc_object *gobj = NULL;
+    struct grc_object_s *gobj = NULL;
 
     items = cjson_get_object_item(menu, "items");
     t = cjson_get_array_size(items);
@@ -498,7 +498,7 @@ static int load_menu_items(cjson_t *menu, struct grc_object *gobject)
             /* TODO: set error code */
             return -1;
 
-        gobj = new_grc_object(GRC_OBJ_MENU_ITEM);
+        gobj = new_grc_object(MENU_ITEM_OBJECT);
 
         if (NULL == gobj)
             return -1;
@@ -509,7 +509,7 @@ static int load_menu_items(cjson_t *menu, struct grc_object *gobject)
             goto error_block;
 
         /* We set the object property to a menu */
-        PROP_set(gobj->prop, type, AL_GRC_OBJ_MENU);
+        PROP_set(gobj->prop, type, GRC_OBJECT_MENU);
 
         /* Creates a reference for this object, if it has a tag */
         grc_object_set_tag(gobj, PROP_get(gobj->prop, name));
@@ -527,11 +527,11 @@ error_block:
     return -1;
 }
 
-static int __load_menu_to_grc(cjson_t *menu, struct al_grc *grc)
+static int __load_menu_to_grc(cjson_t *menu, struct grc_s *grc)
 {
-    struct grc_object *gobj = NULL;
+    struct grc_object_s *gobj = NULL;
 
-    gobj = new_grc_object(GRC_OBJ_MENU);
+    gobj = new_grc_object(MENU_OBJECT);
 
     if (NULL == gobj)
         return -1;
@@ -542,7 +542,7 @@ static int __load_menu_to_grc(cjson_t *menu, struct al_grc *grc)
         goto error_block;
 
     /* We set the object property to a menu */
-    PROP_set(gobj->prop, type, AL_GRC_OBJ_MENU);
+    PROP_set(gobj->prop, type, GRC_OBJECT_MENU);
 
     /* We parse the "items" object here, because a menu is a special object */
     load_menu_items(menu, gobj);
@@ -562,7 +562,7 @@ error_block:
 /*
  * Load the menu to the memory.
  */
-static int load_menu_to_grc(struct al_grc *grc, cjson_t *menu)
+static int load_menu_to_grc(struct grc_s *grc, cjson_t *menu)
 {
     cjson_t *p;
     int i, t_menu;
@@ -593,14 +593,14 @@ static int load_menu_to_grc(struct al_grc *grc, cjson_t *menu)
  * Load all objects related info from the GRC to an usable format, such as
  * the objects, keys and menu informations.
  */
-int parse_objects(struct al_grc *grc)
+int parse_objects(struct grc_s *grc)
 {
     cjson_t *n;
 
     n = grc_get_object(grc, OBJ_OBJECTS);
 
     if (NULL == n) {
-        al_set_errno(AL_ERROR_OBJECTS_BLOCK_NOT_FOUND);
+        grc_set_errno(GRC_ERROR_OBJECTS_BLOCK_NOT_FOUND);
         return -1;
     }
 

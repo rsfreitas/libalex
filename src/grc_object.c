@@ -1,10 +1,10 @@
 
 /*
- * Description: Functions to manipulate a 'struct grc_object' structure.
+ * Description: Functions to manipulate a 'struct grc_object_s' structure.
  *
  * Author: Rodrigo Freitas
  * Created at: Thu Jul 28 14:10:38 2016
- * Project: libalex
+ * Project: libgrc
  *
  * Copyright (c) 2014 Rodrigo Freitas
  *
@@ -26,11 +26,11 @@
 
 #include <stdlib.h>
 
-#include "libalex.h"
+#include "libgrc.h"
 
 void destroy_grc_object(void *a)
 {
-    struct grc_object *p = (struct grc_object *)a;
+    struct grc_object_s *p = (struct grc_object_s *)a;
 
     if (NULL == p)
         return;
@@ -53,23 +53,23 @@ void destroy_grc_object(void *a)
     free(p);
 }
 
-struct grc_object *new_grc_object(enum grc_object_type type)
+struct grc_object_s *new_grc_object(enum grc_object_type type)
 {
-    struct grc_object *p = NULL;
+    struct grc_object_s *p = NULL;
 
-    p = calloc(1, sizeof(struct grc_object));
+    p = calloc(1, sizeof(struct grc_object_s));
 
     if (NULL == p) {
-        al_set_errno(AL_ERROR_MEMORY);
+        grc_set_errno(GRC_ERROR_MEMORY);
         return NULL;
     }
 
-    if ((type == GRC_OBJ_STANDARD) || (type == GRC_OBJ_KEY)) {
+    if ((type == STANDARD_OBJECT) || (type == KEY_OBJECT)) {
         p->dlg = calloc(1, sizeof(DIALOG));
 
         if (NULL == p->dlg)
             goto error_block;
-    } else if (type == GRC_OBJ_MENU_ITEM) {
+    } else if (type == MENU_ITEM_OBJECT) {
         p->menu = calloc(1, sizeof(MENU));
 
         if (NULL == p->menu)
@@ -85,7 +85,7 @@ error_block:
     return NULL;
 }
 
-struct grc_obj_properties *grc_object_get_properties(struct grc_object *object)
+struct grc_obj_properties *grc_object_get_properties(struct grc_object_s *object)
 {
     if (NULL == object)
         return NULL;
@@ -93,7 +93,7 @@ struct grc_obj_properties *grc_object_get_properties(struct grc_object *object)
     return object->prop;
 }
 
-DIALOG *grc_object_get_DIALOG(struct grc_object *object)
+DIALOG *grc_object_get_DIALOG(struct grc_object_s *object)
 {
     if (NULL == object)
         return NULL;
@@ -101,7 +101,7 @@ DIALOG *grc_object_get_DIALOG(struct grc_object *object)
     return object->dlg;
 }
 
-MENU *grc_object_get_MENU(struct grc_object *object)
+MENU *grc_object_get_MENU(struct grc_object_s *object)
 {
     if (NULL == object)
         return NULL;
@@ -109,7 +109,7 @@ MENU *grc_object_get_MENU(struct grc_object *object)
     return object->menu;
 }
 
-void grc_object_set_MENU(struct grc_object *object, MENU *menu)
+void grc_object_set_MENU(struct grc_object_s *object, MENU *menu)
 {
     if (NULL == object)
         return;
@@ -117,7 +117,7 @@ void grc_object_set_MENU(struct grc_object *object, MENU *menu)
     object->menu = menu;
 }
 
-void grc_object_set_tag(struct grc_object *object, const char *tag)
+void grc_object_set_tag(struct grc_object_s *object, const char *tag)
 {
     if ((NULL == object) || (NULL == tag))
         return;
@@ -128,7 +128,7 @@ void grc_object_set_tag(struct grc_object *object, const char *tag)
 
 static int search_object_by_tag(void *a, void *b)
 {
-    struct grc_object *o = (struct grc_object *)a;
+    struct grc_object_s *o = (struct grc_object_s *)a;
     const char *tag = (const char *)b;
 
     if (strcmp(o->tag, tag) == 0)
@@ -137,39 +137,39 @@ static int search_object_by_tag(void *a, void *b)
     return 0;
 }
 
-DIALOG *grc_object_get_DIALOG_from_tag(struct grc_object *object,
+DIALOG *grc_object_get_DIALOG_from_tag(struct grc_object_s *object,
     const char *tag)
 {
-    struct grc_object *o = NULL;
+    struct grc_object_s *o = NULL;
 
     if (NULL == object) {
-        al_set_errno(AL_ERROR_NULL_ARG);
+        grc_set_errno(GRC_ERROR_NULL_ARG);
         return NULL;
     }
 
     o = cdll_map(object, search_object_by_tag, (void *)tag);
 
     if (NULL == o) {
-        al_set_errno(AL_ERROR_OBJECT_NOT_FOUND);
+        grc_set_errno(GRC_ERROR_OBJECT_NOT_FOUND);
         return NULL;
     }
 
     return grc_object_get_DIALOG(o);
 }
 
-MENU *grc_object_get_MENU_from_tag(struct grc_object *object, const char *tag)
+MENU *grc_object_get_MENU_from_tag(struct grc_object_s *object, const char *tag)
 {
-    struct grc_object *o = NULL;
+    struct grc_object_s *o = NULL;
 
     if (NULL == object) {
-        al_set_errno(AL_ERROR_NULL_ARG);
+        grc_set_errno(GRC_ERROR_NULL_ARG);
         return NULL;
     }
 
     o = cdll_map(object, search_object_by_tag, (void *)tag);
 
     if (NULL == o) {
-        al_set_errno(AL_ERROR_OBJECT_NOT_FOUND);
+        grc_set_errno(GRC_ERROR_OBJECT_NOT_FOUND);
         return NULL;
     }
 
