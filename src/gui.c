@@ -104,7 +104,7 @@ static int __disable_key(void *arg __attribute__((unused)))
     return D_O_K;
 }
 
-static void DIALOG_add_default_esc_key(DIALOG *dlg, unsigned int index,
+static int DIALOG_add_default_esc_key(DIALOG *dlg, unsigned int index,
     struct grc_s *grc)
 {
     DIALOG *p;
@@ -112,16 +112,16 @@ static void DIALOG_add_default_esc_key(DIALOG *dlg, unsigned int index,
 
     /* Was the key defined by the user? */
     if (info_get_value(grc->info, INFO_ESC_KEY_USER_DEFINED) == true)
-        return;
+        return 0;
 
     /* Did the user ask to ignore the ESC key? */
     if (info_get_value(grc->info, INFO_IGNORE_ESC_KEY) == false)
-        return;
+        return 0;
 
     gobj = new_grc_object(STANDARD_OBJECT);
 
     if (NULL == gobj)
-        return;
+        return 0;
 
     /*
      * Uses the Allegro key object to avoid create an unecessary
@@ -135,6 +135,13 @@ static void DIALOG_add_default_esc_key(DIALOG *dlg, unsigned int index,
 
     /* Saves this new objects so we can free it later */
     grc->tmp_objects = cdll_unshift(grc->tmp_objects, gobj);
+
+    /*
+     * We need to tell if the item was inserted or not, that's why the
+     * return here is a positive value. Thus if a menu is also needed
+     * by the DIALOG its index inside it will be correctly calculated.
+     */
+    return 1;
 }
 
 static int create_menu_item(unsigned int index, void *a, void *b)
@@ -183,7 +190,6 @@ static int create_menu(unsigned int index, void *a, void *b)
         if (NULL == m)
             return -1;
 
-        m->text = (char *)PROP_get(prop, text);
         cdll_map_indexed(o->items, create_menu_item, m);
         grc_object_set_MENU(o, m);
     }
@@ -205,7 +211,7 @@ static void DIALOG_add_menu(DIALOG *dlg, unsigned int index, struct grc_s *grc)
         return;
 
     /*
-     * Uses the Allegro key object to avoid create an unecessary
+     * Uses the Allegro key object to avoid create an unnecessary
      * 'callback_data' structure.
      */
     p = gobj->dlg;
@@ -236,6 +242,8 @@ static void DIALOG_add_menu(DIALOG *dlg, unsigned int index, struct grc_s *grc)
 
     /* Saves this new objects so we can free it later */
     grc->tmp_objects = cdll_unshift(grc->tmp_objects, gobj);
+
+    return;
 
 error_block:
     if (gobj != NULL)
@@ -300,15 +308,18 @@ int DIALOG_create(struct grc_s *grc)
         d[index] = *q;
     }
 
-    /* Add the menu */
-    if (grc->ui_menu != NULL)
-        DIALOG_add_menu(d, dlg_items - 3, grc);
-
-    /* We ignore the ESC key (if needed) */
-    DIALOG_add_default_esc_key(d, dlg_items - 2, grc);
-
     /* Ends the DIALOG */
     DIALOG_creation_finish(d, dlg_items - 1, grc);
+
+    /* We ignore the ESC key (if needed) */
+    index = DIALOG_add_default_esc_key(d, dlg_items - 2, grc);
+
+    /*
+     * Add the menu. Here the item index may vary due an insertion of the
+     * default ESC key or not.
+     */
+    if (grc->ui_menu != NULL)
+        DIALOG_add_menu(d, dlg_items - (2 + index), grc);
 
     /* Points to the new DIALOG */
     grc->dlg = d;
