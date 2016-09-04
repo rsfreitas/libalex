@@ -1,4 +1,7 @@
 
+.PHONY: outputdir clean dest_clean purge install install_headers dev_install \
+    uninstall
+
 CC = gcc
 
 MAJOR_VERSION = $(shell grep MAJOR_VERSION ../include/libgrc.h | awk '{print $$4}')
@@ -11,8 +14,9 @@ LIBNAME = $(PREFIX).so
 SONAME = $(LIBNAME)
 DEST_LIBNAME = $(LIBNAME).$(MAJOR_VERSION).$(MINOR_VERSION).$(BUILD)
 
-TARGET = ../bin/$(SONAME)
-TARGET_DEST = ../bin/$(DEST_LIBNAME)
+TARGET_DIR = ../bin
+TARGET = $(TARGET_DIR)/$(SONAME)
+TARGET_DEST = $(TARGET_DIR)/$(DEST_LIBNAME)
 
 INCLUDEDIR = -I../include
 INCLUDEDIR += -I/usr/local/include
@@ -58,8 +62,7 @@ OBJS =						\
 	writer.o				\
 	$(GUI_OBJS)
 
-$(TARGET): $(OBJS)
-	rm -f $(LIBNAME)*
+$(TARGET): outputdir $(OBJS)
 	$(CC) -shared -Wl,-soname,$(SONAME),--version-script,$(PREFIX).sym -o $(TARGET_DEST) $(OBJS) $(LIBDIR) $(LIBS)
 
 clean:
@@ -87,4 +90,9 @@ dev_install: install_headers install
 uninstall: dest_clean
 	rm -rf /usr/local/include/grc
 	rm -f /usr/local/include/libgrc.h
+
+outputdir: $(TARGET_DIR)
+
+$(TARGET_DIR):
+	mkdir -p $(TARGET_DIR)
 

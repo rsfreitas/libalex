@@ -38,36 +38,35 @@ int gui_clock_proc(int msg, DIALOG *d, int c)
 {
     struct callback_data *acd = d->dp3;
     struct grc_s *grc = NULL;
-    int ret;
-    struct tm *t;
-    time_t tp;
+    struct tm *tm;
+    time_t now;
+    char *clock_str = (char *)d->dp;
 
     grc = get_callback_grc(acd);
-    ret = d_text_proc(msg, d, c);
 
     switch (msg) {
         case MSG_START:
-            time(&tp);
-            localtime_r(&tp, &grc->dlg_tm);
-            memset(grc->dlg_clock_str, 0, sizeof(grc->dlg_clock_str));
+            time(&now);
+            localtime_r(&now, &grc->dlg_tm);
+            memset(clock_str, 0, MAX_CLOCK_STR_SIZE);
             break;
 
         case MSG_IDLE:
-            time(&tp);
-            t = localtime(&tp);
+            time(&now);
+            tm = localtime(&now);
 
-           if ((grc->dlg_tm.tm_sec != t->tm_sec) ||
-               (grc->dlg_tm.tm_min != t->tm_min) ||
-               (grc->dlg_tm.tm_hour != t->tm_hour))
+            if ((grc->dlg_tm.tm_sec != tm->tm_sec) ||
+                (grc->dlg_tm.tm_min != tm->tm_min) ||
+                (grc->dlg_tm.tm_hour != tm->tm_hour))
             {
-                grc->dlg_tm = *t;
+                grc->dlg_tm = *tm;
                 object_message(d, MSG_DRAW, 0);
             }
 
             break;
 
         case MSG_DRAW:
-            sprintf(grc->dlg_clock_str, "%02d/%02d/%04d %02d:%02d:%02d",
+            sprintf(clock_str, "%02d/%02d/%04d %02d:%02d:%02d",
                     grc->dlg_tm.tm_mday, grc->dlg_tm.tm_mon + 1,
                     grc->dlg_tm.tm_year + 1900, grc->dlg_tm.tm_hour,
                     grc->dlg_tm.tm_min, grc->dlg_tm.tm_sec);
@@ -75,6 +74,6 @@ int gui_clock_proc(int msg, DIALOG *d, int c)
             break;
     }
 
-    return ret;
+    return d_text_proc(msg, d, c);
 }
 

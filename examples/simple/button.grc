@@ -26,8 +26,8 @@
         {
             "type": "digital_clock",
             "foreground": "yellow",
-            "pos_x": 646,
-            "pos_y": 472
+            "pos_x": 5,
+            "pos_y": 185
         }
     ],
     "keys": [
