@@ -25,7 +25,7 @@
  */
 
 #ifndef _LIBGRC_H
-#define _LIBGRC_H		        1
+#define _LIBGRC_H               1
 
 #ifdef LIBGRC_COMPILE
 # define MAJOR_VERSION          0

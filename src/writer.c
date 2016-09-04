@@ -294,7 +294,7 @@ int LIBEXPORT grc_GRC_create_object(grc_t *grc)
     wb = (struct writer_builder *)grc_get_internal_data(grc);
 
     if (NULL == wb) {
-        /* FIXME: set erro code */
+        /* FIXME: set error code */
         return -1;
     }
 

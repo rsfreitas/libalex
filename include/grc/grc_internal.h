@@ -118,6 +118,9 @@
 /* Radio button default height */
 #define DEFAULT_RADIO_HEIGHT        15
 
+/* Max DIALOG clock size */
+#define MAX_CLOCK_STR_SIZE          32
+
 /** Enumerators */
 
 /* Keyboard layout */
@@ -198,7 +201,7 @@ struct grc_object_s {
     struct grc_obj_properties   *prop;
 
     /* Maybe this a 'digital_clock' object */
-    char                        dlg_clock_str[256];
+    char                        dlg_clock_str[MAX_CLOCK_STR_SIZE];
 
     /* Is this a menu? */
     MENU                        *menu;
@@ -231,7 +234,6 @@ struct grc_s {
     DIALOG                  *last_edit_object;
 
     /* 'digital_clock' info */
-    char                    dlg_clock_str[256];
     struct tm               dlg_tm;
 
     /* Temporary values while creating a GRC file. */
