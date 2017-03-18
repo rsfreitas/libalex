@@ -30,8 +30,8 @@
 #define OUT_GFX_COLOR_DEPTH             8
 
 struct writer_builder {
-    cjson_t     *array;
-    cjson_t     *object;
+    cl_json_t     *array;
+    cl_json_t     *object;
 };
 
 static void destroy_writer_builder(void *ptr)
@@ -60,12 +60,12 @@ static struct writer_builder *new_writer_builder(void)
 
 static int create_root_object(struct grc_s *grc)
 {
-    cjson_t *p = NULL;
+    cl_json_t *p = NULL;
 
     p = grc_get_JSON(grc);
 
     if (NULL == p) {
-        p = cjson_create_object();
+        p = cl_json_create_object();
 
         if (NULL == p) {
             grc_set_errno(GRC_ERROR_MEMORY);
@@ -81,7 +81,7 @@ static int create_root_object(struct grc_s *grc)
 int LIBEXPORT grc_GRC_create_colors(grc_t *grc,
     const char *foreground, const char *background)
 {
-    cjson_t *fg, *bg, *c, *root;
+    cl_json_t *fg, *bg, *c, *root;
 
     grc_errno_clear();
 
@@ -101,9 +101,9 @@ int LIBEXPORT grc_GRC_create_colors(grc_t *grc,
         return -1;
     }
 
-    fg = cjson_create_string(foreground);
-    bg = cjson_create_string(background);
-    c = cjson_create_object();
+    fg = cl_json_create_string(foreground);
+    bg = cl_json_create_string(background);
+    c = cl_json_create_object();
 
     if ((NULL == fg) || (NULL == bg) || (NULL == c)) {
         grc_set_errno(GRC_ERROR_MEMORY);
@@ -111,12 +111,12 @@ int LIBEXPORT grc_GRC_create_colors(grc_t *grc,
     }
 
     /* Create an object with the colors */
-    cjson_add_item_to_object(c, OBJ_FOREGROUND, fg);
-    cjson_add_item_to_object(c, OBJ_BACKGROUND, bg);
+    cl_json_add_item_to_object(c, OBJ_FOREGROUND, fg);
+    cl_json_add_item_to_object(c, OBJ_BACKGROUND, bg);
 
     /* Add it to the main object */
     root = grc_get_JSON(grc);
-    cjson_add_item_to_object(root, OBJ_COLORS, c);
+    cl_json_add_item_to_object(root, OBJ_COLORS, c);
 
     return 0;
 }
@@ -125,7 +125,7 @@ int LIBEXPORT grc_GRC_create_info(grc_t *grc, unsigned int width,
     unsigned int height, enum grc_color_depth color_depth,
     bool block_exit_keys, bool mouse, bool ignore_esc_key)
 {
-    cjson_t *c, *k, *m, *e, *w, *h, *i, *root;
+    cl_json_t *c, *k, *m, *e, *w, *h, *i, *root;
 
     grc_errno_clear();
 
@@ -137,26 +137,26 @@ int LIBEXPORT grc_GRC_create_info(grc_t *grc, unsigned int width,
     if (create_root_object(grc) < 0)
         return -1;
 
-    w = cjson_create_number(width);
-    h = cjson_create_number(height);
-    c = cjson_create_number(color_depth);
+    w = cl_json_create_number(width);
+    h = cl_json_create_number(height);
+    c = cl_json_create_number(color_depth);
 
     if (block_exit_keys == false)
-        k = cjson_create_false();
+        k = cl_json_create_false();
     else
-        k = cjson_create_true();
+        k = cl_json_create_true();
 
     if (mouse == false)
-        m = cjson_create_false();
+        m = cl_json_create_false();
     else
-        m = cjson_create_true();
+        m = cl_json_create_true();
 
     if (ignore_esc_key == false)
-        e = cjson_create_false();
+        e = cl_json_create_false();
     else
-        e = cjson_create_true();
+        e = cl_json_create_true();
 
-    i = cjson_create_object();
+    i = cl_json_create_object();
 
     if ((NULL == w) || (NULL == h) || (NULL == k) || (NULL == m) ||
         (NULL == e) || (NULL == i))
@@ -166,16 +166,16 @@ int LIBEXPORT grc_GRC_create_info(grc_t *grc, unsigned int width,
     }
 
     /* Create an object with the info */
-    cjson_add_item_to_object(i, OBJ_WIDTH, w);
-    cjson_add_item_to_object(i, OBJ_HEIGHT, h);
-    cjson_add_item_to_object(i, OBJ_COLOR_DEPTH, c);
-    cjson_add_item_to_object(i, OBJ_BLOCK_EXIT_KEYS, k);
-    cjson_add_item_to_object(i, OBJ_MOUSE, m);
-    cjson_add_item_to_object(i, OBJ_IGNORE_ESC_KEY, e);
+    cl_json_add_item_to_object(i, OBJ_WIDTH, w);
+    cl_json_add_item_to_object(i, OBJ_HEIGHT, h);
+    cl_json_add_item_to_object(i, OBJ_COLOR_DEPTH, c);
+    cl_json_add_item_to_object(i, OBJ_BLOCK_EXIT_KEYS, k);
+    cl_json_add_item_to_object(i, OBJ_MOUSE, m);
+    cl_json_add_item_to_object(i, OBJ_IGNORE_ESC_KEY, e);
 
     /* Add it to the main object */
     root = grc_get_JSON(grc);
-    cjson_add_item_to_object(root, OBJ_INFO, i);
+    cl_json_add_item_to_object(root, OBJ_INFO, i);
 
     return 0;
 }
@@ -193,7 +193,7 @@ static int create_tmp_array(grc_t *grc)
 
     create_root_object(grc);
     wb = new_writer_builder();
-    wb->array = cjson_create_array();
+    wb->array = cl_json_create_array();
 
     if (NULL == wb->array) {
         grc_set_errno(GRC_ERROR_MEMORY);
@@ -216,7 +216,7 @@ int LIBEXPORT grc_GRC_keys_start(grc_t *grc)
 int LIBEXPORT grc_GRC_add_key(grc_t *grc, const char *key,
     const char *name)
 {
-    cjson_t *k, *n = NULL, *p;
+    cl_json_t *k, *n = NULL, *p;
     struct writer_builder *wb = NULL;
 
     grc_errno_clear();
@@ -227,12 +227,12 @@ int LIBEXPORT grc_GRC_add_key(grc_t *grc, const char *key,
     }
 
     wb = (struct writer_builder *)grc_get_internal_data(grc);
-    k = cjson_create_string(key);
+    k = cl_json_create_string(key);
 
     if (name != NULL)
-        n = cjson_create_string(name);
+        n = cl_json_create_string(name);
 
-    p = cjson_create_object();
+    p = cl_json_create_object();
 
     if ((NULL == k) || ((name != NULL) && (NULL == n)) || (NULL == p)) {
         grc_set_errno(GRC_ERROR_MEMORY);
@@ -240,20 +240,20 @@ int LIBEXPORT grc_GRC_add_key(grc_t *grc, const char *key,
     }
 
     /* Create the object */
-    cjson_add_item_to_object(p, OBJ_KEY, k);
+    cl_json_add_item_to_object(p, OBJ_KEY, k);
 
     if (n != NULL)
-        cjson_add_item_to_object(p, OBJ_TAG, n);
+        cl_json_add_item_to_object(p, OBJ_TAG, n);
 
     /* Add to the array */
-    cjson_add_item_to_array(wb->array, p);
+    cl_json_add_item_to_array(wb->array, p);
 
     return 0;
 }
 
 static int add_tmp_array(grc_t *grc, const char *array_name)
 {
-    cjson_t *root = NULL;
+    cl_json_t *root = NULL;
     struct writer_builder *wb = NULL;
 
     grc_errno_clear();
@@ -265,7 +265,7 @@ static int add_tmp_array(grc_t *grc, const char *array_name)
 
     root = grc_get_JSON(grc);
     wb = (struct writer_builder *)grc_get_internal_data(grc);
-    cjson_add_item_to_object(root, array_name, wb->array);
+    cl_json_add_item_to_object(root, array_name, wb->array);
 
     return 0;
 }
@@ -298,7 +298,7 @@ int LIBEXPORT grc_GRC_create_object(grc_t *grc)
         return -1;
     }
 
-    wb->object = cjson_create_object();
+    wb->object = cl_json_create_object();
 
     if (NULL == wb->object) {
         grc_set_errno(GRC_ERROR_MEMORY);
@@ -320,7 +320,7 @@ int LIBEXPORT grc_GRC_finish_object(grc_t *grc)
     }
 
     wb = (struct writer_builder *)grc_get_internal_data(grc);
-    cjson_add_item_to_array(wb->array, wb->object);
+    cl_json_add_item_to_array(wb->array, wb->object);
 
     return 0;
 }
@@ -332,7 +332,7 @@ int LIBEXPORT grc_GRC_set_object_property(grc_t *grc,
     va_list ap;
     enum grc_entry_type_value grc_value;
     const char *jkey = NULL;
-    cjson_t *c;
+    cl_json_t *c;
     int i;
     char *s = NULL;
 
@@ -467,18 +467,18 @@ int LIBEXPORT grc_GRC_set_object_property(grc_t *grc,
     if (jkey != NULL) {
         switch (grc_value) {
             case GRC_NUMBER:
-                c = cjson_create_number(i);
+                c = cl_json_create_number(i);
                 break;
 
             case GRC_STRING:
-                c = cjson_create_string(s);
+                c = cl_json_create_string(s);
                 break;
 
             case GRC_BOOL:
                 if (i == false)
-                    c = cjson_create_false();
+                    c = cl_json_create_false();
                 else
-                    c = cjson_create_true();
+                    c = cl_json_create_true();
 
                 break;
         }
@@ -489,7 +489,7 @@ int LIBEXPORT grc_GRC_set_object_property(grc_t *grc,
         }
 
         wb = (struct writer_builder *)grc_get_internal_data(grc);
-        cjson_add_item_to_object(wb->object, jkey, c);
+        cl_json_add_item_to_object(wb->object, jkey, c);
     }
 
     va_end(ap);

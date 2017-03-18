@@ -27,8 +27,8 @@
 #include "libgrc.h"
 
 struct gfx_color_s {
-    cstring_t   *s_fg;
-    cstring_t   *s_bg;
+    cl_string_t *s_fg;
+    cl_string_t *s_bg;
     int         fg;
     int         bg;
 };
@@ -121,8 +121,8 @@ void color_finish(struct gfx_color_s *color)
     if (NULL == color)
         return;
 
-    cstring_unref(color->s_fg);
-    cstring_unref(color->s_bg);
+    cl_string_unref(color->s_fg);
+    cl_string_unref(color->s_bg);
     free(color);
 }
 
@@ -165,7 +165,7 @@ int color_grc_to_al(int color_depth, const char *color_name)
 
 int color_parse(struct grc_s *grc)
 {
-    cjson_t *jcolors;
+    cl_json_t *jcolors;
     struct property_detail *dt;
     struct gfx_color_s *color;
 
@@ -198,10 +198,10 @@ int color_parse(struct grc_s *grc)
      * at this point it hasn't been initialized yet.
      */
     color->fg = color_grc_to_al(info_color_depth(grc),
-                                cstring_valueof(color->s_fg));
+                                cl_string_valueof(color->s_fg));
 
     color->bg = color_grc_to_al(info_color_depth(grc),
-                                cstring_valueof(color->s_bg));
+                                cl_string_valueof(color->s_bg));
 
     return 0;
 

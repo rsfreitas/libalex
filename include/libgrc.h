@@ -30,7 +30,7 @@
 #ifdef LIBGRC_COMPILE
 # define MAJOR_VERSION          0
 # define MINOR_VERSION          1
-# define BUILD                  0
+# define BUILD                  1
 #endif
 
 #ifndef LIBEXPORT

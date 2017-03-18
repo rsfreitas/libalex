@@ -94,7 +94,7 @@ static void uninit_messages(void)
         free(__mlog.tmp[i]);
 
     free(__mlog.tmp);
-    cdll_free(__mlog.lines, NULL);
+    cl_dll_free(__mlog.lines, NULL);
 }
 
 static void print_messages(DIALOG *d)
@@ -122,7 +122,7 @@ static void clear_messages(DIALOG *d)
                       __mlog.c, ' ');
     }
 
-    cdll_free(__mlog.lines, NULL);
+    cl_dll_free(__mlog.lines, NULL);
     __mlog.lines = NULL;
 
     pthread_mutex_unlock(&__m_lines);
@@ -201,11 +201,11 @@ void gui_messages_set(enum grc_line_break lbreak, int fg_color,
     }
 
     /* Remove lines that reach the limit */
-    rm_lines = (cdll_size(__mlog.lines) + msg_lines) - __mlog.l;
+    rm_lines = (cl_dll_size(__mlog.lines) + msg_lines) - __mlog.l;
 
     if (rm_lines > 0) {
         for (i = 0; i < (unsigned int)rm_lines; i++) {
-            line = cdll_pop(&__mlog.lines);
+            line = cl_dll_pop(&__mlog.lines);
             free(line);
         }
     }
@@ -213,7 +213,7 @@ void gui_messages_set(enum grc_line_break lbreak, int fg_color,
     /* Add new lines */
     for (i = 0; i < msg_lines; i++) {
         line = new_line(__mlog.tmp[i], fg_color, color);
-        __mlog.lines = cdll_unshift(__mlog.lines, line);
+        __mlog.lines = cl_dll_unshift(__mlog.lines, line);
     }
 
     pthread_mutex_unlock(&__m_lines);

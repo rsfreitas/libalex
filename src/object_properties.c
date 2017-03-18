@@ -39,11 +39,11 @@ struct property_detail {
 /* Structure to store an object "object" of a GRC file */
 struct grc_obj_properties {
     enum grc_object     type;
-    cstring_t           *name;
-    cstring_t           *parent;
-    cstring_t           *text;
-    cstring_t           *fg;
-    cstring_t           *key;
+    cl_string_t         *name;
+    cl_string_t         *parent;
+    cl_string_t         *text;
+    cl_string_t         *fg;
+    cl_string_t         *key;
     int                 x;
     int                 y;
     int                 w;
@@ -138,16 +138,16 @@ enum grc_entry_type_value propery_detail_type(struct property_detail *d)
 void destroy_obj_properties(struct grc_obj_properties *prop)
 {
     if (prop->parent != NULL)
-        cstring_unref(prop->parent);
+        cl_string_unref(prop->parent);
 
     if (prop->name != NULL)
-        cstring_unref(prop->name);
+        cl_string_unref(prop->name);
 
     if (prop->text != NULL)
-        cstring_unref(prop->text);
+        cl_string_unref(prop->text);
 
     if (prop->fg != NULL)
-        cstring_unref(prop->fg);
+        cl_string_unref(prop->fg);
 
     free(prop);
 }
@@ -173,11 +173,11 @@ static struct grc_obj_properties *new_empty_obj_properties(void)
  * Create and return a structure 'struct grc_obj_properties'. It is created
  * and filled with an object content from 'objects' array inside a GRC file.
  */
-struct grc_obj_properties *new_obj_properties(cjson_t *object)
+struct grc_obj_properties *new_obj_properties(cl_json_t *object)
 {
     struct grc_obj_properties *p = NULL;
     struct property_detail *dt;
-    cstring_t *tmp;
+    cl_string_t *tmp;
 
     p = new_empty_obj_properties();
 
@@ -188,7 +188,7 @@ struct grc_obj_properties *new_obj_properties(cjson_t *object)
         goto undefined_grc_jkey_block;
 
     tmp = grc_get_object_str(object, property_detail_string(dt));
-    p->type = tr_str_type_to_grc_type(cstring_valueof(tmp));
+    p->type = tr_str_type_to_grc_type(cl_string_valueof(tmp));
     free(tmp);
 
     /* tag */
@@ -301,7 +301,7 @@ struct grc_obj_properties *new_obj_properties(cjson_t *object)
         goto undefined_grc_jkey_block;
 
     tmp = grc_get_object_str(object, property_detail_string(dt));
-    p->line_break_mode = tr_line_break(cstring_valueof(tmp));
+    p->line_break_mode = tr_line_break(cl_string_valueof(tmp));
     free(tmp);
 
     /* input_length */
@@ -329,7 +329,7 @@ struct grc_obj_properties *new_obj_properties(cjson_t *object)
         goto undefined_grc_jkey_block;
 
     tmp = grc_get_object_str(object, property_detail_string(dt));
-    p->radio_type = tr_radio_type(cstring_valueof(tmp));
+    p->radio_type = tr_radio_type(cl_string_valueof(tmp));
     free(tmp);
 
     /* password */
@@ -348,7 +348,7 @@ struct grc_obj_properties *new_obj_properties(cjson_t *object)
         goto undefined_grc_jkey_block;
 
     tmp = grc_get_object_str(object, property_detail_string(dt));
-    p->horizontal_position = tr_horizontal_position(cstring_valueof(tmp));
+    p->horizontal_position = tr_horizontal_position(cl_string_valueof(tmp));
     free(tmp);
 
     /* fps */
@@ -414,7 +414,7 @@ const char *grc_obj_get_property_name(struct grc_obj_properties *prop)
     if (NULL == prop)
         return NULL;
 
-    return cstring_valueof(prop->name);
+    return cl_string_valueof(prop->name);
 }
 
 const char *grc_obj_get_property_key(struct grc_obj_properties *prop)
@@ -422,7 +422,7 @@ const char *grc_obj_get_property_key(struct grc_obj_properties *prop)
     if (NULL == prop)
         return NULL;
 
-    return cstring_valueof(prop->key);
+    return cl_string_valueof(prop->key);
 }
 
 const char *grc_obj_get_property_parent(struct grc_obj_properties *prop)
@@ -430,7 +430,7 @@ const char *grc_obj_get_property_parent(struct grc_obj_properties *prop)
     if (NULL == prop)
         return NULL;
 
-    return cstring_valueof(prop->parent);
+    return cl_string_valueof(prop->parent);
 }
 
 const char *grc_obj_get_property_text(struct grc_obj_properties *prop)
@@ -438,7 +438,7 @@ const char *grc_obj_get_property_text(struct grc_obj_properties *prop)
     if (NULL == prop)
         return NULL;
 
-    return cstring_valueof(prop->text);
+    return cl_string_valueof(prop->text);
 }
 
 const char *grc_obj_get_property_fg(struct grc_obj_properties *prop)
@@ -446,7 +446,7 @@ const char *grc_obj_get_property_fg(struct grc_obj_properties *prop)
     if (NULL == prop)
         return NULL;
 
-    return cstring_valueof(prop->fg);
+    return cl_string_valueof(prop->fg);
 }
 
 enum grc_object grc_obj_get_property_type(struct grc_obj_properties *prop)

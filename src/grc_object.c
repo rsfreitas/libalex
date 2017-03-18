@@ -147,7 +147,7 @@ DIALOG *grc_object_get_DIALOG_from_tag(struct grc_object_s *object,
         return NULL;
     }
 
-    o = cdll_map(object, search_object_by_tag, (void *)tag);
+    o = cl_dll_map(object, search_object_by_tag, (void *)tag);
 
     if (NULL == o) {
         grc_set_errno(GRC_ERROR_OBJECT_NOT_FOUND);
@@ -166,7 +166,7 @@ MENU *grc_object_get_MENU_from_tag(struct grc_object_s *object, const char *tag)
         return NULL;
     }
 
-    o = cdll_map(object, search_object_by_tag, (void *)tag);
+    o = cl_dll_map(object, search_object_by_tag, (void *)tag);
 
     if (NULL == o) {
         grc_set_errno(GRC_ERROR_OBJECT_NOT_FOUND);

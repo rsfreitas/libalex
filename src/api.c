@@ -157,7 +157,6 @@ int LIBEXPORT grc_uninit(grc_t *grc)
 
     /* Free the object */
     destroy_grc(grc);
-    cexit();
 
     return 0;
 }
