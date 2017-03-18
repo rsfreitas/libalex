@@ -34,19 +34,19 @@
 void destroy_grc(struct grc_s *grc)
 {
     if (grc->ui_objects != NULL)
-        cdll_free(grc->ui_objects, destroy_grc_object);
+        cl_dll_free(grc->ui_objects, destroy_grc_object);
 
     if (grc->tmp_objects != NULL)
-        cdll_free(grc->tmp_objects, destroy_grc_object);
+        cl_dll_free(grc->tmp_objects, destroy_grc_object);
 
     if (grc->ui_keys != NULL)
-        cdll_free(grc->ui_keys, destroy_grc_object);
+        cl_dll_free(grc->ui_keys, destroy_grc_object);
 
     if (grc->dlg != NULL)
         free(grc->dlg);
 
     if (grc->jgrc != NULL)
-        cjson_delete(grc->jgrc);
+        cl_json_delete(grc->jgrc);
 
     if (grc->info != NULL)
         info_finish(grc->info);
@@ -173,7 +173,7 @@ struct gfx_info_s *grc_get_info(struct grc_s *grc)
     return grc->info;
 }
 
-cjson_t *grc_get_JSON(struct grc_s *grc)
+cl_json_t *grc_get_JSON(struct grc_s *grc)
 {
     if (NULL == grc)
         return NULL;
@@ -181,7 +181,7 @@ cjson_t *grc_get_JSON(struct grc_s *grc)
     return grc->jgrc;
 }
 
-int grc_set_JSON(struct grc_s *grc, cjson_t *json)
+int grc_set_JSON(struct grc_s *grc, cl_json_t *json)
 {
     if (NULL == grc)
         return -1;

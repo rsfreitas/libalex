@@ -606,17 +606,17 @@ static struct screen_key *find_clicked_button(int x, int y, int keyb_layout)
 static char *add_char(const char *s, unsigned int pos, char *c)
 {
     size_t l;
-    cstring_t *tmp = NULL;
+    cl_string_t *tmp = NULL;
     char *p = NULL;
 
     l = strlen(s);
 
     /* Are we inserting into the end? */
     if (pos == l) {
-        tmp = cstring_create("%s", s);
-        cstring_cat(tmp, "%s", c);
-        p = strdup(cstring_valueof(tmp));
-        cstring_unref(tmp);
+        tmp = cl_string_create("%s", s);
+        cl_string_cat(tmp, "%s", c);
+        p = strdup(cl_string_valueof(tmp));
+        cl_string_unref(tmp);
 
         return p;
     }
@@ -624,10 +624,10 @@ static char *add_char(const char *s, unsigned int pos, char *c)
     p = strdup(s);
     p[pos] = '\0';
 
-    tmp = cstring_create("%s%s%s", p, c, s + pos);
+    tmp = cl_string_create("%s%s%s", p, c, s + pos);
     free(p);
-    p = strdup(cstring_valueof(tmp));
-    cstring_unref(tmp);
+    p = strdup(cl_string_valueof(tmp));
+    cl_string_unref(tmp);
 
     return p;
 }
@@ -705,10 +705,10 @@ static int update_last_edit_object_value(DIALOG *d, struct grc_s *grc,
 
                 /* FIXME: We need to rewrite this... */
                 {
-                    cstring_t *__p = cstring_create("%s", tmp);
-                    cstring_idchr(__p, edit->d2 - 1);
+                    cl_string_t *__p = cl_string_create("%s", tmp);
+                    cl_string_idchr(__p, edit->d2 - 1);
                     free(tmp);
-                    tmp = strdup(cstring_valueof(__p));
+                    tmp = strdup(cl_string_valueof(__p));
                 }
 
                 ed_pos = edit->d2 - 1;

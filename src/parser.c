@@ -36,7 +36,7 @@
  */
 int parse_file(struct grc_s *grc, const char *grc_filename)
 {
-    grc->jgrc = cjson_read_file(grc_filename);
+    grc->jgrc = cl_json_read_file(grc_filename);
 
     if (NULL == grc->jgrc)
         return -1;
@@ -50,7 +50,7 @@ int parse_file(struct grc_s *grc, const char *grc_filename)
  */
 int parse_mem(struct grc_s *grc, const char *data)
 {
-    grc->jgrc = cjson_parse(data);
+    grc->jgrc = cl_json_parse(data);
 
     if (NULL == grc->jgrc)
         return -1;
@@ -178,13 +178,13 @@ static int grc_to_DIALOG(struct grc_object_s *gobject, struct grc_s *grc)
                  * Creates a temporary buffer to store the asterisks strings.
                  */
                 gdata = new_grc_generic_data();
-                gobject->g_data = cdll_unshift(gobject->g_data, gdata);
+                gobject->g_data = cl_dll_unshift(gobject->g_data, gdata);
                 d->dp2 = gdata->data;
             }
 
             /* Creates the buffer to store the typed string in the object. */
             gdata = new_grc_generic_data();
-            gobject->g_data = cdll_unshift(gobject->g_data, gdata);
+            gobject->g_data = cl_dll_unshift(gobject->g_data, gdata);
             d->dp = gdata->data;
 
             d->flags = D_EXIT;
@@ -311,7 +311,7 @@ static int grc_to_DIALOG(struct grc_object_s *gobject, struct grc_s *grc)
 /*
  * Load a standard object to the internal 'struct grc_object_s' list.
  */
-static int __load_object_to_grc(cjson_t *object, struct grc_s *grc)
+static int __load_object_to_grc(cl_json_t *object, struct grc_s *grc)
 {
     struct grc_object_s *gobj = NULL;
 
@@ -340,7 +340,7 @@ static int __load_object_to_grc(cjson_t *object, struct grc_s *grc)
     grc_object_set_tag(gobj, PROP_get(gobj->prop, name));
 
     /* Store the loaded object */
-    grc->ui_objects = cdll_unshift(grc->ui_objects, gobj);
+    grc->ui_objects = cl_dll_unshift(grc->ui_objects, gobj);
 
     return 0;
 
@@ -354,12 +354,12 @@ error_block:
 /*
  * Load all standard objects to the memory.
  */
-static int load_objects_to_grc(struct grc_s *grc, cjson_t *objects)
+static int load_objects_to_grc(struct grc_s *grc, cl_json_t *objects)
 {
     int t_objects, i;
-    cjson_t *p;
+    cl_json_t *p;
 
-    t_objects = cjson_get_array_size(objects);
+    t_objects = cl_json_get_array_size(objects);
 
     if (t_objects <= 0) {
         grc_set_errno(GRC_ERROR_NO_OBJECTS);
@@ -367,7 +367,7 @@ static int load_objects_to_grc(struct grc_s *grc, cjson_t *objects)
     }
 
     for (i = 0; i < t_objects; i++) {
-        p = cjson_get_array_item(objects, i);
+        p = cl_json_get_array_item(objects, i);
 
         if (NULL == p)
             /* TODO: set error code */
@@ -410,7 +410,7 @@ static int grc_to_key_DIALOG(struct grc_object_s *gobject, struct grc_s *grc)
 /*
  * Load a key object to the internal 'struct grc_object_s' list.
  */
-static int __load_key_to_grc(cjson_t *key, struct grc_s *grc)
+static int __load_key_to_grc(cl_json_t *key, struct grc_s *grc)
 {
     struct grc_object_s *gobj = NULL;
 
@@ -435,7 +435,7 @@ static int __load_key_to_grc(cjson_t *key, struct grc_s *grc)
     grc_object_set_tag(gobj, PROP_get(gobj->prop, name));
 
     /* Store the loaded key */
-    grc->ui_keys = cdll_unshift(grc->ui_keys, gobj);
+    grc->ui_keys = cl_dll_unshift(grc->ui_keys, gobj);
 
     return 0;
 
@@ -449,16 +449,16 @@ error_block:
 /*
  * Load all key objects to the memory.
  */
-static int load_keys_to_grc(struct grc_s *grc, cjson_t *keys)
+static int load_keys_to_grc(struct grc_s *grc, cl_json_t *keys)
 {
     int t_keys, i;
-    cjson_t *p;
+    cl_json_t *p;
 
     /* Maybe there is no "keys" object inside the GRC */
     if (NULL == keys)
         return 0;
 
-    t_keys = cjson_get_array_size(keys);
+    t_keys = cl_json_get_array_size(keys);
 
     if (t_keys <= 0) {
         grc_set_errno(GRC_ERROR_NO_KEYS);
@@ -468,7 +468,7 @@ static int load_keys_to_grc(struct grc_s *grc, cjson_t *keys)
     info_set_value(grc->info, INFO_ESC_KEY_USER_DEFINED, false, NULL);
 
     for (i = 0; i < t_keys; i++) {
-        p = cjson_get_array_item(keys, i);
+        p = cl_json_get_array_item(keys, i);
 
         if (NULL == p)
             /* TODO: set error code */
@@ -482,17 +482,17 @@ static int load_keys_to_grc(struct grc_s *grc, cjson_t *keys)
     return 0;
 }
 
-static int load_menu_items(cjson_t *menu, struct grc_object_s *gobject)
+static int load_menu_items(cl_json_t *menu, struct grc_object_s *gobject)
 {
-    cjson_t *items, *p;
+    cl_json_t *items, *p;
     int i, t;
     struct grc_object_s *gobj = NULL;
 
-    items = cjson_get_object_item(menu, "items");
-    t = cjson_get_array_size(items);
+    items = cl_json_get_object_item(menu, "items");
+    t = cl_json_get_array_size(items);
 
     for (i = 0; i < t; i++) {
-        p = cjson_get_array_item(items, i);
+        p = cl_json_get_array_item(items, i);
 
         if (NULL == p)
             /* TODO: set error code */
@@ -515,7 +515,7 @@ static int load_menu_items(cjson_t *menu, struct grc_object_s *gobject)
         grc_object_set_tag(gobj, PROP_get(gobj->prop, name));
 
         /* Store the item */
-        gobject->items = cdll_unshift(gobject->items, gobj);
+        gobject->items = cl_dll_unshift(gobject->items, gobj);
     }
 
     return 0;
@@ -527,7 +527,7 @@ error_block:
     return -1;
 }
 
-static int __load_menu_to_grc(cjson_t *menu, struct grc_s *grc)
+static int __load_menu_to_grc(cl_json_t *menu, struct grc_s *grc)
 {
     struct grc_object_s *gobj = NULL;
 
@@ -548,7 +548,7 @@ static int __load_menu_to_grc(cjson_t *menu, struct grc_s *grc)
     load_menu_items(menu, gobj);
 
     /* Store the loaded menu */
-    grc->ui_menu = cdll_unshift(grc->ui_menu, gobj);
+    grc->ui_menu = cl_dll_unshift(grc->ui_menu, gobj);
 
     return 0;
 
@@ -562,9 +562,9 @@ error_block:
 /*
  * Load the menu to the memory.
  */
-static int load_menu_to_grc(struct grc_s *grc, cjson_t *menu)
+static int load_menu_to_grc(struct grc_s *grc, cl_json_t *menu)
 {
-    cjson_t *p;
+    cl_json_t *p;
     int i, t_menu;
 
     /* Maybe there is no "menu" object inside the GRC */
@@ -572,10 +572,10 @@ static int load_menu_to_grc(struct grc_s *grc, cjson_t *menu)
         return 0;
 
     /* Extracts menus and items informations */
-    t_menu = cjson_get_array_size(menu);
+    t_menu = cl_json_get_array_size(menu);
 
     for (i = 0; i < t_menu; i++) {
-        p = cjson_get_array_item(menu, i);
+        p = cl_json_get_array_item(menu, i);
 
         if (NULL == p)
             /* TODO: set error code */
@@ -595,7 +595,7 @@ static int load_menu_to_grc(struct grc_s *grc, cjson_t *menu)
  */
 int parse_objects(struct grc_s *grc)
 {
-    cjson_t *n;
+    cl_json_t *n;
 
     n = grc_get_object(grc, OBJ_OBJECTS);
 
@@ -627,45 +627,45 @@ int parse_objects(struct grc_s *grc)
  * Get the object value from within a GRC file, expecting to be a GRC_NUMBER
  * or a GRC_BOOL object.
  */
-int grc_get_object_value(cjson_t *object, const char *object_name,
+int grc_get_object_value(cl_json_t *object, const char *object_name,
     int default_value)
 {
-    cjson_t *n = NULL;
-    enum cjson_type type;
-    cstring_t *s = NULL;
+    cl_json_t *n = NULL;
+    enum cl_json_type type;
+    cl_string_t *s = NULL;
     int v = 0;
 
-    n = cjson_get_object_item(object, object_name);
+    n = cl_json_get_object_item(object, object_name);
 
     if (NULL == n)
         return default_value;
 
-    type = cjson_get_object_type(n);
+    type = cl_json_get_object_type(n);
 
-    if (type == CJSON_NUMBER) {
-        s = cjson_get_object_value(n);
-        v = cstring_to_int(s);
+    if (type == CL_JSON_NUMBER) {
+        s = cl_json_get_object_value(n);
+        v = cl_string_to_int(s);
 
         return v;
     }
 
-    return (type == CJSON_TRUE ? true : false);
+    return (type == CL_JSON_TRUE ? true : false);
 }
 
 /*
  * Get the object value from within a GRC file, expecting to be a GRC_STRING
  * object.
  */
-cstring_t *grc_get_object_str(cjson_t *object, const char *object_name)
+cl_string_t *grc_get_object_str(cl_json_t *object, const char *object_name)
 {
-    cjson_t *n = NULL;
+    cl_json_t *n = NULL;
 
-    n = cjson_get_object_item(object, object_name);
+    n = cl_json_get_object_item(object, object_name);
 
     if (NULL == n)
         return NULL;
 
-    /* XXX: This returns a new cstring_ref */
-    return cjson_get_object_value(n);
+    /* XXX: This returns a new cl_string_ref */
+    return cl_json_get_object_value(n);
 }
 

@@ -183,7 +183,7 @@ int info_get_value(struct gfx_info_s *info, enum gfx_info field)
  */
 int info_parse(struct grc_s *grc)
 {
-    cjson_t *jinfo;
+    cl_json_t *jinfo;
     struct property_detail *dt;
 
     jinfo = grc_get_object(grc, OBJ_INFO);

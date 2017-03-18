@@ -183,21 +183,21 @@ struct gfx_info_s;
 struct gfx_color_s;
 
 struct grc_generic_data {
-    clist_t     *prev;
-    clist_t     *next;
-    char        data[MAX_EDIT_SIZE];
+    cl_list_entry_t *prev;
+    cl_list_entry_t *next;
+    char            data[MAX_EDIT_SIZE];
 };
 
 struct grc_object_s {
-    clist_t                     *prev;
-    clist_t                     *next;
+    cl_list_entry_t             *prev;
+    cl_list_entry_t             *next;
 
     enum grc_object_type        type;       /** Object type */
     char                        *tag;       /** Reference tag */
 
     DIALOG                      *dlg;       /** Real Allegro's DIALOG object */
     struct callback_data        *cb_data;   /** Object's callback */
-    struct grc_generic_data     *g_data; // TODO: Replace this for a cstring_list_t
+    struct grc_generic_data     *g_data; // TODO: Replace this for a cl_string_list_t
     struct grc_obj_properties   *prop;
 
     /* Maybe this a 'digital_clock' object */
@@ -211,7 +211,7 @@ struct grc_object_s {
 /* Main structure to handle an Allegro DIALOG */
 struct grc_s {
     /* GRC is a JSON object inside */
-    cjson_t                 *jgrc;
+    cl_json_t                 *jgrc;
 
     /*
      * Even having a DIALOG structure inside every grc_object we keep this
@@ -256,10 +256,10 @@ struct grc_menu *get_grc_menu_from_grc(struct grc_s *grc,
 MENU *get_MENU_from_grc(struct grc_s *grc, const char *object_name);
 
 /* parser.c */
-int grc_get_object_value(cjson_t *object, const char *object_name,
+int grc_get_object_value(cl_json_t *object, const char *object_name,
                          int default_value);
 
-cstring_t *grc_get_object_str(cjson_t *object, const char *object_name);
+cl_string_t *grc_get_object_str(cl_json_t *object, const char *object_name);
 int parse_file(struct grc_s *grc, const char *grc_filename);
 int parse_mem(struct grc_s *grc, const char *data);
 int parse_colors(struct grc_s *grc);
@@ -294,8 +294,8 @@ void grc_creates_reference(struct grc_s *grc, struct grc_object_s *object);
 DIALOG *grc_get_DIALOG_from_tag(struct grc_s *grc, const char *tag);
 MENU *grc_get_MENU_from_tag(struct grc_s *grc, const char *tag);
 struct gfx_info_s *grc_get_info(struct grc_s *grc);
-cjson_t *grc_get_JSON(struct grc_s *grc);
-int grc_set_JSON(struct grc_s *grc, cjson_t *json);
+cl_json_t *grc_get_JSON(struct grc_s *grc);
+int grc_set_JSON(struct grc_s *grc, cl_json_t *json);
 void *grc_get_internal_data(struct grc_s *grc);
 void grc_release_internal_data(struct grc_s *grc);
 int grc_set_internal_data(struct grc_s *grc, void *ptr,
@@ -320,7 +320,7 @@ MENU *grc_object_get_MENU_from_tag(struct grc_object_s *object, const char *tag)
 
 /* object_properties.c */
 void destroy_obj_properties(struct grc_obj_properties *odata);
-struct grc_obj_properties *new_obj_properties(cjson_t *object);
+struct grc_obj_properties *new_obj_properties(cl_json_t *object);
 bool grc_obj_properties_has_name(struct grc_obj_properties *prop);
 bool grc_obj_properties_has_parent(struct grc_obj_properties *prop);
 bool grc_obj_properties_has_fg(struct grc_obj_properties *prop);
@@ -370,7 +370,7 @@ const char *str_radio_type(enum grc_radio_button_fmt radio);
 const char *str_horizontal_position(enum grc_horizontal_position hpos);
 const char *str_line_break(enum grc_line_break lbreak);
 const char *str_grc_obj_type(enum grc_object obj);
-cjson_t *grc_get_object(struct grc_s *grc, const char *object);
+cl_json_t *grc_get_object(struct grc_s *grc, const char *object);
 
 /* colors.c */
 int color_parse(struct grc_s *grc);

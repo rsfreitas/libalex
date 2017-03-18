@@ -218,9 +218,9 @@ const char *str_grc_obj_type(enum grc_object obj)
     return n;
 }
 
-cjson_t *grc_get_object(struct grc_s *grc, const char *object)
+cl_json_t *grc_get_object(struct grc_s *grc, const char *object)
 {
-    return cjson_get_object_item(grc->jgrc, object);
+    return cl_json_get_object_item(grc->jgrc, object);
 }
 
 static int special_keys(const char *key)
@@ -259,39 +259,39 @@ static int key_char(const char *key)
  */
 int tr_str_key_to_al_key(const char *skey)
 {
-    cstring_t *tmp = NULL, *p = NULL;
-    cstring_list_t *list = NULL;
+    cl_string_t *tmp = NULL, *p = NULL;
+    cl_string_list_t *list = NULL;
     int ret = -1;
 
-    tmp = cstring_create("%s", skey);
+    tmp = cl_string_create("%s", skey);
 
     if (NULL == tmp)
         return -1;
 
-    list = cstring_split(tmp, "_");
+    list = cl_string_split(tmp, "_");
 
     if (NULL == list)
         goto end_block;
 
-    if (cstring_list_size(list) != 2)
+    if (cl_string_list_size(list) != 2)
         goto end_block;
 
     /* ok */
-    p = cstring_list_get(list, 1);
+    p = cl_string_list_get(list, 1);
 
-    if (cstring_length(p) == 1)
-        ret = key_char(cstring_valueof(p));
+    if (cl_string_length(p) == 1)
+        ret = key_char(cl_string_valueof(p));
     else
-        ret = special_keys(cstring_valueof(p));
+        ret = special_keys(cl_string_valueof(p));
 
-    cstring_unref(p);
+    cl_string_unref(p);
 
 end_block:
     if (tmp != NULL)
-        cstring_unref(tmp);
+        cl_string_unref(tmp);
 
     if (list != NULL)
-        cstring_list_destroy(list);
+        cl_string_list_destroy(list);
 
     return ret;
 }

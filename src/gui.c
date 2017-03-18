@@ -33,7 +33,7 @@
  */
 void gui_reset_resolution(void)
 {
-    cmsleep(100);
+    cl_msleep(100);
     set_gfx_mode(GFX_TEXT, 0, 0, 0, 0);
     remove_keyboard();
     allegro_exit();
@@ -59,7 +59,7 @@ static void DIALOG_creation_start(DIALOG *dlg, struct grc_s *grc)
     dlg[0] = *p;
 
     /* Saves this new objects so we can free it later */
-    grc->tmp_objects = cdll_unshift(grc->tmp_objects, gobj);
+    grc->tmp_objects = cl_dll_unshift(grc->tmp_objects, gobj);
 }
 
 static void DIALOG_creation_finish(DIALOG *dlg, unsigned int index,
@@ -79,7 +79,7 @@ static void DIALOG_creation_finish(DIALOG *dlg, unsigned int index,
     dlg[index] = *p;
 
     /* Saves this new objects so we can free it later */
-    grc->tmp_objects = cdll_unshift(grc->tmp_objects, gobj);
+    grc->tmp_objects = cl_dll_unshift(grc->tmp_objects, gobj);
 
     /* Create the real end of the DIALOG */
     gobj = new_grc_object(STANDARD_OBJECT);
@@ -93,7 +93,7 @@ static void DIALOG_creation_finish(DIALOG *dlg, unsigned int index,
     dlg[index + 1] = *p;
 
     /* Saves this new objects so we can free it later */
-    grc->tmp_objects = cdll_unshift(grc->tmp_objects, gobj);
+    grc->tmp_objects = cl_dll_unshift(grc->tmp_objects, gobj);
 }
 
 /*
@@ -134,7 +134,7 @@ static int DIALOG_add_default_esc_key(DIALOG *dlg, unsigned int index,
     dlg[index] = *p;
 
     /* Saves this new objects so we can free it later */
-    grc->tmp_objects = cdll_unshift(grc->tmp_objects, gobj);
+    grc->tmp_objects = cl_dll_unshift(grc->tmp_objects, gobj);
 
     /*
      * We need to tell if the item was inserted or not, that's why the
@@ -185,12 +185,12 @@ static int create_menu(unsigned int index, void *a, void *b)
 
     if (o->items != NULL) {
         /* Create the menu and insert all its items */
-        m = calloc(cdll_size(o->items) + 1, sizeof(MENU));
+        m = calloc(cl_dll_size(o->items) + 1, sizeof(MENU));
 
         if (NULL == m)
             return -1;
 
-        cdll_map_indexed(o->items, create_menu_item, m);
+        cl_dll_map_indexed(o->items, create_menu_item, m);
         grc_object_set_MENU(o, m);
     }
 
@@ -217,13 +217,13 @@ static void DIALOG_add_menu(DIALOG *dlg, unsigned int index, struct grc_s *grc)
     p = gobj->dlg;
 
     /* Create the main menu */
-    m = calloc(cdll_size(grc->ui_menu) + 1, sizeof(MENU));
+    m = calloc(cl_dll_size(grc->ui_menu) + 1, sizeof(MENU));
 
     if (NULL == m)
         goto error_block;
 
     /* Create all menus and insert them into the main menu */
-    cdll_map_indexed(grc->ui_menu, create_menu, m);
+    cl_dll_map_indexed(grc->ui_menu, create_menu, m);
     grc_object_set_MENU(gobj, m);
 
     /*
@@ -241,7 +241,7 @@ static void DIALOG_add_menu(DIALOG *dlg, unsigned int index, struct grc_s *grc)
     dlg[index] = *p;
 
     /* Saves this new objects so we can free it later */
-    grc->tmp_objects = cdll_unshift(grc->tmp_objects, gobj);
+    grc->tmp_objects = cl_dll_unshift(grc->tmp_objects, gobj);
 
     return;
 
@@ -274,11 +274,11 @@ int DIALOG_create(struct grc_s *grc)
     if (info_get_value(grc->info, INFO_IGNORE_ESC_KEY) == true)
         dlg_items += 1;
 
-    dlg_items += cdll_size(grc->ui_objects);
-    dlg_items += cdll_size(grc->ui_keys);
+    dlg_items += cl_dll_size(grc->ui_objects);
+    dlg_items += cl_dll_size(grc->ui_keys);
 
     /* We only have one menu */
-    dlg_items += (cdll_size(grc->ui_menu) > 0 ? 1 : 0);
+    dlg_items += (cl_dll_size(grc->ui_menu) > 0 ? 1 : 0);
 
     /*
      * The total size of the DIALOG will be the amount of keys + the amount of
